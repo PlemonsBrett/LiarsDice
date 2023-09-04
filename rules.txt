@@ -1,0 +1,11 @@
+Starting Turn: Highest dice roll decides the first player. Winner of last round goes first in subsequent rounds.
+Setup: Each player has 5 dice, known as their "stash." All dice together form "the pool."
+Dice Roll: All players shake their dice in a cup and reveal them secretly to themselves.
+Making a Call: Player One guesses the number of a specific dice face in the entire pool.
+Next Player's Turn: If believed, the next player must make a higher call. (e.g., "two fives" must be followed by at least "three fives.")
+Calling a Liar: If a player is not believed, all dice are revealed.
+Determining Winner:
+    If the call was correct, the caller wins.
+    If the call was incorrect, the one who called "liar" wins.
+Forfeit: Loser pays a forfeit, like a shot or token.
+Continuation: The game continues until a set number of rounds, a time limit, or players decide to end.
