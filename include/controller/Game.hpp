@@ -18,7 +18,7 @@ public:
   std::string ReadRulesFromFile(const std::string& filename);
   void SetupPlayers();
   void PlayGame();
-  bool ValidateGuess(const std::pair<int, int>& new_guess, const std::pair<int, int>& last_guess);
+  std::string ValidateGuess(const std::pair<int, int>& new_guess, const std::pair<int, int>& last_guess);
   std::string CheckGuessAgainstDice(const std::pair<int, int>& last_guess);
 
 private:

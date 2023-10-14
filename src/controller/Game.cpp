@@ -5,6 +5,7 @@
 #include "Game.hpp"
 #include <iostream>
 #include <fstream>
+#include <sstream>
 
 // Constructor implementation
 Game::Game() : currentPlayerIndex(0), lastGuess({0, 0}) {
@@ -55,10 +56,17 @@ void Game::PlayGame() {
   while (true) {
     Player& currentPlayer = players[currentPlayerIndex];
     currentPlayer.DisplayDice();
-    auto guess = currentPlayer.MakeGuess();
 
-    if (!ValidateGuess(guess, lastGuess)) {
-      std::cout << "Invalid guess. Try again.\n";
+    if (lastGuess.first != 0 || lastGuess.second != 0) {
+      std::cout << "Last guess was (" << lastGuess.first << ", " << lastGuess.second << ")\n";
+    }
+
+    auto guess = currentPlayer.MakeGuess();
+    std::string validationError = ValidateGuess(guess, lastGuess);
+
+    if (!validationError.empty()) {
+      std::cout << validationError;
+      currentPlayer.DisplayDice();  // Show the current player's dice again after the error message
       continue;
     }
 
@@ -77,12 +85,31 @@ void Game::PlayGame() {
   }
 }
 
-bool Game::ValidateGuess(const std::pair<int, int>& new_guess, const std::pair<int, int>& last_guess) {
-  return (last_guess.first == 0 && last_guess.second == 0) ||  // First turn
-      (new_guess.first > last_guess.first) ||  // More dice
-      (new_guess.first == last_guess.first && new_guess.second > last_guess.second) ||  // Same number, higher face
-      (new_guess.first < last_guess.first && new_guess.second > last_guess.second);  // Fewer dice, but higher face
+std::string Game::ValidateGuess(const std::pair<int, int>& new_guess, const std::pair<int, int>& last_guess) {
+  std::stringstream errorMsg;
+
+  if (last_guess.first != 0 || last_guess.second != 0) {
+    errorMsg << "Last guess was (" << last_guess.first << ", " << last_guess.second << ")\n";
+  }
+
+  if (new_guess.first < last_guess.first && new_guess.second <= last_guess.second) {
+    errorMsg << "Invalid guess. You have fewer dice but the face value is not greater than the last guess.\n";
+    return errorMsg.str();
+  }
+
+  if (new_guess.first == last_guess.first && new_guess.second <= last_guess.second) {
+    errorMsg << "Invalid guess. You have the same number of dice but the face value is not greater.\n";
+    return errorMsg.str();
+  }
+
+  if (new_guess.first <= last_guess.first && new_guess.second < last_guess.second) {
+    errorMsg << "Invalid guess. You must either have more dice or a greater face value.\n";
+    return errorMsg.str();
+  }
+
+  return ""; // Valid guess
 }
+
 
 std::string Game::CheckGuessAgainstDice(const std::pair<int, int>& last_guess) {
   int counter = 0;
