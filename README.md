@@ -2,6 +2,9 @@
 Liar’s Dice is a multiplayer dice game with a minimum of two players and no upper limit on the number
 of participants. The goal is to make a correct guess or correctly call another player a liar.
 
+# Scenario
+Liar’s Dice uses 5 dice per player (so 15 dice for three people, 20 dice for four people, and so on). The object of the game is to guess how many of a particular die sides are showing among all the players, knowing only your own set. Each player’s guess has to increase the number of die sides on the table. Guessing continues until a player is called out as a “liar” and all the dice are revealed.
+
 # Background
 _Most of the information below came from this [article](https://www.thoughtco.com/how-to-play-liars-dice-687532)._
 
@@ -31,3 +34,33 @@ two must call out three or higher for his or her first number, so “three fives
 four twos” would all be acceptable. “One five” or “two sixes” would be unacceptable.
 - Game play continues until someone is called out.
 
+# Project Structure
+```md
+LiarDiceGame/
+│
+├── src/
+│   ├── controller/
+│   │   └── Game.cpp
+│   ├── model/
+│   │   ├── Player.cpp
+│   │   └── Dice.cpp
+│   ├── views/
+│   └── main.cpp
+│
+├── include/
+│   ├── controller/
+│   │   └── Game.hpp
+│   ├── model/
+│   │   ├── Player.hpp
+│   │   └── Dice.hpp
+│   └── views/
+│
+├── assets/
+│   └── rules.txt
+│
+├── build/ (or dist/)
+│
+├── CMakeLists.txt
+│
+└── README.md
+```

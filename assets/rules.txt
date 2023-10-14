@@ -7,5 +7,3 @@ Calling a Liar: If a player is not believed, all dice are revealed.
 Determining Winner:
     If the call was correct, the caller wins.
     If the call was incorrect, the one who called "liar" wins.
-Forfeit: Loser pays a forfeit, like a shot or token.
-Continuation: The game continues until a set number of rounds, a time limit, or players decide to end.
