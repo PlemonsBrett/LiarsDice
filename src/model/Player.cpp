@@ -4,6 +4,7 @@
 //
 
 #include "model/Player.hpp"
+#include "exceptions/InputException.hpp"
 #include <iostream>
 #include <sstream>
 #include <utility>
@@ -50,7 +51,10 @@ Guess Player::MakeGuess() {
       break;
     }
 
-    std::cout << "Invalid input. Please try again.\n";
+    std::cerr << "Invalid input: " << input << std::endl;
+    std::cerr << "Please try again. Example: 3,4" << std::endl;
+
+    // Clear the input buffer
     std::cin.clear();
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
   }
