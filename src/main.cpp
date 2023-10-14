@@ -1,27 +1,38 @@
 #include "Game.hpp"
 #include <iostream>
+#include <limits>
+
+namespace LiarsDice {
+
+const std::string PLAY_AGAIN_YES = "yes";
+const std::string WELCOME_MESSAGE = "Welcome to Liar's Dice!\n";
+const std::string GOODBYE_MESSAGE = "Thank you for playing Liar's Dice!\n";
+const std::string PLAY_AGAIN_PROMPT = "Do you want to play again? (yes/no): ";
 
 int main() {
   std::string playAgain;
 
-  // Show Welcome Message
-  std::cout << "Welcome to Liar's Dice!\n";
+  // Display the welcome message
+  std::cout << WELCOME_MESSAGE;
 
   do {
-    // Initialize the Game
+    // Initialize and start the game
     Game game;
     game.Init();
 
-    // Ask the user if they want to play again
-    std:: cout << "Do you want to play again? (yes/no): ";
+    // Prompt the user to play again
+    std::cout << PLAY_AGAIN_PROMPT;
     std::cin >> playAgain;
 
-    // Clear the input buffer to make sure cin works correctly in the next iteration
+    // Clear the input buffer to ensure proper functioning of cin in the next iteration
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-  } while (playAgain == "yes");
+  } while (playAgain == PLAY_AGAIN_YES);
 
-  // Goodbye Message;
-  std::cout << "Thank you for playing Liar's Dice!\n";
+  // Display the goodbye message
+  std::cout << GOODBYE_MESSAGE;
 
   return 0;
 }
+
+} // namespace LiarsDice
+
