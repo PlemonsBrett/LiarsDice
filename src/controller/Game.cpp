@@ -1,11 +1,13 @@
 //
 // Created by Brett on 9/4/2023.
+// This file contains the implementation of the Game class, which handles the game logic for Liar's Dice.
 //
 
 #include "Game.hpp"
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <stdexcept>
 
 // Constructor implementation
 Game::Game() : currentPlayerIndex(0), lastGuess({0, 0}) {
@@ -23,8 +25,7 @@ std::string Game::ReadRulesFromFile(const std::string& filename) {
   std::string rulesContent;
   std::ifstream file_handle(filename);
   if (!file_handle) {
-    std::cout << "Error: Could not open rules file.\n";
-    return "";
+    throw std::runtime_error("Error: Could not open rules file.");
   }
   std::string line;
   while (std::getline(file_handle, line)) {
@@ -34,6 +35,7 @@ std::string Game::ReadRulesFromFile(const std::string& filename) {
 }
 
 void Game::SetupPlayers() {
+  // Validate the number of players
   std::cout << "Enter the number of players: ";
   int num_players;
   std::cin >> num_players;
@@ -55,18 +57,13 @@ void Game::SetupPlayers() {
 void Game::PlayGame() {
   while (true) {
     Player& currentPlayer = players[currentPlayerIndex];
-    currentPlayer.DisplayDice();
-
-    if (lastGuess.first != 0 || lastGuess.second != 0) {
-      std::cout << "Last guess was (" << lastGuess.first << ", " << lastGuess.second << ")\n";
-    }
+    displayCurrentState(currentPlayer);
 
     auto guess = currentPlayer.MakeGuess();
     std::string validationError = ValidateGuess(guess, lastGuess);
 
     if (!validationError.empty()) {
       std::cout << validationError;
-      currentPlayer.DisplayDice();  // Show the current player's dice again after the error message
       continue;
     }
 
@@ -78,31 +75,42 @@ void Game::PlayGame() {
       break;
     }
 
-    ++currentPlayerIndex;
-    if (currentPlayerIndex >= players.size()) {
-      currentPlayerIndex = 0;
-    }
+    updateCurrentPlayerIndex();
   }
 }
 
-std::string Game::ValidateGuess(const std::pair<int, int>& new_guess, const std::pair<int, int>& last_guess) {
+void Game::displayCurrentState(Player& currentPlayer) {
+  currentPlayer.DisplayDice();
+  if (lastGuess.diceCount != 0 || lastGuess.diceValue != 0) {
+    std::cout << "Last guess was (" << lastGuess.diceCount << ", " << lastGuess.diceValue << ")\n";
+  }
+}
+
+void Game::updateCurrentPlayerIndex() {
+  ++currentPlayerIndex;
+  if (currentPlayerIndex >= players.size()) {
+    currentPlayerIndex = 0;
+  }
+}
+
+std::string Game::ValidateGuess(const Guess& new_guess, const Guess& last_guess) {
   std::stringstream errorMsg;
 
-  if (last_guess.first != 0 || last_guess.second != 0) {
-    errorMsg << "Last guess was (" << last_guess.first << ", " << last_guess.second << ")\n";
+  if (last_guess.diceCount != 0 || last_guess.diceValue != 0) {
+    errorMsg << "Last guess was (" << last_guess.diceCount << ", " << last_guess.diceValue << ")\n";
   }
 
-  if (new_guess.first < last_guess.first && new_guess.second <= last_guess.second) {
+  if (new_guess.diceCount < last_guess.diceCount && new_guess.diceValue <= last_guess.diceValue) {
     errorMsg << "Invalid guess. You have fewer dice but the face value is not greater than the last guess.\n";
     return errorMsg.str();
   }
 
-  if (new_guess.first == last_guess.first && new_guess.second <= last_guess.second) {
+  if (new_guess.diceCount == last_guess.diceCount && new_guess.diceValue <= last_guess.diceValue) {
     errorMsg << "Invalid guess. You have the same number of dice but the face value is not greater.\n";
     return errorMsg.str();
   }
 
-  if (new_guess.first <= last_guess.first && new_guess.second < last_guess.second) {
+  if (new_guess.diceCount <= last_guess.diceCount && new_guess.diceValue < last_guess.diceValue) {
     errorMsg << "Invalid guess. You must either have more dice or a greater face value.\n";
     return errorMsg.str();
   }
@@ -111,14 +119,14 @@ std::string Game::ValidateGuess(const std::pair<int, int>& new_guess, const std:
 }
 
 
-std::string Game::CheckGuessAgainstDice(const std::pair<int, int>& last_guess) {
+std::string Game::CheckGuessAgainstDice(const Guess& last_guess) {
   int counter = 0;
   for (const auto& player : players) {
     for (const auto& die : player.GetDice()) {
-      if (die.GetFaceValue() == last_guess.second) {
+      if (die.GetFaceValue() == last_guess.diceValue) {
         ++counter;
       }
     }
   }
-  return (counter >= last_guess.first) ? "Guessing Player" : "Calling Player";
+  return (counter >= last_guess.diceCount) ? "Guessing Player" : "Calling Player";
 }

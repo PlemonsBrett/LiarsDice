@@ -44,6 +44,8 @@ private:
   int currentPlayerIndex;
   Guess lastGuess;
   std::string rulesText;
+  void updateCurrentPlayerIndex();
+  void displayCurrentState(Player &currentPlayer);
 };
 
 #endif //GAME_HPP
