@@ -1,5 +1,6 @@
 //
 // Created by Brett on 9/4/2023.
+// This class handles the game logic for Liar's Dice.
 //
 
 #ifndef GAME_HPP
@@ -10,23 +11,39 @@
 #include <utility>
 #include "Player.hpp"
 
+// Struct to represent a guess
+struct Guess {
+  int diceValue;
+  int diceCount;
+};
+
 class Game {
 public:
   Game();
+
+  // Initializes the game
   void Init();
 
+  // Reads game rules from a file
   std::string ReadRulesFromFile(const std::string& filename);
+
+  // Sets up players for the game
   void SetupPlayers();
+
+  // Main game loop
   void PlayGame();
-  std::string ValidateGuess(const std::pair<int, int>& new_guess, const std::pair<int, int>& last_guess);
-  std::string CheckGuessAgainstDice(const std::pair<int, int>& last_guess);
+
+  // Validates a new guess against the last guess
+  std::string ValidateGuess(const Guess& new_guess, const Guess& last_guess);
+
+  // Checks the last guess against the actual dice
+  std::string CheckGuessAgainstDice(const Guess& last_guess);
 
 private:
   std::vector<Player> players;
   int currentPlayerIndex;
-  std::pair<int, int> lastGuess;
+  Guess lastGuess;
   std::string rulesText;
 };
 
 #endif //GAME_HPP
-
