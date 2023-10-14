@@ -18,6 +18,10 @@ set(SOURCES
         ./src/model/Dice.cpp
         ./src/model/Player.cpp
         ./src/main.cpp
+        include/exceptions/CustomException.hpp
+        include/exceptions/FileException.hpp
+        include/exceptions/InputException.hpp
+        include/exceptions/GameLogicException.hpp
 )
 
 # Define the executable and link it with the source files
