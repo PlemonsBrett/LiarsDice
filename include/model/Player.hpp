@@ -8,6 +8,7 @@
 
 #include <vector>
 #include "Dice.hpp"
+#include "controller/Game.hpp"
 
 class Player {
 public:
@@ -21,7 +22,7 @@ public:
   void DisplayDice();
 
   // Allows the player to make a guess
-  std::pair<int, int> MakeGuess();
+  Guess MakeGuess();
 
   // Allows the player to call "Liar" on another player's guess
   bool CallLiar();

@@ -9,8 +9,7 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Include directories for controller and model
-include_directories(./include/controller)
-include_directories(./include/model)
+include_directories(./include)
 
 # List of source files
 set(SOURCES

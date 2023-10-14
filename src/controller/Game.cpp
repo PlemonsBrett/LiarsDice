@@ -3,7 +3,8 @@
 // This file contains the implementation of the Game class, which handles the game logic for Liar's Dice.
 //
 
-#include "Game.hpp"
+#include "controller/Game.hpp"
+#include "exceptions/FileException.hpp"
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -15,8 +16,15 @@ Game::Game() : currentPlayerIndex(0), lastGuess({0, 0}) {
 }
 
 void Game::Init() {
-  rulesText = ReadRulesFromFile("./assets/rules.txt");
-  std::cout << rulesText;
+  try {
+    rulesText = ReadRulesFromFile("./assets/rules.txt");
+    std::cout << rulesText;
+  } catch (const FileException& e) {
+    std::cerr << e.what() << std::endl;
+    std::cerr << "Ensure 'assets/rules.txt' exists in the same directory as 'LiarsDice.exe'.";
+    exit(EXIT_FAILURE); // Exit the game
+  }
+
   SetupPlayers();
   PlayGame();
 }
@@ -24,9 +32,12 @@ void Game::Init() {
 std::string Game::ReadRulesFromFile(const std::string& filename) {
   std::string rulesContent;
   std::ifstream file_handle(filename);
+
+  // Check if the file could be opened
   if (!file_handle) {
-    throw std::runtime_error("Error: Could not open rules file.");
+    throw FileException("Could not open rules.txt");
   }
+
   std::string line;
   while (std::getline(file_handle, line)) {
     rulesContent += line + '\n';
@@ -59,7 +70,7 @@ void Game::PlayGame() {
     Player& currentPlayer = players[currentPlayerIndex];
     displayCurrentState(currentPlayer);
 
-    auto guess = currentPlayer.MakeGuess();
+    Guess guess = currentPlayer.MakeGuess();
     std::string validationError = ValidateGuess(guess, lastGuess);
 
     if (!validationError.empty()) {

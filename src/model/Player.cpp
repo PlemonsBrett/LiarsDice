@@ -3,7 +3,7 @@
 // This file contains the implementation of the Player class, which represents a player in the game of Liar's Dice.
 //
 
-#include "Player.hpp"
+#include "model/Player.hpp"
 #include <iostream>
 #include <sstream>
 #include <utility>
@@ -32,8 +32,8 @@ void Player::DisplayDice() {
 }
 
 // Allow the player to make a guess
-std::pair<int, int> Player::MakeGuess() {
-  std::pair<int, int> guess;
+Guess Player::MakeGuess() {
+  Guess guess{};
   // Loop until a valid guess is made
   while (true) {
     std::cout << "Enter your guess in format (quantity, face_value): ";
