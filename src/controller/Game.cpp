@@ -11,7 +11,6 @@
 #include <stdexcept>
 
 // Named constants
-const std::string CLEAR_SCREEN_CODE = "\033c";
 const std::string INVALID_GUESS_MSG_GENERAL = "Invalid guess. You must either have more dice or a greater face value"
                                               ".\n";
 const std::string INVALID_GUESS_MSG_FACE_VALUE = "Invalid guess. You have the same number of dice but the face value "
@@ -79,7 +78,7 @@ void Game::GetSetupInput(int& num_players) {
 void Game::PlayGame() {
   while (true) {
     // Clear the screen
-    std::cout << CLEAR_SCREEN_CODE; // ANSI escape code to clear screen
+    system("cls");
 
     // Display the rules
     std::cout << rulesText;
