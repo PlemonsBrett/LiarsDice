@@ -3,8 +3,8 @@
 // This file contains the implementation of the Game class, which handles the game logic for Liar's Dice.
 //
 
-#include "controller/Game.hpp"
-#include "exceptions/FileException.hpp"
+#include "Game.hpp"
+#include "FileException.hpp"
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -70,7 +70,7 @@ void Game::PlayGame() {
     Player& currentPlayer = players[currentPlayerIndex];
     displayCurrentState(currentPlayer);
 
-    Guess guess = currentPlayer.MakeGuess();
+    auto guess = Guess(currentPlayer.MakeGuess());
     std::string validationError = ValidateGuess(guess, lastGuess);
 
     if (!validationError.empty()) {
@@ -90,7 +90,7 @@ void Game::PlayGame() {
   }
 }
 
-void Game::displayCurrentState(Player& currentPlayer) {
+void Game::displayCurrentState(Player& currentPlayer) const {
   currentPlayer.DisplayDice();
   if (lastGuess.diceCount != 0 || lastGuess.diceValue != 0) {
     std::cout << "Last guess was (" << lastGuess.diceCount << ", " << lastGuess.diceValue << ")\n";

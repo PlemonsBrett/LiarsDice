@@ -9,12 +9,18 @@
 #include <vector>
 #include <string>
 #include <utility>
-#include "model/Player.hpp"
+#include "Player.hpp"
 
 // Struct to represent a guess
 struct Guess {
   int diceValue;
   int diceCount;
+
+  // Convert pair<int, int> into Guess
+  explicit Guess(std::pair<int, int> guess_pair) {
+    diceCount = guess_pair.first;
+    diceValue = guess_pair.second;
+  }
 };
 
 class Game {
@@ -45,7 +51,7 @@ private:
   Guess lastGuess;
   std::string rulesText;
   void updateCurrentPlayerIndex();
-  void displayCurrentState(Player &currentPlayer);
+  void displayCurrentState(Player &currentPlayer) const;
 };
 
 #endif //GAME_HPP

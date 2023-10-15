@@ -8,8 +8,10 @@ project(LiarsDice)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Include directories for controller and model
-include_directories(./include)
+# Include directories for controller, exceptions, and model
+include_directories(./include/controller)
+include_directories(./include/exceptions)
+include_directories(./include/model)
 
 # List of source files
 set(SOURCES
@@ -17,10 +19,6 @@ set(SOURCES
         ./src/model/Dice.cpp
         ./src/model/Player.cpp
         ./src/main.cpp
-        include/exceptions/CustomException.hpp
-        include/exceptions/FileException.hpp
-        include/exceptions/InputException.hpp
-        include/exceptions/GameLogicException.hpp
 )
 
 # Define the executable and link it with the source files
