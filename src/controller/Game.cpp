@@ -10,6 +10,15 @@
 #include <sstream>
 #include <stdexcept>
 
+// Named constants
+const std::string CLEAR_SCREEN_CODE = "\033c";
+const std::string INVALID_GUESS_MSG_GENERAL = "Invalid guess. You must either have more dice or a greater face value"
+                                              ".\n";
+const std::string INVALID_GUESS_MSG_FACE_VALUE = "Invalid guess. You have the same number of dice but the face value "
+                                                 "is not greater.\n";
+const std::string INVALID_GUESS_MSG_DICE_COUNT = "Invalid guess. You have fewer dice but the face value is not "
+                                                 "greater than the last guess.\n";
+
 // Constructor implementation
 Game::Game() : currentPlayerIndex(0), lastGuess({0, 0}) {
 
@@ -49,15 +58,11 @@ void Game::SetupPlayers() {
   // Validate the number of players
   std::cout << "Enter the number of players: ";
   int num_players;
-  std::cin >> num_players;
-  std::cin.clear();
-  std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+  GetSetupInput(num_players);
 
   while (num_players < 2) {
     std::cout << "Please enter a number greater than 1: ";
-    std::cin >> num_players;
-    std::cin.clear();
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    GetSetupInput(num_players);
   }
   players.reserve(num_players);
   for (int i = 1; i <= num_players; ++i) {
@@ -65,10 +70,16 @@ void Game::SetupPlayers() {
   }
 }
 
+void Game::GetSetupInput(int& num_players) {
+  std::cin >> num_players;
+  std::cin.clear();
+  std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+}
+
 void Game::PlayGame() {
   while (true) {
     // Clear the screen
-    std::cout << "\033c"; // ANSI escape code to clear screen
+    std::cout << CLEAR_SCREEN_CODE; // ANSI escape code to clear screen
 
     // Display the rules
     std::cout << rulesText;
@@ -121,17 +132,17 @@ std::string Game::ValidateGuess(const Guess& new_guess, const Guess& last_guess)
   }
 
   if (new_guess.diceCount < last_guess.diceCount && new_guess.diceValue <= last_guess.diceValue) {
-    errorMsg << "Invalid guess. You have fewer dice but the face value is not greater than the last guess.\n";
+    errorMsg << INVALID_GUESS_MSG_DICE_COUNT;
     return errorMsg.str();
   }
 
   if (new_guess.diceCount == last_guess.diceCount && new_guess.diceValue <= last_guess.diceValue) {
-    errorMsg << "Invalid guess. You have the same number of dice but the face value is not greater.\n";
+    errorMsg << INVALID_GUESS_MSG_FACE_VALUE;
     return errorMsg.str();
   }
 
   if (new_guess.diceCount <= last_guess.diceCount && new_guess.diceValue < last_guess.diceValue) {
-    errorMsg << "Invalid guess. You must either have more dice or a greater face value.\n";
+    errorMsg << INVALID_GUESS_MSG_GENERAL;
     return errorMsg.str();
   }
 

@@ -52,6 +52,7 @@ private:
   std::string rulesText;
   void updateCurrentPlayerIndex();
   void displayCurrentState(Player &currentPlayer) const;
+  void GetSetupInput(int &num_players);
 };
 
 #endif //GAME_HPP
