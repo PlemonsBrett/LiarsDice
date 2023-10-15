@@ -15,9 +15,11 @@ int main() {
   // Display the welcome message
   std::cout << WELCOME_MESSAGE;
 
+  // Initialize the game
+  Game game;
+
   do {
-    // Initialize and start the game
-    Game game;
+    // Start the game
     game.Init();
 
     // Prompt the user to play again
