@@ -2,7 +2,7 @@
 #include <iostream>
 #include <limits>
 
-namespace LiarsDice {
+
 
 const std::string PLAY_AGAIN_YES = "yes";
 const std::string WELCOME_MESSAGE = "Welcome to Liar's Dice!\n";
@@ -33,6 +33,4 @@ int main() {
 
   return 0;
 }
-
-} // namespace LiarsDice
 

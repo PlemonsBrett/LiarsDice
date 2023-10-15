@@ -67,6 +67,12 @@ void Game::SetupPlayers() {
 
 void Game::PlayGame() {
   while (true) {
+    // Clear the screen
+    std::cout << "\033c"; // ANSI escape code to clear screen
+
+    // Display the rules
+    std::cout << rulesText;
+
     Player& currentPlayer = players[currentPlayerIndex];
     displayCurrentState(currentPlayer);
 
@@ -91,10 +97,13 @@ void Game::PlayGame() {
 }
 
 void Game::displayCurrentState(Player& currentPlayer) const {
-  currentPlayer.DisplayDice();
+  std::cout << "PLAYER " << currentPlayer.GetPlayerId() << "'s Turn:\n";
   if (lastGuess.diceCount != 0 || lastGuess.diceValue != 0) {
-    std::cout << "Last guess was (" << lastGuess.diceCount << ", " << lastGuess.diceValue << ")\n";
+    std::cout << "Last Guess: " << lastGuess.diceCount << ", " << lastGuess.diceValue << '\n';
   }
+  std::cout << "Your Dice: ";
+  currentPlayer.DisplayDice();
+  std::cout << '\n';
 }
 
 void Game::updateCurrentPlayerIndex() {

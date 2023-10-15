@@ -29,6 +29,8 @@ public:
   // Returns a const reference to the player's dice to avoid copying
   [[nodiscard]] const std::vector<Dice>& GetDice() const { return dice; }
 
+  [[nodiscard]] int GetPlayerId() const { return id; };
+
 private:
   int id;  // Player ID
   std::vector<Dice> dice;  // Player's dice
