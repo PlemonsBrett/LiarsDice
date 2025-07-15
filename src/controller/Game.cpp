@@ -3,12 +3,12 @@
 // This file contains the implementation of the Game class, which handles the game logic for Liar's Dice.
 //
 
-#include "Game.hpp"
-#include "FileException.hpp"
+#include "controller/Game.hpp"
+#include "exceptions/FileException.hpp"
 #include <iostream>
+#include <string>
 #include <fstream>
 #include <sstream>
-#include <stdexcept>
 
 // Named constants
 const std::string INVALID_GUESS_MSG_GENERAL = "Invalid guess. You must either have more dice or a greater face value"
