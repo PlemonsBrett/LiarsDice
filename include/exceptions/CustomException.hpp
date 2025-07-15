@@ -5,7 +5,6 @@
 #ifndef LIARSDICE_INCLUDE_EXCEPTIONS_CUSTOMEXCEPTION_HPP
 #define LIARSDICE_INCLUDE_EXCEPTIONS_CUSTOMEXCEPTION_HPP
 
-#include <stdexcept>
 #include <string>
 #include <utility>
 

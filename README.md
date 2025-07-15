@@ -44,7 +44,6 @@ LiarDiceGame/
 │   ├── model/
 │   │   ├── Player.cpp
 │   │   └── Dice.cpp
-│   ├── views/
 │   └── main.cpp
 │
 ├── include/
@@ -53,12 +52,16 @@ LiarDiceGame/
 │   ├── model/
 │   │   ├── Player.hpp
 │   │   └── Dice.hpp
-│   └── views/
+│   └── exceptions
+│   │   ├── CustomException.hpp
+│   │   ├── FileException.hpp
+│   │   ├── GameLogicException.hpp
+│   │   └── InputException.hpp
 │
 ├── assets/
 │   └── rules.txt
 │
-├── build/ (or dist/)
+├── build/
 │
 ├── CMakeLists.txt
 │

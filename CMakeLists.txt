@@ -25,4 +25,4 @@ add_executable(LiarsDice ${SOURCES})
 # Custom command to copy assets to the build directory after building the project
 add_custom_command(TARGET LiarsDice POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${CMAKE_SOURCE_DIR}/assets $<TARGET_FILE_DIR:LiarsDice>/assets)
+        ${CMAKE_SOURCE_DIR}/assets $<TARGET_FILE_DIR:LiarsDice>/assets)`
