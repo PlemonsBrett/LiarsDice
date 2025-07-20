@@ -1,8 +1,11 @@
-cmake_minimum_required(VERSION 3.21)
+cmake_minimum_required(VERSION 3.28)
 
 # Force use of Homebrew LLVM toolchain
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_C_COMPILER "/opt/homebrew/opt/llvm/bin/clang")
 set(CMAKE_CXX_COMPILER "/opt/homebrew/opt/llvm/bin/clang++")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
 
 # Project definition
 project(LiarsDice 

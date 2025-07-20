@@ -3,7 +3,7 @@
 A modern C++23 implementation of the classic Liar's Dice game with a professional library structure, comprehensive testing, and development tools.
 
 [![C++23](https://img.shields.io/badge/C%2B%2B-23-blue.svg)](https://en.cppreference.com/w/cpp/23)
-[![CMake](https://img.shields.io/badge/CMake-3.21+-green.svg)](https://cmake.org/)
+[![CMake](https://img.shields.io/badge/CMake-3.28+-green.svg)](https://cmake.org/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 ## 📖 About the Game
@@ -27,7 +27,7 @@ Throughout China, Liar's Dice (說謊者的骰子, shuōhuǎng zhě de shǎizi) 
 ### Prerequisites
 
 - **C++23 compatible compiler** (GCC 12+, Clang 15+, or MSVC 2022+)
-- **CMake 3.21+**
+- **CMake 3.28+**
 - **Git** (for cloning)
 
 ### Installation & Build
@@ -230,7 +230,7 @@ g++ -std=c++23 your_app.cpp -I/path/to/include -L/path/to/lib -lliarsdice_core
 
 **Build fails with C++23 errors:**
 - Ensure you have a modern compiler (GCC 12+, Clang 15+)
-- Check that CMake is version 3.21 or higher
+- Check that CMake is version 3.28 or higher
 
 **Tests fail to build:**
 - Catch2 is automatically fetched, ensure internet connectivity
