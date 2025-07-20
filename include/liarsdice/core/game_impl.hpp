@@ -82,9 +82,9 @@ public:
     interfaces::IGameState& get_game_state() override;
     [[nodiscard]] const interfaces::IGameState& get_game_state() const override;
     void reset() override;
-    [[nodiscard]] constexpr size_t get_min_players() const override;
-    [[nodiscard]] constexpr size_t get_max_players() const override;
-    [[nodiscard]] constexpr size_t get_initial_dice_per_player() const override;
+    [[nodiscard]] size_t get_min_players() const override;
+    [[nodiscard]] size_t get_max_players() const override;
+    [[nodiscard]] size_t get_initial_dice_per_player() const override;
 
 private:
     /**

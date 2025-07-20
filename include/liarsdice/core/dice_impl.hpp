@@ -58,7 +58,7 @@ public:
     void roll() override;
     [[nodiscard]] unsigned int get_face_value() const override;
     void set_face_value(unsigned int value) override;
-    [[nodiscard]] constexpr bool is_valid_face_value(unsigned int value) const override;
+    [[nodiscard]] bool is_valid_face_value(unsigned int value) const override;
     [[nodiscard]] std::unique_ptr<interfaces::IDice> clone() const override;
 
 private:

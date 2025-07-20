@@ -39,7 +39,7 @@ public:
    * @param value The value to check
    * @return true if the value is valid (1-6), false otherwise
    */
-  [[nodiscard]] virtual constexpr bool is_valid_face_value(unsigned int value) const = 0;
+  [[nodiscard]] virtual bool is_valid_face_value(unsigned int value) const = 0;
 
   /**
    * @brief Clone this die (for copying purposes)

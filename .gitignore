@@ -173,7 +173,7 @@ _deps
 .env.test.local
 .env.production.local
 CLAUDE.md
-docs/
+docs/notes/
 build/*
 .DS_Store
 .claude/

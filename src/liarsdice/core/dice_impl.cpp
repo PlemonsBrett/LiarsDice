@@ -66,7 +66,7 @@ void DiceImpl::set_face_value(unsigned int value) {
     validate_and_set_face_value(value);
 }
 
-constexpr bool DiceImpl::is_valid_face_value(unsigned int value) const {
+bool DiceImpl::is_valid_face_value(unsigned int value) const {
     return value >= kMinFaceValue && value <= kMaxFaceValue;
 }
 

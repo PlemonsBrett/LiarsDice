@@ -211,15 +211,15 @@ void GameImpl::reset() {
     initialized_ = false;
 }
 
-constexpr size_t GameImpl::get_min_players() const {
+size_t GameImpl::get_min_players() const {
     return kMinPlayers;
 }
 
-constexpr size_t GameImpl::get_max_players() const {
+size_t GameImpl::get_max_players() const {
     return kMaxPlayers;
 }
 
-constexpr size_t GameImpl::get_initial_dice_per_player() const {
+size_t GameImpl::get_initial_dice_per_player() const {
     return kInitialDicePerPlayer;
 }
 
