@@ -6,10 +6,10 @@
 #ifndef GAME_HPP
 #define GAME_HPP
 
-#include <vector>
+#include "liarsdice/core/player.hpp"
 #include <string>
 #include <utility>
-#include "liarsdice/core/player.hpp"
+#include <vector>
 
 // Struct to represent a guess
 struct Guess {
@@ -17,8 +17,8 @@ struct Guess {
   int dice_value;
 
   // Convert pair<int, int> into Guess
-  explicit Guess(std::pair<int, int> guess_pair) 
-    : dice_count(guess_pair.first), dice_value(guess_pair.second) {}
+  explicit Guess(std::pair<int, int> guess_pair)
+      : dice_count(guess_pair.first), dice_value(guess_pair.second) {}
 };
 
 class Game {
@@ -29,7 +29,7 @@ public:
   void init();
 
   // Reads game rules from a file
-  static std::string read_rules_from_file(const std::string& filename);
+  static std::string read_rules_from_file(const std::string &filename);
 
   // Sets up players for the game
   void setup_players();
@@ -38,10 +38,10 @@ public:
   void play_game();
 
   // Validates a new guess against the last guess
-  static std::string validate_guess(const Guess& new_guess, const Guess& last_guess);
+  static std::string validate_guess(const Guess &new_guess, const Guess &last_guess);
 
   // Checks the last guess against the actual dice
-  std::string check_guess_against_dice(const Guess& last_guess);
+  std::string check_guess_against_dice(const Guess &last_guess);
 
 private:
   std::vector<Player> players_;
@@ -53,4 +53,4 @@ private:
   static void get_setup_input(int &num_players);
 };
 
-#endif //GAME_HPP
+#endif // GAME_HPP

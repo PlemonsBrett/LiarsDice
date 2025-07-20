@@ -1,33 +1,35 @@
 //
 // Created by Brett on 9/4/2023.
-// This file contains the implementation of the Game class, which handles the game logic for Liar's Dice.
+// This file contains the implementation of the Game class, which handles the game logic for Liar's
+// Dice.
 //
 
 #include "liarsdice/core/game.hpp"
 #include "liarsdice/exceptions/file_exception.hpp"
-#include <iostream>
-#include <string>
 #include <fstream>
+#include <iostream>
 #include <sstream>
+#include <string>
 
 // Named constants
-const std::string kInvalidGuessMsgGeneral = "Invalid guess. You must either have more dice or a greater face value"
-                                              ".\n";
-const std::string kInvalidGuessMsgFaceValue = "Invalid guess. You have the same number of dice but the face value "
-                                                 "is not greater.\n";
-const std::string kInvalidGuessMsgDiceCount = "Invalid guess. You have fewer dice but the face value is not "
-                                                 "greater than the last guess.\n";
+const std::string kInvalidGuessMsgGeneral =
+    "Invalid guess. You must either have more dice or a greater face value"
+    ".\n";
+const std::string kInvalidGuessMsgFaceValue =
+    "Invalid guess. You have the same number of dice but the face value "
+    "is not greater.\n";
+const std::string kInvalidGuessMsgDiceCount =
+    "Invalid guess. You have fewer dice but the face value is not "
+    "greater than the last guess.\n";
 
 // Constructor implementation
-Game::Game() : current_player_index_(0), last_guess_({0, 0}) {
-
-}
+Game::Game() : current_player_index_(0), last_guess_({0, 0}) {}
 
 void Game::init() {
   try {
     rules_text_ = read_rules_from_file("./assets/rules.txt");
     std::cout << rules_text_;
-  } catch (const FileException& e) {
+  } catch (const FileException &e) {
     std::cerr << e.what() << '\n';
     std::cerr << "Ensure 'assets/rules.txt' exists in the same directory as 'LiarsDice.exe'.";
     exit(EXIT_FAILURE); // Exit the game
@@ -37,7 +39,7 @@ void Game::init() {
   play_game();
 }
 
-std::string Game::read_rules_from_file(const std::string& filename) {
+std::string Game::read_rules_from_file(const std::string &filename) {
   std::string rules_content;
   std::ifstream file_handle(filename);
 
@@ -69,7 +71,7 @@ void Game::setup_players() {
   }
 }
 
-void Game::get_setup_input(int& num_players) {
+void Game::get_setup_input(int &num_players) {
   std::cin >> num_players;
   std::cin.clear();
   std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
@@ -83,7 +85,7 @@ void Game::play_game() {
     // Display the rules
     std::cout << rules_text_;
 
-    Player& current_player = players_[static_cast<size_t>(current_player_index_)];
+    Player &current_player = players_[static_cast<size_t>(current_player_index_)];
     display_current_state(current_player);
 
     auto guess = Guess(Player::make_guess());
@@ -106,7 +108,7 @@ void Game::play_game() {
   }
 }
 
-void Game::display_current_state(Player& current_player) const {
+void Game::display_current_state(Player &current_player) const {
   std::cout << "PLAYER " << current_player.get_player_id() << "'s Turn:\n";
   if (last_guess_.dice_count != 0 || last_guess_.dice_value != 0) {
     std::cout << "Last Guess: " << last_guess_.dice_count << ", " << last_guess_.dice_value << '\n';
@@ -123,24 +125,28 @@ void Game::update_current_player_index() {
   }
 }
 
-std::string Game::validate_guess(const Guess& new_guess, const Guess& last_guess) {
+std::string Game::validate_guess(const Guess &new_guess, const Guess &last_guess) {
   std::stringstream error_msg;
 
   if (last_guess.dice_count != 0 || last_guess.dice_value != 0) {
-    error_msg << "Last guess was (" << last_guess.dice_count << ", " << last_guess.dice_value << ")\n";
+    error_msg << "Last guess was (" << last_guess.dice_count << ", " << last_guess.dice_value
+              << ")\n";
   }
 
-  if (new_guess.dice_count < last_guess.dice_count && new_guess.dice_value <= last_guess.dice_value) {
+  if (new_guess.dice_count < last_guess.dice_count &&
+      new_guess.dice_value <= last_guess.dice_value) {
     error_msg << kInvalidGuessMsgDiceCount;
     return error_msg.str();
   }
 
-  if (new_guess.dice_count == last_guess.dice_count && new_guess.dice_value <= last_guess.dice_value) {
+  if (new_guess.dice_count == last_guess.dice_count &&
+      new_guess.dice_value <= last_guess.dice_value) {
     error_msg << kInvalidGuessMsgFaceValue;
     return error_msg.str();
   }
 
-  if (new_guess.dice_count <= last_guess.dice_count && new_guess.dice_value < last_guess.dice_value) {
+  if (new_guess.dice_count <= last_guess.dice_count &&
+      new_guess.dice_value < last_guess.dice_value) {
     error_msg << kInvalidGuessMsgGeneral;
     return error_msg.str();
   }
@@ -148,11 +154,10 @@ std::string Game::validate_guess(const Guess& new_guess, const Guess& last_guess
   return ""; // Valid guess
 }
 
-
-std::string Game::check_guess_against_dice(const Guess& last_guess) {
+std::string Game::check_guess_against_dice(const Guess &last_guess) {
   int counter = 0;
-  for (const auto& player : players_) {
-    for (const auto& die : player.get_dice()) {
+  for (const auto &player : players_) {
+    for (const auto &die : player.get_dice()) {
       if (die.get_face_value() == static_cast<unsigned int>(last_guess.dice_value)) {
         ++counter;
       }

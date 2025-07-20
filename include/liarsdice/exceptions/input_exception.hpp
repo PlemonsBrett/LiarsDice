@@ -9,7 +9,8 @@
 
 class InputException : public CustomException {
 public:
-  explicit InputException(const std::string& message) : CustomException("Input Error: " + message) {}
+  explicit InputException(const std::string &message)
+      : CustomException("Input Error: " + message) {}
 };
 
-#endif //LIARSDICE_INCLUDE_EXCEPTIONS_INPUTEXCEPTION_HPP
+#endif // LIARSDICE_INCLUDE_EXCEPTIONS_INPUTEXCEPTION_HPP

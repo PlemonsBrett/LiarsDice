@@ -20,12 +20,10 @@ public:
   [[nodiscard]] unsigned int get_face_value() const;
 
 private:
-  unsigned int face_value_{};  // Holds the face value of the dice
-  std::random_device random_device_;  // Random device engine
-  std::mt19937 generator_;  // Mersenne Twister random number generator
-  std::uniform_int_distribution<> distribution_;  // Uniform distribution
+  unsigned int face_value_{};                    // Holds the face value of the dice
+  std::random_device random_device_;             // Random device engine
+  std::mt19937 generator_;                       // Mersenne Twister random number generator
+  std::uniform_int_distribution<> distribution_; // Uniform distribution
 };
 
 #endif // DICE_HPP
-
-

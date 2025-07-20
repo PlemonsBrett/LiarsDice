@@ -2,10 +2,11 @@
 
 // Main interfaces header - includes all interface definitions
 #include "i_dice.hpp"
-#include "i_random_generator.hpp"
-#include "i_player.hpp"
-#include "i_game_state.hpp"
 #include "i_game.hpp"
+#include "i_game_state.hpp"
+#include "i_player.hpp"
+#include "i_random_generator.hpp"
+#include "i_service_factory.hpp"
 
 namespace liarsdice::interfaces {
 
@@ -15,5 +16,6 @@ using PlayerPtr = std::unique_ptr<IPlayer>;
 using GameStatePtr = std::unique_ptr<IGameState>;
 using GamePtr = std::unique_ptr<IGame>;
 using RandomGeneratorPtr = std::unique_ptr<IRandomGenerator>;
+using ServiceFactoryPtr = std::unique_ptr<IServiceFactory>;
 
 } // namespace liarsdice::interfaces

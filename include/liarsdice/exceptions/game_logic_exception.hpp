@@ -9,7 +9,8 @@
 
 class GameLogicException : public CustomException {
 public:
-  explicit GameLogicException(const std::string& message) : CustomException("Game Logic Error: " + message) {}
+  explicit GameLogicException(const std::string &message)
+      : CustomException("Game Logic Error: " + message) {}
 };
 
-#endif //LIARSDICE_INCLUDE_EXCEPTIONS_GAMELOGICEXCEPTION_HPP
+#endif // LIARSDICE_INCLUDE_EXCEPTIONS_GAMELOGICEXCEPTION_HPP

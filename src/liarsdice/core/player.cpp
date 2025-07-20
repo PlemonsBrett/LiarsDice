@@ -1,13 +1,14 @@
 //
 // Created by Brett on 9/4/2023.
-// This file contains the implementation of the Player class, which represents a player in the game of Liar's Dice.
+// This file contains the implementation of the Player class, which represents a player in the game
+// of Liar's Dice.
 //
 
 #include "liarsdice/core/player.hpp"
 #include <iostream>
+#include <limits>
 #include <sstream>
 #include <utility>
-#include <limits>
 
 // Constructor initializes the player ID and reserves space for 5 dice
 Player::Player(int id) : id_(id), dice_(5) {
@@ -17,7 +18,7 @@ Player::Player(int id) : id_(id), dice_(5) {
 
 // Roll all dice for the player
 void Player::roll_dice() {
-  for (auto& die : dice_) {
+  for (auto &die : dice_) {
     die.roll();
   }
 }
@@ -25,7 +26,7 @@ void Player::roll_dice() {
 // Display the face values of the player's dice
 void Player::display_dice() {
   std::cout << "Player " << id_ << ", your dice are: ";
-  for (const auto& die : dice_) {
+  for (const auto &die : dice_) {
     std::cout << die.get_face_value() << ' ';
   }
   std::cout << '\n';

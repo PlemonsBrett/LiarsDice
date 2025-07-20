@@ -14,11 +14,15 @@ Checks: >
   -cppcoreguidelines-pro-bounds-array-to-pointer-decay,
   -modernize-use-trailing-return-type,
   -readability-magic-numbers,
-  -readability-identifier-length
+  -readability-identifier-length,
+  -readability-use-anyofallof
 
 WarningsAsErrors: ''
-HeaderFilterRegex: '.*'
+HeaderFilterRegex: '^(?!.*/opt/homebrew/).*'
+SystemHeaders: false
 FormatStyle: file
+ExtraArgs: 
+  - '-std=c++2b'
 
 CheckOptions:
   - key: readability-identifier-naming.ClassCase

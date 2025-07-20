@@ -43,10 +43,6 @@ function(set_project_warnings target)
         -Wformat=2         # warn on security issues around functions that format output
         -Wimplicit-fallthrough # warn on implicit fallthrough
         -Wmisleading-indentation # warn if indentation implies blocks where blocks do not exist
-        -Wduplicated-cond  # warn if if / else chain has duplicated conditions
-        -Wduplicated-branches # warn if if / else branches have duplicated code
-        -Wlogical-op       # warn about logical operations being used where bitwise were probably wanted
-        -Wuseless-cast     # warn if you perform a cast to the same type
     )
 
     if(WARNINGS_AS_ERRORS)

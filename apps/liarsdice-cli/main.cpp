@@ -2,8 +2,6 @@
 #include <iostream>
 #include <limits>
 
-
-
 const std::string kPlayAgainYes = "yes";
 const std::string kWelcomeMessage = "Welcome to Liar's Dice!\n";
 const std::string kGoodbyeMessage = "Thank you for playing Liar's Dice!\n";
@@ -29,7 +27,7 @@ int main() {
 
     // Clear the input buffer to ensure proper functioning of cin in the next iteration
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-    
+
     should_continue = (play_again == kPlayAgainYes);
   }
 
@@ -38,4 +36,3 @@ int main() {
 
   return 0;
 }
-

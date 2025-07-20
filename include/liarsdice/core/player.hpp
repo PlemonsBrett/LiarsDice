@@ -6,8 +6,8 @@
 #ifndef PLAYER_HPP
 #define PLAYER_HPP
 
-#include <vector>
 #include "liarsdice/core/dice.hpp"
+#include <vector>
 
 class Player {
 public:
@@ -27,13 +27,13 @@ public:
   static bool call_liar();
 
   // Returns a const reference to the player's dice to avoid copying
-  [[nodiscard]] const std::vector<Dice>& get_dice() const { return dice_; }
+  [[nodiscard]] const std::vector<Dice> &get_dice() const { return dice_; }
 
   [[nodiscard]] int get_player_id() const { return id_; };
 
 private:
-  int id_;  // Player ID
-  std::vector<Dice> dice_;  // Player's dice
+  int id_;                 // Player ID
+  std::vector<Dice> dice_; // Player's dice
 };
 
-#endif //PLAYER_HPP
+#endif // PLAYER_HPP
