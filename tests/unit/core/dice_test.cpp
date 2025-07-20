@@ -15,43 +15,32 @@ class DiceTest : public ::testing::Test {
 
 TEST_F(DiceTest, DefaultConstructor) {
   Dice dice;
-  EXPECT_GE(dice.getValue(), 1);
-  EXPECT_LE(dice.getValue(), 6);
-}
-
-TEST_F(DiceTest, ValueConstructor) {
-  Dice dice(3);
-  EXPECT_EQ(dice.getValue(), 3);
+  EXPECT_GE(dice.GetFaceValue(), 1);
+  EXPECT_LE(dice.GetFaceValue(), 6);
 }
 
 TEST_F(DiceTest, RollProducesValidValues) {
   Dice dice;
-  std::set<int> possible_values{1, 2, 3, 4, 5, 6};
+  std::set<unsigned int> possible_values{1, 2, 3, 4, 5, 6};
   
   // Roll the dice many times and ensure all values are valid
   for (int i = 0; i < 100; ++i) {
-    dice.roll();
-    int value = dice.getValue();
+    dice.Roll();
+    unsigned int value = dice.GetFaceValue();
     EXPECT_TRUE(possible_values.count(value) > 0) 
         << "Invalid dice value: " << value;
   }
 }
 
-TEST_F(DiceTest, SetValue) {
-  Dice dice;
-  dice.setValue(4);
-  EXPECT_EQ(dice.getValue(), 4);
-}
-
 TEST_F(DiceTest, RollChangesValue) {
-  Dice dice(1);
-  int original_value = dice.getValue();
+  Dice dice;
+  unsigned int original_value = dice.GetFaceValue();
   
   // Roll multiple times to increase chance of getting a different value
   bool value_changed = false;
   for (int i = 0; i < 50; ++i) {
-    dice.roll();
-    if (dice.getValue() != original_value) {
+    dice.Roll();
+    if (dice.GetFaceValue() != original_value) {
       value_changed = true;
       break;
     }

@@ -76,6 +76,11 @@ if(LIARSDICE_INSTALL)
     # Install the library
     install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
+    # Install interface library for warnings
+    install(TARGETS liarsdice_warnings
+        EXPORT LiarsDiceTargets
+    )
+
     # Generate and install CMake config files
     install(EXPORT LiarsDiceTargets
         FILE LiarsDiceTargets.cmake
