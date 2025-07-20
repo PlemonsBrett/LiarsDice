@@ -28,17 +28,37 @@ Throughout China, Liar's Dice (說謊者的骰子, shuōhuǎng zhě de shǎizi) 
 
 - **C++23 compatible compiler** (GCC 12+, Clang 15+, or MSVC 2022+)
 - **CMake 3.28+**
+- **Conan 2.0+** (optional, for easier dependency management)
 - **Git** (for cloning)
 
 ### Installation & Build
+
+#### Option 1: With Conan (Recommended)
 
 ```bash
 # Clone the repository
 git clone <repository-url>
 cd LiarsDice
 
-# Build the project (Release mode)
+# Install Conan (if not already installed)
+pip install conan
+
+# Build with Conan (automatically detected)
 ./scripts/build.sh
+
+# Or explicitly use Conan
+./scripts/build-conan.sh
+```
+
+#### Option 2: Traditional CMake
+
+```bash
+# Clone the repository
+git clone <repository-url>
+cd LiarsDice
+
+# Build with FetchContent for dependencies
+./scripts/build.sh Release no
 
 # Or build manually
 cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
@@ -103,12 +123,32 @@ LiarsDice/
 # Development build with debug info
 ./scripts/build.sh Debug
 
+# Force Conan usage
+./scripts/build.sh Release yes
+
+# Force traditional CMake (no Conan)
+./scripts/build.sh Release no
+
 # Manual configuration with options
 cmake -B build -S . \
   -DCMAKE_BUILD_TYPE=Debug \
   -DLIARSDICE_BUILD_TESTS=ON \
   -DLIARSDICE_BUILD_EXAMPLES=ON \
   -DLIARSDICE_BUILD_BENCHMARKS=OFF
+```
+
+#### Conan Configuration
+
+```bash
+# Create custom Conan profile
+cp profiles/default ~/.conan2/profiles/liarsdice
+conan profile detect --force  # Auto-detect system settings
+
+# Install dependencies only
+conan install . --build=missing
+
+# Build with specific Conan options
+conan create . --build=missing -o build_tests=True
 ```
 
 ### Available CMake Options
@@ -233,8 +273,9 @@ g++ -std=c++23 your_app.cpp -I/path/to/include -L/path/to/lib -lliarsdice_core
 - Check that CMake is version 3.28 or higher
 
 **Tests fail to build:**
-- Catch2 is automatically fetched, ensure internet connectivity
-- For offline builds, install Catch2 system-wide
+- With Conan: Check `conan install . --build=missing` runs successfully
+- With FetchContent: Catch2 is automatically fetched, ensure internet connectivity
+- For offline builds, install Catch2 system-wide or use Conan with local cache
 
 **Missing compile_commands.json:**
 ```bash

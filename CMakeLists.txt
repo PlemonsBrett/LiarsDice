@@ -41,11 +41,27 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(cmake/StandardProjectSettings.cmake)
 include(cmake/CompilerWarnings.cmake)
 
+# Conan integration (if available)
+if(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/conan_toolchain.cmake" OR 
+   EXISTS "${CMAKE_CURRENT_BINARY_DIR}/Release/generators/conan_toolchain.cmake" OR
+   EXISTS "${CMAKE_CURRENT_BINARY_DIR}/Debug/generators/conan_toolchain.cmake")
+    message(STATUS "Using Conan for dependency management")
+    set(USING_CONAN TRUE)
+else()
+    message(STATUS "Conan not detected, using FetchContent for dependencies")
+    set(USING_CONAN FALSE)
+endif()
+
 # Find packages if needed
 if(LIARSDICE_BUILD_TESTS)
-    find_package(Catch2 3 QUIET)
-    if(NOT Catch2_FOUND)
-        message(STATUS "Catch2 not found. Tests will use FetchContent.")
+    if(USING_CONAN)
+        find_package(Catch2 REQUIRED)
+        message(STATUS "Using Catch2 from Conan")
+    else()
+        find_package(Catch2 3 QUIET)
+        if(NOT Catch2_FOUND)
+            message(STATUS "Catch2 not found. Tests will use FetchContent.")
+        endif()
     endif()
 endif()
 
