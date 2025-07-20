@@ -1,0 +1,40 @@
+# Test Fixtures Directory
+
+This directory contains test data files, mock objects, and reusable test
+fixtures that support comprehensive testing across the LiarsDice project.
+
+# Test fixture types:
+# - JSON configuration files for game state testing
+# - Mock player data and game scenarios
+# - Sample dice roll sequences for deterministic testing
+# - Test databases or data files for persistence testing
+# - Network message samples for communication testing
+# - Performance benchmarking data sets
+# - Error condition reproduction data
+
+# Fixture organization:
+# - Subdirectories by component (core/, adapters/, di/, etc.)
+# - Naming convention: component_scenario_fixture.json
+# - Versioned fixtures for regression testing
+# - Shared fixtures for cross-component integration tests
+
+# Mock object patterns:
+# - Mock implementations of core interfaces
+# - Fake services for dependency injection testing
+# - Stub implementations for external service simulation
+# - Test doubles for complex integration scenarios
+
+# Data formats:
+# - JSON for structured test data
+# - CSV for tabular test datasets
+# - Binary files for performance testing scenarios
+# - Configuration files for environment setup
+
+# Fixture management:
+# - Automated fixture generation for edge cases
+# - Fixture validation to ensure test data integrity
+# - Version control for fixture evolution
+# - Documentation of fixture purpose and usage
+
+Keep this directory in version control to maintain reusable test assets
+that ensure consistent and comprehensive test coverage.

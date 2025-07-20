@@ -1,9 +1,7 @@
 #pragma once
 
-#include <memory>
 #include <string>
 #include "i_game_state.hpp"
-#include "i_player.hpp"
 
 namespace liarsdice::interfaces {
 
@@ -37,20 +35,20 @@ public:
      * @brief Check if the game has ended
      * @return true if game is over, false otherwise
      */
-    virtual bool is_game_over() const = 0;
+    [[nodiscard]] virtual bool is_game_over() const = 0;
 
     /**
      * @brief Get the ID of the winning player
      * @return Winner's player ID, or -1 if no winner yet
      */
-    virtual int get_winner_id() const = 0;
+    [[nodiscard]] virtual int get_winner_id() const = 0;
 
     /**
      * @brief Validate a player's guess against game rules
      * @param guess The guess to validate
      * @return Error message if invalid, empty string if valid
      */
-    virtual std::string validate_guess(const Guess& guess) const = 0;
+    [[nodiscard]] virtual std::string validate_guess(const Guess& guess) const = 0;
 
     /**
      * @brief Process a player's guess
@@ -76,7 +74,7 @@ public:
      * @brief Get the current game state (const version)
      * @return Const reference to the game state interface
      */
-    virtual const IGameState& get_game_state() const = 0;
+    [[nodiscard]] virtual const IGameState& get_game_state() const = 0;
 
     /**
      * @brief Reset the game to initial state
@@ -87,19 +85,19 @@ public:
      * @brief Get the minimum number of players required
      * @return Minimum player count
      */
-    virtual size_t get_min_players() const = 0;
+    [[nodiscard]] virtual size_t get_min_players() const = 0;
 
     /**
      * @brief Get the maximum number of players allowed
      * @return Maximum player count
      */
-    virtual size_t get_max_players() const = 0;
+    [[nodiscard]] virtual size_t get_max_players() const = 0;
 
     /**
      * @brief Get the number of dice each player starts with
      * @return Initial dice count per player
      */
-    virtual size_t get_initial_dice_per_player() const = 0;
+    [[nodiscard]] virtual size_t get_initial_dice_per_player() const = 0;
 };
 
 } // namespace liarsdice::interfaces

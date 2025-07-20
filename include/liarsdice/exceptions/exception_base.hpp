@@ -10,12 +10,12 @@
 
 class CustomException : public std::exception {
 public:
-  explicit CustomException(std::string  message) : message(std::move(message)) {}
+  explicit CustomException(std::string  message) : message_(std::move(message)) {}
   [[nodiscard]] const char* what() const noexcept override {
-    return message.c_str();
+    return message_.c_str();
   }
 private:
-  std::string message;
+  std::string message_;
 };
 
 #endif //LIARSDICE_INCLUDE_EXCEPTIONS_CUSTOMEXCEPTION_HPP

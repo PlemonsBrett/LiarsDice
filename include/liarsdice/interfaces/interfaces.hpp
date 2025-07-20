@@ -1,7 +1,6 @@
 #pragma once
 
 // Main interfaces header - includes all interface definitions
-#include "concepts.hpp"
 #include "i_dice.hpp"
 #include "i_random_generator.hpp"
 #include "i_player.hpp"

@@ -8,7 +8,6 @@
 #include <string>
 #include <concepts>
 #include <expected>
-#include <format>
 #include "../interfaces/concepts.hpp"
 
 namespace liarsdice::di {
@@ -16,19 +15,19 @@ namespace liarsdice::di {
 /**
  * @brief Service lifetime management options
  */
-enum class ServiceLifetime {
-    Transient,  ///< New instance created each time
-    Singleton   ///< Single instance reused across all requests
+enum class ServiceLifetime : std::uint8_t {
+    kTransient,  ///< New instance created each time
+    kSingleton   ///< Single instance reused across all requests
 };
 
 /**
  * @brief Error types for dependency injection operations
  */
-enum class DIError {
-    ServiceNotRegistered,
-    CircularDependency,
-    CreationFailed,
-    InvalidLifetime
+enum class DIError : std::uint8_t {
+    kServiceNotRegistered,
+    kCircularDependency,
+    kCreationFailed,
+    kInvalidLifetime
 };
 
 /**
@@ -39,7 +38,7 @@ public:
     explicit DIException(const std::string& message, DIError error_type)
         : std::runtime_error(message), error_type_(error_type) {}
 
-    DIError get_error_type() const noexcept { return error_type_; }
+    [[nodiscard]] DIError get_error_type() const noexcept { return error_type_; }
 
 private:
     DIError error_type_;
@@ -113,12 +112,14 @@ public:
     template<interfaces::ServiceInterface TInterface, 
              std::derived_from<TInterface> TImplementation, 
              typename... Args>
-    void register_service(ServiceLifetime lifetime = ServiceLifetime::Transient,
-                         std::string name = {},
+    void register_service(ServiceLifetime lifetime = ServiceLifetime::kTransient,
+                         const std::string& name = {},
                          Args&&... args) {
         
-        auto factory = [args...]() -> std::any {
-            auto ptr = std::make_unique<TImplementation>(args...);
+        auto factory = [args_tuple = std::tuple<Args...>(std::forward<Args>(args)...)]() -> std::any {
+            auto ptr = std::apply([](auto&&... forwarded_args) {
+                return std::make_unique<TImplementation>(std::forward<decltype(forwarded_args)>(forwarded_args)...);
+            }, args_tuple);
             return std::unique_ptr<TInterface>(std::move(ptr));
         };
 
@@ -143,8 +144,8 @@ public:
      */
     template<interfaces::ServiceInterface TInterface>
     void register_factory(std::function<std::unique_ptr<TInterface>()> factory,
-                         ServiceLifetime lifetime = ServiceLifetime::Transient,
-                         std::string name = {}) {
+                         ServiceLifetime lifetime = ServiceLifetime::kTransient,
+                         const std::string& name = {}) {
         
         auto wrapped_factory = [factory = std::move(factory)] -> std::any {
             return factory();
@@ -170,7 +171,7 @@ public:
      */
     template<interfaces::ServiceInterface TInterface>
     void register_instance(std::unique_ptr<TInterface> instance, 
-                          std::string name = {}) {
+                          const std::string& name = {}) {
         
         auto factory = [instance = std::move(instance)]() mutable -> std::any {
             return std::move(instance);
@@ -180,7 +181,7 @@ public:
         auto service_name = name.empty() ? typeid(TInterface).name() : name;
 
         services_.emplace(type_index,
-            ServiceDescriptor(std::move(factory), ServiceLifetime::Singleton, 
+            ServiceDescriptor(std::move(factory), ServiceLifetime::kSingleton, 
                             type_index, service_name));
 
         if (!name.empty()) {
@@ -211,7 +212,7 @@ public:
     ServiceResult<T> resolve(const std::string& name) {
         auto it = named_services_.find(name);
         if (it == named_services_.end()) {
-            return std::unexpected(DIError::ServiceNotRegistered);
+            return std::unexpected(DIError::kServiceNotRegistered);
         }
         return resolve_internal<T>(it->second);
     }
@@ -223,7 +224,7 @@ public:
      * @return true if registered, false otherwise
      */
     template<typename T>
-    bool is_registered() const {
+    [[nodiscard]] bool is_registered() const {
         auto type_index = std::type_index(typeid(T));
         return services_.contains(type_index);
     }
@@ -234,7 +235,7 @@ public:
      * @param name Service name
      * @return true if registered, false otherwise
      */
-    bool is_registered(const std::string& name) const {
+    [[nodiscard]] bool is_registered(const std::string& name) const {
         return named_services_.contains(name);
     }
 
@@ -243,7 +244,7 @@ public:
      * 
      * @return Vector of service names
      */
-    std::vector<std::string> get_registered_services() const {
+    [[nodiscard]] std::vector<std::string> get_registered_services() const {
         std::vector<std::string> names;
         names.reserve(named_services_.size());
         
@@ -267,7 +268,7 @@ public:
      * 
      * @return Service count
      */
-    size_t size() const {
+    [[nodiscard]] size_t size() const {
         return services_.size();
     }
 
@@ -276,16 +277,16 @@ private:
     ServiceResult<T> resolve_internal(std::type_index type_index) {
         auto it = services_.find(type_index);
         if (it == services_.end()) {
-            return std::unexpected(DIError::ServiceNotRegistered);
+            return std::unexpected(DIError::kServiceNotRegistered);
         }
 
         auto& descriptor = it->second;
 
         try {
-            if (descriptor.lifetime == ServiceLifetime::Singleton) {
+            if (descriptor.lifetime == ServiceLifetime::kSingleton) {
                 // For singletons, check if instance already exists
                 if (!descriptor.singleton_instance.has_value()) {
-                    auto instance = descriptor.factory();
+                    auto* instance = descriptor.factory();
                     descriptor.singleton_instance = instance;
                 }
                 
@@ -293,30 +294,30 @@ private:
                 auto& stored_instance = descriptor.singleton_instance;
                 auto* ptr = std::any_cast<std::unique_ptr<T>>(&stored_instance);
                 if (!ptr) {
-                    return std::unexpected(DIError::CreationFailed);
+                    return std::unexpected(DIError::kCreationFailed);
                 }
                 
                 // For this implementation, we'll create a new instance each time
                 // In a production system, you might want to return shared_ptr instead
-                auto new_instance = descriptor.factory();
+                auto* new_instance = descriptor.factory();
                 auto* result_ptr = std::any_cast<std::unique_ptr<T>>(&new_instance);
                 if (!result_ptr) {
-                    return std::unexpected(DIError::CreationFailed);
+                    return std::unexpected(DIError::kCreationFailed);
                 }
                 
                 return std::move(*result_ptr);
-            } else {
-                // Transient: create new instance each time
-                auto instance = descriptor.factory();
-                auto* ptr = std::any_cast<std::unique_ptr<T>>(&instance);
-                if (!ptr) {
-                    return std::unexpected(DIError::CreationFailed);
-                }
-                
-                return std::move(*ptr);
             }
+            
+            // Transient: create new instance each time
+            auto* instance = descriptor.factory();
+            auto* ptr = std::any_cast<std::unique_ptr<T>>(&instance);
+            if (!ptr) {
+                return std::unexpected(DIError::kCreationFailed);
+            }
+            
+            return std::move(*ptr);
         } catch (...) {
-            return std::unexpected(DIError::CreationFailed);
+            return std::unexpected(DIError::kCreationFailed);
         }
     }
 };
@@ -335,21 +336,20 @@ private:
 public:
     explicit ServiceScope(ServiceContainer& container) : container_(container) {}
     
-    ~ServiceScope() {
-        // Remove services registered in this scope
-        // Note: In a full implementation, you'd want to track and remove services
-        // For now, we'll rely on container lifetime management
-        // (registered_types_ and registered_names_ are kept for future use)
-        (void)registered_types_;  // Suppress unused variable warning
-        (void)registered_names_;  // Suppress unused variable warning
-    }
+    ~ServiceScope() = default;
+
+    // Non-copyable and non-movable (contains reference member)
+    ServiceScope(const ServiceScope&) = delete;
+    ServiceScope& operator=(const ServiceScope&) = delete;
+    ServiceScope(ServiceScope&&) = delete;
+    ServiceScope& operator=(ServiceScope&&) = delete;
 
     // Forward registration methods to container
     template<interfaces::ServiceInterface TInterface, 
              std::derived_from<TInterface> TImplementation, 
              typename... Args>
-    void register_service(ServiceLifetime lifetime = ServiceLifetime::Transient,
-                         std::string name = {},
+    void register_service(ServiceLifetime lifetime = ServiceLifetime::kTransient,
+                         const std::string& name = {},
                          Args&&... args) {
         container_.register_service<TInterface, TImplementation>(
             lifetime, name, std::forward<Args>(args)...);

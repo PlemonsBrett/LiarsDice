@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 3.21)
 
+# Force use of Homebrew LLVM toolchain
+set(CMAKE_C_COMPILER "/opt/homebrew/opt/llvm/bin/clang")
+set(CMAKE_CXX_COMPILER "/opt/homebrew/opt/llvm/bin/clang++")
+
 # Project definition
 project(LiarsDice 
     VERSION 1.0.0

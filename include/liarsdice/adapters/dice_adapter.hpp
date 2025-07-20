@@ -42,7 +42,7 @@ public:
             has_custom_value_ = true;
         } else {
             // Use existing dice roll method
-            dice_.Roll();
+            dice_.roll();
         }
     }
 
@@ -50,7 +50,7 @@ public:
         if (has_custom_value_) {
             return current_face_value_;
         }
-        return dice_.GetFaceValue();
+        return dice_.get_face_value();
     }
 
     void set_face_value(unsigned int value) override {

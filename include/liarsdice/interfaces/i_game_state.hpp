@@ -1,7 +1,6 @@
 #pragma once
 
 #include <optional>
-#include <memory>
 #include "i_player.hpp"
 
 namespace liarsdice::interfaces {
@@ -32,7 +31,7 @@ public:
      * @brief Get the index of the current player
      * @return Current player index
      */
-    virtual size_t get_current_player_index() const = 0;
+    [[nodiscard]] virtual size_t get_current_player_index() const = 0;
 
     /**
      * @brief Move to the next player's turn
@@ -43,13 +42,13 @@ public:
      * @brief Get the total number of players
      * @return Player count
      */
-    virtual size_t get_player_count() const = 0;
+    [[nodiscard]] virtual size_t get_player_count() const = 0;
 
     /**
      * @brief Check if the game is currently active
      * @return true if game is in progress, false otherwise
      */
-    virtual bool is_game_active() const = 0;
+    [[nodiscard]] virtual bool is_game_active() const = 0;
 
     /**
      * @brief Set the game active state
@@ -61,7 +60,7 @@ public:
      * @brief Get the current round number
      * @return The round number (starts at 1)
      */
-    virtual int get_round_number() const = 0;
+    [[nodiscard]] virtual int get_round_number() const = 0;
 
     /**
      * @brief Increment the round number
@@ -72,7 +71,7 @@ public:
      * @brief Get the last guess made in the game
      * @return Optional guess (empty if no guess has been made)
      */
-    virtual std::optional<Guess> get_last_guess() const = 0;
+    [[nodiscard]] virtual std::optional<Guess> get_last_guess() const = 0;
 
     /**
      * @brief Set the last guess made
@@ -97,7 +96,7 @@ public:
      * @param index The player index
      * @return Const reference to the player interface
      */
-    virtual const IPlayer& get_player(size_t index) const = 0;
+    [[nodiscard]] virtual const IPlayer& get_player(size_t index) const = 0;
 
     /**
      * @brief Get the current player
@@ -109,20 +108,20 @@ public:
      * @brief Get the current player (const version)
      * @return Const reference to the current player
      */
-    virtual const IPlayer& get_current_player() const = 0;
+    [[nodiscard]] virtual const IPlayer& get_current_player() const = 0;
 
     /**
      * @brief Count total dice across all players with a specific face value
      * @param face_value The face value to count
      * @return Total count of dice with that value
      */
-    virtual size_t count_total_dice_with_value(unsigned int face_value) const = 0;
+    [[nodiscard]] virtual size_t count_total_dice_with_value(unsigned int face_value) const = 0;
 
     /**
      * @brief Get the total number of dice remaining in the game
      * @return Total dice count
      */
-    virtual size_t get_total_dice_count() const = 0;
+    [[nodiscard]] virtual size_t get_total_dice_count() const = 0;
 };
 
 } // namespace liarsdice::interfaces

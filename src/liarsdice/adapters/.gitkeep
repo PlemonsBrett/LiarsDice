@@ -1,0 +1,47 @@
+# Adapters Implementation Directory
+
+This directory contains implementation files for adapter pattern classes
+that provide interface compatibility and external system integration.
+
+## Adapter implementations include
+
+### - RandomNumberGenerator adapters for different RNG libraries
+
+### - Platform-specific implementations (Windows, macOS, Linux)
+
+### - Third-party library integrations and wrappers
+
+### - Database connectivity adapters (if persistence is added)
+
+### - Network communication adapters for multiplayer support
+
+### - File I/O adapters for game state persistence
+
+### - Audio/graphics adapters for enhanced user interfaces
+
+## Adapter pattern benefits
+
+### - Isolates external dependencies from core game logic
+
+### - Enables easy testing through mock implementations
+
+### - Supports multiple platform targets
+
+### - Facilitates dependency injection and inversion of control
+
+### - Provides clean interfaces for complex external systems
+
+## Implementation guidelines
+
+### - Implement corresponding header interfaces from include/liarsdice/adapters/
+
+### - Follow RAII principles for resource management
+
+### - Provide comprehensive error handling and exception safety
+
+### - Include detailed logging for debugging and diagnostics
+
+### - Support configuration through dependency injection
+
+Keep this directory in version control to maintain implementation structure
+for adapter pattern components that bridge external systems.

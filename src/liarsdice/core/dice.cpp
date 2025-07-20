@@ -6,16 +6,16 @@
 #include "liarsdice/core/dice.hpp"
 
 // Constructor initializes the random number generator and rolls the dice
-Dice::Dice() : rd(), gen(rd()), dis(1, 6) {
-  Roll();
+Dice::Dice() : generator_(random_device_()), distribution_(1, 6) {
+  roll();
 }
 
 // Rolls the dice using std::mt19937 and std::uniform_int_distribution
-void Dice::Roll() {
-  face_value = dis(gen);
+void Dice::roll() {
+  face_value_ = static_cast<unsigned int>(distribution_(generator_));
 }
 
 // Returns the current face value of the dice
-unsigned int Dice::GetFaceValue() const {
-  return face_value;
+unsigned int Dice::get_face_value() const {
+  return face_value_;
 }

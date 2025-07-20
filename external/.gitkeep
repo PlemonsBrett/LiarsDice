@@ -1,0 +1,14 @@
+# External Dependencies Directory
+
+This directory is reserved for external libraries and dependencies that may be
+downloaded or installed during the build process. Currently empty as the project
+uses CMake's FetchContent for dependency management (e.g., Google Test).
+
+# Examples of what might go here:
+# - Third-party libraries not available through package managers
+# - Git submodules for external dependencies
+# - Downloaded archives of specific library versions
+# - Custom builds of modified external libraries
+
+Keep this directory in version control to ensure the build system can create
+necessary subdirectories during configuration.

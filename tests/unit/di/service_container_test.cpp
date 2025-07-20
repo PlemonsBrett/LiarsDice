@@ -1,4 +1,7 @@
+// Google Test main header for unit testing
 #include <gtest/gtest.h>
+
+// Dependency injection container and related interfaces
 #include "liarsdice/di/di.hpp"
 #include "liarsdice/interfaces/interfaces.hpp"
 #include "liarsdice/adapters/random_generator.hpp"
@@ -11,7 +14,7 @@ using namespace liarsdice::adapters;
 class ITestService {
 public:
     virtual ~ITestService() = default;
-    virtual int get_value() const = 0;
+    [[nodiscard]] virtual int get_value() const = 0;
     virtual void set_value(int value) = 0;
 };
 
@@ -22,43 +25,43 @@ private:
 public:
     explicit TestServiceImpl(int value = 42) : value_(value) {}
 
-    int get_value() const override { return value_; }
+    [[nodiscard]] int get_value() const override { return value_; }
     void set_value(int value) override { value_ = value; }
 };
 
 class ICalculator {
 public:
     virtual ~ICalculator() = default;
-    virtual int add(int a, int b) const = 0;
-    virtual int multiply(int a, int b) const = 0;
+    [[nodiscard]] virtual int add(int a, int b) const = 0;
+    [[nodiscard]] virtual int multiply(int a, int b) const = 0;
 };
 
 class Calculator : public ICalculator {
 public:
-    int add(int a, int b) const override { return a + b; }
-    int multiply(int a, int b) const override { return a * b; }
+    [[nodiscard]] int add(int a, int b) const override { return a + b; }
+    [[nodiscard]] int multiply(int a, int b) const override { return a * b; }
 };
 
 class ServiceContainerTest : public ::testing::Test {
-protected:
+public:
     void SetUp() override {
-        container_ = std::make_unique<ServiceContainer>();
+        container = std::make_unique<ServiceContainer>();
     }
 
     void TearDown() override {
-        container_.reset();
+        container.reset();
     }
 
-    std::unique_ptr<ServiceContainer> container_;
+    std::unique_ptr<ServiceContainer> container;
 };
 
 TEST_F(ServiceContainerTest, RegisterAndResolveTransientService) {
     // Register service
-    container_->register_service<ITestService, TestServiceImpl>(
-        ServiceLifetime::Transient, "", 100);
+    container->register_service<ITestService, TestServiceImpl>(
+        ServiceLifetime::kTransient, "", 100);
 
     // Resolve service
-    auto result = container_->resolve<ITestService>();
+    auto result = container->resolve<ITestService>();
     ASSERT_TRUE(result.has_value());
     
     auto service = std::move(*result);
@@ -68,11 +71,11 @@ TEST_F(ServiceContainerTest, RegisterAndResolveTransientService) {
 
 TEST_F(ServiceContainerTest, RegisterAndResolveSingletonService) {
     // Register singleton
-    container_->register_service<ITestService, TestServiceImpl>(
-        ServiceLifetime::Singleton, "", 200);
+    container->register_service<ITestService, TestServiceImpl>(
+        ServiceLifetime::kSingleton, "", 200);
 
     // Resolve first instance
-    auto result1 = container_->resolve<ITestService>();
+    auto result1 = container->resolve<ITestService>();
     ASSERT_TRUE(result1.has_value());
     
     auto service1 = std::move(*result1);
@@ -85,7 +88,7 @@ TEST_F(ServiceContainerTest, RegisterAndResolveSingletonService) {
     // Resolve second instance - for our current implementation,
     // this creates a new instance each time (not true singleton behavior)
     // In a production system, you'd want shared_ptr for true singletons
-    auto result2 = container_->resolve<ITestService>();
+    auto result2 = container->resolve<ITestService>();
     ASSERT_TRUE(result2.has_value());
     
     auto service2 = std::move(*result2);
@@ -100,10 +103,10 @@ TEST_F(ServiceContainerTest, RegisterWithCustomFactory) {
         return std::make_unique<TestServiceImpl>(999);
     };
 
-    container_->register_factory<ITestService>(factory, ServiceLifetime::Transient);
+    container->register_factory<ITestService>(factory, ServiceLifetime::kTransient);
 
     // Resolve service
-    auto result = container_->resolve<ITestService>();
+    auto result = container->resolve<ITestService>();
     ASSERT_TRUE(result.has_value());
     
     auto service = std::move(*result);
@@ -113,83 +116,83 @@ TEST_F(ServiceContainerTest, RegisterWithCustomFactory) {
 
 TEST_F(ServiceContainerTest, RegisterNamedService) {
     // Register named services
-    container_->register_service<ITestService, TestServiceImpl>(
-        ServiceLifetime::Transient, "service1", 111);
-    container_->register_service<ITestService, TestServiceImpl>(
-        ServiceLifetime::Transient, "service2", 222);
+    container->register_service<ITestService, TestServiceImpl>(
+        ServiceLifetime::kTransient, "service1", 111);
+    container->register_service<ITestService, TestServiceImpl>(
+        ServiceLifetime::kTransient, "service2", 222);
 
     // Resolve by name
-    auto result1 = container_->resolve<ITestService>("service1");
+    auto result1 = container->resolve<ITestService>("service1");
     ASSERT_TRUE(result1.has_value());
     EXPECT_EQ((*result1)->get_value(), 111);
 
-    auto result2 = container_->resolve<ITestService>("service2");
+    auto result2 = container->resolve<ITestService>("service2");
     ASSERT_TRUE(result2.has_value());
     EXPECT_EQ((*result2)->get_value(), 222);
 }
 
 TEST_F(ServiceContainerTest, ResolveNonExistentService) {
     // Try to resolve unregistered service
-    auto result = container_->resolve<ITestService>();
+    auto result = container->resolve<ITestService>();
     EXPECT_FALSE(result.has_value());
-    EXPECT_EQ(result.error(), DIError::ServiceNotRegistered);
+    EXPECT_EQ(result.error(), DIError::kServiceNotRegistered);
 }
 
 TEST_F(ServiceContainerTest, ResolveNonExistentNamedService) {
     // Try to resolve unregistered named service
-    auto result = container_->resolve<ITestService>("nonexistent");
+    auto result = container->resolve<ITestService>("nonexistent");
     EXPECT_FALSE(result.has_value());
-    EXPECT_EQ(result.error(), DIError::ServiceNotRegistered);
+    EXPECT_EQ(result.error(), DIError::kServiceNotRegistered);
 }
 
 TEST_F(ServiceContainerTest, IsRegisteredCheck) {
-    EXPECT_FALSE(container_->is_registered<ITestService>());
-    EXPECT_FALSE(container_->is_registered("test_service"));
+    EXPECT_FALSE(container->is_registered<ITestService>());
+    EXPECT_FALSE(container->is_registered("test_service"));
 
-    container_->register_service<ITestService, TestServiceImpl>(
-        ServiceLifetime::Transient, "test_service");
+    container->register_service<ITestService, TestServiceImpl>(
+        ServiceLifetime::kTransient, "test_service");
 
-    EXPECT_TRUE(container_->is_registered<ITestService>());
-    EXPECT_TRUE(container_->is_registered("test_service"));
+    EXPECT_TRUE(container->is_registered<ITestService>());
+    EXPECT_TRUE(container->is_registered("test_service"));
 }
 
 TEST_F(ServiceContainerTest, GetRegisteredServices) {
-    EXPECT_EQ(container_->size(), 0);
-    EXPECT_TRUE(container_->get_registered_services().empty());
+    EXPECT_EQ(container->size(), 0);
+    EXPECT_TRUE(container->get_registered_services().empty());
 
-    container_->register_service<ITestService, TestServiceImpl>(
-        ServiceLifetime::Transient, "service1");
-    container_->register_service<ICalculator, Calculator>(
-        ServiceLifetime::Transient, "calc");
+    container->register_service<ITestService, TestServiceImpl>(
+        ServiceLifetime::kTransient, "service1");
+    container->register_service<ICalculator, Calculator>(
+        ServiceLifetime::kTransient, "calc");
 
-    EXPECT_EQ(container_->size(), 2);
+    EXPECT_EQ(container->size(), 2);
     
-    auto services = container_->get_registered_services();
+    auto services = container->get_registered_services();
     EXPECT_EQ(services.size(), 2);
     EXPECT_TRUE(std::find(services.begin(), services.end(), "service1") != services.end());
     EXPECT_TRUE(std::find(services.begin(), services.end(), "calc") != services.end());
 }
 
 TEST_F(ServiceContainerTest, ClearServices) {
-    container_->register_service<ITestService, TestServiceImpl>();
-    container_->register_service<ICalculator, Calculator>();
+    container->register_service<ITestService, TestServiceImpl>();
+    container->register_service<ICalculator, Calculator>();
 
-    EXPECT_EQ(container_->size(), 2);
+    EXPECT_EQ(container->size(), 2);
 
-    container_->clear();
+    container->clear();
 
-    EXPECT_EQ(container_->size(), 0);
-    EXPECT_FALSE(container_->is_registered<ITestService>());
-    EXPECT_FALSE(container_->is_registered<ICalculator>());
+    EXPECT_EQ(container->size(), 0);
+    EXPECT_FALSE(container->is_registered<ITestService>());
+    EXPECT_FALSE(container->is_registered<ICalculator>());
 }
 
 TEST_F(ServiceContainerTest, RandomGeneratorIntegration) {
     // Register random generator
-    container_->register_service<IRandomGenerator, StandardRandomGenerator>(
-        ServiceLifetime::Singleton);
+    container->register_service<IRandomGenerator, StandardRandomGenerator>(
+        ServiceLifetime::kSingleton);
 
     // Resolve and test
-    auto result = container_->resolve<IRandomGenerator>();
+    auto result = container->resolve<IRandomGenerator>();
     ASSERT_TRUE(result.has_value());
     
     auto rng = std::move(*result);
@@ -218,10 +221,10 @@ TEST_F(ServiceContainerTest, MockRandomGeneratorDeterministic) {
         return std::make_unique<MockRandomGenerator>(values);
     };
 
-    container_->register_factory<IRandomGenerator>(factory);
+    container->register_factory<IRandomGenerator>(factory);
 
     // Resolve and test deterministic behavior
-    auto result = container_->resolve<IRandomGenerator>();
+    auto result = container->resolve<IRandomGenerator>();
     ASSERT_TRUE(result.has_value());
     
     auto rng = std::move(*result);
@@ -241,27 +244,27 @@ TEST_F(ServiceContainerTest, MockRandomGeneratorDeterministic) {
 
 // ServiceContainerBuilder tests
 class ServiceContainerBuilderTest : public ::testing::Test {
-protected:
+public:
     void SetUp() override {
-        builder_ = std::make_unique<ServiceContainerBuilder>();
+        builder = std::make_unique<ServiceContainerBuilder>();
     }
 
-    std::unique_ptr<ServiceContainerBuilder> builder_;
+    std::unique_ptr<ServiceContainerBuilder> builder;
 };
 
 TEST_F(ServiceContainerBuilderTest, FluentInterface) {
     // Use fluent interface to configure services
-    builder_->register_service<ITestService>()
+    builder->register_service<ITestService>()
         .as_singleton()
         .named("main_service")
         .use<TestServiceImpl>(500);
 
-    builder_->register_service<ICalculator>()
+    builder->register_service<ICalculator>()
         .as_transient()
         .use<Calculator>();
 
     // Build container
-    auto container = builder_->build();
+    auto container = builder->build();
     ASSERT_NE(container, nullptr);
 
     // Test registration worked
@@ -285,11 +288,11 @@ TEST_F(ServiceContainerBuilderTest, UseFactory) {
         return service;
     };
 
-    builder_->register_service<ITestService>()
+    builder->register_service<ITestService>()
         .as_transient()
         .use_factory(custom_factory);
 
-    auto container = builder_->build();
+    auto container = builder->build();
     auto result = container->resolve<ITestService>();
     
     ASSERT_TRUE(result.has_value());

@@ -1,0 +1,29 @@
+# Benchmarks Directory
+
+This directory is reserved for performance benchmarks and profiling code.
+Benchmarks are built when LIARSDICE_BUILD_BENCHMARKS=ON is set in CMake.
+
+## Potential benchmark targets
+
+### - Dice rolling performance tests
+
+### - Game state management efficiency
+
+### - Player action processing speed
+
+### - Memory allocation patterns
+
+### - Random number generator performance
+
+### - Large-scale game simulation benchmarks
+
+## Common benchmark frameworks for C++
+
+### - Google Benchmark (micro-benchmarks)
+
+## - Celero (cross-platform benchmarking)
+
+### - Custom timing utilities
+
+Keep this directory in version control to maintain the project structure
+even when benchmarks are not yet implemented.

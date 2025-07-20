@@ -7,7 +7,6 @@
     "cmake.configureOnOpen": true,
     "cmake.configureOnEdit": true,
     "cmake.buildTask": true,
-    
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
     "C_Cpp.default.compileCommands": "${workspaceFolder}/build/compile_commands.json",
     "C_Cpp.default.cppStandard": "c++23",
@@ -16,7 +15,6 @@
         "${workspaceFolder}/include",
         "${workspaceFolder}/src/include"
     ],
-    
     "files.associations": {
         "*.hpp": "cpp",
         "*.cpp": "cpp",
@@ -25,22 +23,18 @@
         "CMakeLists.txt": "cmake",
         "*.cmake": "cmake"
     },
-    
     "files.exclude": {
         "**/build": true,
         "**/.cache": true,
         "**/compile_commands.json": true
     },
-    
     "editor.formatOnSave": true,
     "editor.formatOnType": true,
     "editor.codeActionsOnSave": {
         "source.fixAll": "explicit"
     },
-    
     "clang-format.executable": "clang-format",
     "clang-format.style": "file",
-    
     "clang-tidy.executable": "clang-tidy",
     "clang-tidy.compilerArgs": [
         "-std=c++23"
@@ -48,7 +42,6 @@
     "clang-tidy.compilerArgsBefore": [
         "-I${workspaceFolder}/include"
     ],
-    
     "testMate.cpp.test.executables": [
         {
             "name": "Unit Tests",
@@ -57,10 +50,8 @@
             "env": {}
         }
     ],
-    
     "terminal.integrated.cwd": "${workspaceFolder}",
     "terminal.integrated.defaultProfile.osx": "bash",
-    
     "search.exclude": {
         "**/build": true,
         "**/.cache": true,
@@ -70,30 +61,30 @@
         "**/*.so": true,
         "**/*.dylib": true
     },
-    
     "cSpell.words": [
-        "GAMELOGICEXCEPTION",
-        "LIARSDICE",
-        "STREQUAL",
-        "VARCHAR",
-        "liarsdice",
-        "DLIARSDICE",
-        "DCMAKE",
-        "RAII",
-        "ctest",
-        "gtest",
-        "lldb",
+        "Celero",
         "cmake",
-        "hpp",
-        "cpp",
-        "endl",
         "cout",
+        "cpp",
+        "ctest",
+        "DCMAKE",
+        "DLIARSDICE",
+        "endl",
+        "GAMELOGICEXCEPTION",
+        "gtest",
+        "hpp",
+        "liarsdice",
+        "LIARSDICE",
+        "lldb",
+        "lliarsdice",
+        "metaprogramming",
         "MSVC",
+        "RAII",
         "shǎizi",
         "shuōhuǎng",
-        "lliarsdice"
+        "STREQUAL",
+        "VARCHAR"
     ],
-    
     "cmake.options.statusBarVisibility": "visible",
     "cmake.options.advanced": {
         "build": {

@@ -14,26 +14,26 @@ namespace liarsdice::di {
  */
 class ServiceLocator {
 private:
-    static inline std::unique_ptr<ServiceContainer> container_;
-    static inline bool initialized_ = false;
+    static inline std::unique_ptr<ServiceContainer> container;
+    static inline bool initialized = false;
 
 public:
     /**
      * @brief Initialize the service locator with a container
      */
     static void initialize(std::unique_ptr<ServiceContainer> container) {
-        container_ = std::move(container);
-        initialized_ = true;
+        ServiceLocator::container = std::move(container);
+        initialized = true;
     }
 
     /**
      * @brief Get the global service container
      */
     static ServiceContainer& get_container() {
-        if (!initialized_ || !container_) {
-            throw DIException("ServiceLocator not initialized", DIError::ServiceNotRegistered);
+        if (!initialized || !container) {
+            throw DIException("ServiceLocator not initialized", DIError::kServiceNotRegistered);
         }
-        return *container_;
+        return *container;
     }
 
     /**
@@ -56,32 +56,40 @@ public:
      * @brief Check if the service locator is initialized
      */
     static bool is_initialized() {
-        return initialized_ && container_ != nullptr;
+        return initialized && container != nullptr;
     }
 
     /**
      * @brief Reset the service locator
      */
     static void reset() {
-        container_.reset();
-        initialized_ = false;
+        container.reset();
+        initialized = false;
     }
 };
 
 /**
- * @brief Helper macros for common DI operations
+ * @brief Helper functions for common DI operations
  */
-#define REGISTER_SERVICE(Container, Interface, Implementation, ...) \
-    (Container).register_service<Interface, Implementation>(__VA_ARGS__)
+template<typename Container, typename Interface, typename Implementation, typename... Args>
+constexpr void register_service(Container& container, Args&&... args) {
+    container.template register_service<Interface, Implementation>(std::forward<Args>(args)...);
+}
 
-#define REGISTER_SINGLETON(Container, Interface, Implementation, ...) \
-    (Container).register_service<Interface, Implementation>( \
-        ::liarsdice::di::ServiceLifetime::Singleton, "", __VA_ARGS__)
+template<typename Container, typename Interface, typename Implementation, typename... Args>
+constexpr void register_singleton(Container& container, Args&&... args) {
+    container.template register_service<Interface, Implementation>(
+        ::liarsdice::di::ServiceLifetime::kSingleton, "", std::forward<Args>(args)...);
+}
 
-#define RESOLVE_SERVICE(Container, Interface) \
-    (Container).resolve<Interface>()
+template<typename Container, typename Interface>
+constexpr auto resolve_service(Container& container) {
+    return container.template resolve<Interface>();
+}
 
-#define RESOLVE_NAMED_SERVICE(Container, Interface, Name) \
-    (Container).resolve<Interface>(Name)
+template<typename Container, typename Interface>
+constexpr auto resolve_named_service(Container& container, const std::string& name) {
+    return container.template resolve<Interface>(name);
+}
 
 } // namespace liarsdice::di

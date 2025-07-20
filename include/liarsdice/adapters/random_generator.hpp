@@ -2,7 +2,7 @@
 
 #include "../interfaces/i_random_generator.hpp"
 #include <random>
-#include <memory>
+#include <algorithm>
 
 namespace liarsdice::adapters {
 
@@ -14,8 +14,8 @@ namespace liarsdice::adapters {
  */
 class StandardRandomGenerator : public interfaces::IRandomGenerator {
 private:
-    mutable std::mt19937 generator_;
     std::random_device rd_;
+    mutable std::mt19937 generator_;
 
 public:
     /**

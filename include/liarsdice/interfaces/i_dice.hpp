@@ -1,6 +1,11 @@
 #pragma once
 
+#include <memory>
+
 namespace liarsdice::interfaces {
+
+// Forward declaration
+class IDice;
 
 /**
  * @brief Interface for dice objects
@@ -21,7 +26,7 @@ public:
      * @brief Get the current face value of the die
      * @return The current face value (1-6)
      */
-    virtual unsigned int get_face_value() const = 0;
+    [[nodiscard]] virtual unsigned int get_face_value() const = 0;
 
     /**
      * @brief Set the face value of the die (for testing purposes)
@@ -34,13 +39,13 @@ public:
      * @param value The value to check
      * @return true if the value is valid (1-6), false otherwise
      */
-    virtual bool is_valid_face_value(unsigned int value) const = 0;
+    [[nodiscard]] virtual bool is_valid_face_value(unsigned int value) const = 0;
 
     /**
      * @brief Clone this die (for copying purposes)
      * @return A unique pointer to a cloned die
      */
-    virtual std::unique_ptr<IDice> clone() const = 0;
+    [[nodiscard]] virtual ::std::unique_ptr<IDice> clone() const = 0;
 };
 
 } // namespace liarsdice::interfaces

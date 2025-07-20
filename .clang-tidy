@@ -18,7 +18,6 @@ Checks: >
 
 WarningsAsErrors: ''
 HeaderFilterRegex: '.*'
-AnalyzeTemporaryDtors: false
 FormatStyle: file
 
 CheckOptions:
@@ -70,4 +69,3 @@ CheckOptions:
     value: lower_case
   - key: cppcoreguidelines-special-member-functions.AllowSoleDefaultDtor
     value: true
-...

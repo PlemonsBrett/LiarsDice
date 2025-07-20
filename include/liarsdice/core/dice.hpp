@@ -14,16 +14,16 @@ public:
   Dice();
 
   // Rolls the dice and updates the face value
-  void Roll();
+  void roll();
 
   // Returns the current face value of the dice
-  [[nodiscard]] unsigned int GetFaceValue() const;
+  [[nodiscard]] unsigned int get_face_value() const;
 
 private:
-  unsigned int face_value{};  // Holds the face value of the dice
-  std::random_device rd;  // Random device engine
-  std::mt19937 gen;  // Mersenne Twister random number generator
-  std::uniform_int_distribution<> dis;  // Uniform distribution
+  unsigned int face_value_{};  // Holds the face value of the dice
+  std::random_device random_device_;  // Random device engine
+  std::mt19937 generator_;  // Mersenne Twister random number generator
+  std::uniform_int_distribution<> distribution_;  // Uniform distribution
 };
 
 #endif // DICE_HPP

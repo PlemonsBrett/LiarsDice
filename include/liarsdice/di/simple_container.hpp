@@ -52,12 +52,12 @@ public:
         static_assert(std::is_base_of_v<TInterface, TImplementation>, 
                      "TImplementation must derive from TInterface");
 
-        auto factory = [args...]() -> void* {
-            return new TImplementation(args...);
+        auto factory = [args = std::tuple<Args...>(std::forward<Args>(args)...)]() -> void* {
+            return std::apply([](auto&&... args) { return new TImplementation(std::forward<decltype(args)>(args)...); }, args);
         };
 
         auto deleter = [](void* ptr) {
-            delete static_cast<TImplementation*>(ptr);
+            std::unique_ptr<TImplementation>(static_cast<TImplementation*>(ptr));
         };
 
         auto type_index = std::type_index(typeid(TInterface));
@@ -66,7 +66,7 @@ public:
         services_.emplace(type_index, ServiceEntry(factory, deleter, service_name));
 
         if (!name.empty()) {
-            named_services_[name] = type_index;
+            named_services_.emplace(name, type_index);
         }
     }
 
@@ -83,7 +83,7 @@ public:
         };
 
         auto deleter = [](void* ptr) {
-            delete static_cast<TInterface*>(ptr);
+            std::unique_ptr<TInterface>(static_cast<TInterface*>(ptr));
         };
 
         auto type_index = std::type_index(typeid(TInterface));
@@ -92,7 +92,7 @@ public:
         services_.emplace(type_index, ServiceEntry(wrapper_factory, deleter, service_name));
 
         if (!name.empty()) {
-            named_services_[name] = type_index;
+            named_services_.emplace(name, type_index);
         }
     }
 
@@ -137,14 +137,14 @@ public:
     template<typename T>
     bool is_registered() const {
         auto type_index = std::type_index(typeid(T));
-        return services_.find(type_index) != services_.end();
+        return services_.contains(type_index);
     }
 
     /**
      * @brief Check if a named service is registered
      */
     bool is_registered(const std::string& name) const {
-        return named_services_.find(name) != named_services_.end();
+        return named_services_.contains(name);
     }
 
     /**

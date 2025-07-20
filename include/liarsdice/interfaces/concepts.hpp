@@ -1,9 +1,8 @@
 #pragma once
 
 #include <concepts>
-#include <vector>
-#include <string>
 #include <type_traits>
+#include <memory>
 
 namespace liarsdice::interfaces {
 
@@ -15,8 +14,8 @@ template<typename T>
 concept DiceInterface = requires(T dice) {
     { dice.roll() } -> std::same_as<void>;
     { dice.get_face_value() } -> std::convertible_to<unsigned int>;
-    { dice.set_face_value(1u) } -> std::same_as<void>;
-    { dice.is_valid_face_value(1u) } -> std::same_as<bool>;
+    { dice.set_face_value(1U) } -> std::same_as<void>;
+    { dice.is_valid_face_value(1U) } -> std::same_as<bool>;
 };
 
 // Concept for player interface
@@ -53,7 +52,7 @@ concept GameInterface = requires(T game) {
 template<typename T>
 concept RandomGeneratorInterface = requires(T rng) {
     { rng.generate(1, 6) } -> std::convertible_to<int>;
-    { rng.seed(0u) } -> std::same_as<void>;
+    { rng.seed(0U) } -> std::same_as<void>;
 };
 
 // Concept for service interface (for DI container)

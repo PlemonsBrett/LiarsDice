@@ -4,34 +4,37 @@
 
 
 
-const std::string PLAY_AGAIN_YES = "yes";
-const std::string WELCOME_MESSAGE = "Welcome to Liar's Dice!\n";
-const std::string GOODBYE_MESSAGE = "Thank you for playing Liar's Dice!\n";
-const std::string PLAY_AGAIN_PROMPT = "Do you want to play again? (yes/no): ";
+const std::string kPlayAgainYes = "yes";
+const std::string kWelcomeMessage = "Welcome to Liar's Dice!\n";
+const std::string kGoodbyeMessage = "Thank you for playing Liar's Dice!\n";
+const std::string kPlayAgainPrompt = "Do you want to play again? (yes/no): ";
 
 int main() {
-  std::string playAgain;
+  std::string play_again;
+  bool should_continue = true;
 
   // Display the welcome message
-  std::cout << WELCOME_MESSAGE;
+  std::cout << kWelcomeMessage;
 
   // Initialize the game
   Game game;
 
-  do {
+  while (should_continue) {
     // Start the game
-    game.Init();
+    game.init();
 
     // Prompt the user to play again
-    std::cout << PLAY_AGAIN_PROMPT;
-    std::cin >> playAgain;
+    std::cout << kPlayAgainPrompt;
+    std::cin >> play_again;
 
     // Clear the input buffer to ensure proper functioning of cin in the next iteration
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-  } while (playAgain == PLAY_AGAIN_YES);
+    
+    should_continue = (play_again == kPlayAgainYes);
+  }
 
   // Display the goodbye message
-  std::cout << GOODBYE_MESSAGE;
+  std::cout << kGoodbyeMessage;
 
   return 0;
 }

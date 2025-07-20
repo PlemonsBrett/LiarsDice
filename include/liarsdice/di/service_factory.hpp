@@ -2,7 +2,6 @@
 
 #include <memory>
 #include <functional>
-#include <type_traits>
 #include "../interfaces/concepts.hpp"
 #include "service_container.hpp"
 
@@ -126,7 +125,7 @@ private:
         };
         
         if (!std::apply(check_deps, deps)) {
-            throw DIException("Failed to resolve dependencies", DIError::CreationFailed);
+            throw DIException("Failed to resolve dependencies", DIError::kCreationFailed);
         }
 
         // Extract values and create instance
@@ -144,24 +143,24 @@ private:
 template<interfaces::ServiceInterface TInterface>
 class ServiceRegistration {
 private:
-    ServiceContainer& container_;
-    ServiceLifetime lifetime_ = ServiceLifetime::Transient;
+    ServiceContainer* container_;
+    ServiceLifetime lifetime_ = ServiceLifetime::kTransient;
     std::string name_;
 
 public:
     explicit ServiceRegistration(ServiceContainer& container) 
-        : container_(container) {}
+        : container_(&container) {}
 
     /**
      * @brief Set service lifetime
      */
     ServiceRegistration& as_singleton() {
-        lifetime_ = ServiceLifetime::Singleton;
+        lifetime_ = ServiceLifetime::kSingleton;
         return *this;
     }
 
     ServiceRegistration& as_transient() {
-        lifetime_ = ServiceLifetime::Transient;
+        lifetime_ = ServiceLifetime::kTransient;
         return *this;
     }
 
@@ -178,7 +177,7 @@ public:
      */
     template<std::derived_from<TInterface> TImplementation, typename... Args>
     void use(Args&&... args) {
-        container_.register_service<TInterface, TImplementation>(
+        container_->register_service<TInterface, TImplementation>(
             lifetime_, name_, std::forward<Args>(args)...);
     }
 
@@ -186,14 +185,14 @@ public:
      * @brief Register with factory function
      */
     void use_factory(std::function<std::unique_ptr<TInterface>()> factory) {
-        container_.register_factory<TInterface>(std::move(factory), lifetime_, name_);
+        container_->register_factory<TInterface>(std::move(factory), lifetime_, name_);
     }
 
     /**
      * @brief Register existing instance
      */
     void use_instance(std::unique_ptr<TInterface> instance) {
-        container_.register_instance<TInterface>(std::move(instance), name_);
+        container_->register_instance<TInterface>(std::move(instance), name_);
     }
 };
 

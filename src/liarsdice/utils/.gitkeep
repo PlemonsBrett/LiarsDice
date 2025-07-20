@@ -1,0 +1,41 @@
+# Utilities Directory
+
+This directory contains utility functions and helper classes that provide
+common functionality across the LiarsDice library components.
+
+## Potential utility modules
+
+### - String manipulation and formatting helpers
+
+### - Mathematical utilities (probability calculations, statistics)
+
+### - Input validation and sanitization functions
+
+### - Logging and debugging utilities
+
+### - Container manipulation helpers
+
+### - Type conversion utilities
+
+### - Configuration file parsing
+
+### - Cross-platform compatibility abstractions
+
+### - Memory management utilities
+
+### - Error handling and exception utilities
+
+## Design principles for utilities
+
+### - Header-only when possible for easy inclusion
+
+### - Minimal dependencies on external libraries
+
+### - Well-tested with comprehensive unit tests
+
+### - Clear, self-documenting function names
+
+### - Const-correct and exception-safe implementations
+
+Keep this directory in version control to maintain consistent library structure
+and provide a designated location for shared utility code.

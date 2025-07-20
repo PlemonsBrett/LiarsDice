@@ -15,25 +15,25 @@ public:
   explicit Player(int id);
 
   // Rolls all the dice for the player
-  void RollDice();
+  void roll_dice();
 
   // Displays the face values of the player's dice
-  void DisplayDice();
+  void display_dice();
 
   // Allows the player to make a guess
-  std::pair<int, int> MakeGuess();
+  static std::pair<int, int> make_guess();
 
   // Allows the player to call "Liar" on another player's guess
-  bool CallLiar();
+  static bool call_liar();
 
   // Returns a const reference to the player's dice to avoid copying
-  [[nodiscard]] const std::vector<Dice>& GetDice() const { return dice; }
+  [[nodiscard]] const std::vector<Dice>& get_dice() const { return dice_; }
 
-  [[nodiscard]] int GetPlayerId() const { return id; };
+  [[nodiscard]] int get_player_id() const { return id_; };
 
 private:
-  int id;  // Player ID
-  std::vector<Dice> dice;  // Player's dice
+  int id_;  // Player ID
+  std::vector<Dice> dice_;  // Player's dice
 };
 
 #endif //PLAYER_HPP
