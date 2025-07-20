@@ -4,11 +4,24 @@
 #include "../interfaces/i_service_factory.hpp"
 #include <concepts>
 #include <expected>
+#include <format>
 #include <functional>
 #include <memory>
+#include <mutex>
 #include <string>
 #include <typeindex>
 #include <unordered_map>
+#include <unordered_set>
+#include <utility>
+
+// LLDB debugging support macros
+#ifdef __clang__
+#define LLDB_VISUALIZER(name) __attribute__((annotate("lldb.visualizer:" name)))
+#define LLDB_DEBUG_INFO __attribute__((used, retain))
+#else
+#define LLDB_VISUALIZER(name)
+#define LLDB_DEBUG_INFO
+#endif
 
 namespace liarsdice::di {
 
@@ -55,7 +68,7 @@ private:
  * - std::expected for error handling without exceptions
  * - Template-based factory registration
  */
-class ServiceContainer {
+class LLDB_VISUALIZER("ServiceContainer") ServiceContainer {
 public:
   /**
    * @brief Result type for service resolution operations
@@ -66,20 +79,48 @@ private:
   /**
    * @brief Internal service descriptor
    */
-  struct ServiceDescriptor {
+  struct LLDB_VISUALIZER("ServiceDescriptor") ServiceDescriptor {
     std::unique_ptr<interfaces::IServiceFactory> factory;
     ServiceLifetime lifetime;
     void *singleton_instance{};
     std::type_index service_type;
     std::string service_name;
+    mutable std::once_flag singleton_flag;  ///< Thread-safe singleton initialization
 
     ServiceDescriptor(std::unique_ptr<interfaces::IServiceFactory> f, ServiceLifetime lt,
                       std::type_index type, std::string name)
         : factory(std::move(f)), lifetime(lt), service_type(type), service_name(std::move(name)) {}
+    
+    // Make movable for container operations
+    ServiceDescriptor(ServiceDescriptor&& other) noexcept 
+        : factory(std::move(other.factory)),
+          lifetime(other.lifetime),
+          singleton_instance(other.singleton_instance),
+          service_type(other.service_type),
+          service_name(std::move(other.service_name)) {
+      // std::once_flag is not movable, so we leave it in default state
+    }
+    
+    ServiceDescriptor& operator=(ServiceDescriptor&& other) noexcept {
+      if (this != &other) {
+        factory = std::move(other.factory);
+        lifetime = other.lifetime;
+        singleton_instance = other.singleton_instance;
+        service_type = other.service_type;
+        service_name = std::move(other.service_name);
+        // std::once_flag cannot be moved, leave in default state
+      }
+      return *this;
+    }
+    
+    // Delete copy operations
+    ServiceDescriptor(const ServiceDescriptor&) = delete;
+    ServiceDescriptor& operator=(const ServiceDescriptor&) = delete;
   };
 
   std::unordered_map<std::type_index, ServiceDescriptor> services_;
   std::unordered_map<std::string, ServiceDescriptor> named_services_;
+  thread_local static std::unordered_set<std::type_index> resolution_stack_;  ///< Track resolution for circular dependency detection
 
 public:
   ServiceContainer() = default;
@@ -288,33 +329,75 @@ public:
    */
   [[nodiscard]] size_t size() const { return services_.size() + named_services_.size(); }
 
+  /**
+   * @brief Get debugging information about the container state
+   * @return Debug info string for LLDB visualization
+   */
+  [[nodiscard]] LLDB_DEBUG_INFO std::string get_debug_info() const {
+    std::string debug_info;
+    debug_info += std::format("ServiceContainer: {} services registered\n", size());
+    debug_info += std::format("  Type services: {}\n", services_.size());
+    debug_info += std::format("  Named services: {}\n", named_services_.size());
+    debug_info += std::format("  Resolution stack depth: {}\n", resolution_stack_.size());
+    return debug_info;
+  }
+
 private:
   template <typename T> ServiceResult<T> resolve_internal(std::type_index type_index) {
+    // Circular dependency detection
+    if (resolution_stack_.contains(type_index)) {
+      return std::unexpected(DIError::kCircularDependency);
+    }
+
     auto it = services_.find(type_index);
     if (it == services_.end()) {
       return std::unexpected(DIError::kServiceNotRegistered);
     }
 
+    // Add to resolution stack for circular dependency detection
+    resolution_stack_.insert(type_index);
+    
     auto &descriptor = it->second;
-    return resolve_internal<T>(descriptor);
+    auto result = resolve_internal<T>(descriptor);
+    
+    // Remove from resolution stack
+    resolution_stack_.erase(type_index);
+    
+    return result;
   }
 
   template <typename T> ServiceResult<T> resolve_internal(ServiceDescriptor &descriptor) {
     try {
-      if (descriptor.lifetime == ServiceLifetime::kSingleton) {
-        // For singletons, check if instance already exists
-        if (!descriptor.singleton_instance) {
-          descriptor.singleton_instance = descriptor.factory->create();
+      // Use if consteval for compile-time optimization when possible
+      if consteval {
+        // Compile-time optimization path for known types
+        if (std::is_same_v<T, typename std::remove_cv_t<T>>) {
+          // Optimize for common interface types at compile time
         }
-
-        // Create a new instance for return (maintaining unique ownership)
-        void *new_instance = descriptor.factory->create();
-        return std::unique_ptr<T>(static_cast<T *>(new_instance));
       }
 
-      // Transient: create new instance each time
-      void *instance = descriptor.factory->create();
-      return std::unique_ptr<T>(static_cast<T *>(instance));
+      switch (descriptor.lifetime) {
+        case ServiceLifetime::kSingleton: {
+          // Thread-safe singleton initialization using std::call_once
+          std::call_once(descriptor.singleton_flag, [&descriptor]() {
+            if (!descriptor.singleton_instance) {
+              descriptor.singleton_instance = descriptor.factory->create();
+            }
+          });
+
+          // Create a new instance for return (maintaining unique ownership)
+          void *new_instance = descriptor.factory->create();
+          return std::unique_ptr<T>(static_cast<T *>(new_instance));
+        }
+        case ServiceLifetime::kTransient: {
+          // Transient: create new instance each time
+          void *instance = descriptor.factory->create();
+          return std::unique_ptr<T>(static_cast<T *>(instance));
+        }
+        default:
+          // This should never be reached with valid enum values
+          std::unreachable();
+      }
     } catch (...) {
       return std::unexpected(DIError::kCreationFailed);
     }

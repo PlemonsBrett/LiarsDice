@@ -85,19 +85,19 @@ public:
    * @brief Get the minimum number of players required
    * @return Minimum player count
    */
-  [[nodiscard]] virtual size_t get_min_players() const = 0;
+  [[nodiscard]] virtual constexpr size_t get_min_players() const = 0;
 
   /**
    * @brief Get the maximum number of players allowed
    * @return Maximum player count
    */
-  [[nodiscard]] virtual size_t get_max_players() const = 0;
+  [[nodiscard]] virtual constexpr size_t get_max_players() const = 0;
 
   /**
    * @brief Get the number of dice each player starts with
    * @return Initial dice count per player
    */
-  [[nodiscard]] virtual size_t get_initial_dice_per_player() const = 0;
+  [[nodiscard]] virtual constexpr size_t get_initial_dice_per_player() const = 0;
 };
 
 } // namespace liarsdice::interfaces

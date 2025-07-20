@@ -1,8 +1,12 @@
 # Create the core library
 add_library(liarsdice_core
     liarsdice/core/dice.cpp
+    liarsdice/core/dice_impl.cpp
     liarsdice/core/player.cpp
+    liarsdice/core/player_impl.cpp
     liarsdice/core/game.cpp
+    liarsdice/core/game_impl.cpp
+    liarsdice/di/service_container.cpp
 )
 
 add_library(liarsdice::core ALIAS liarsdice_core)
