@@ -1,69 +1,276 @@
-# Liar's Dice
-Liar’s Dice is a multiplayer dice game with a minimum of two players and no upper limit on the number
-of participants. The goal is to make a correct guess or correctly call another player a liar.
+# 🎲 Liar's Dice
 
-# Scenario
-Liar’s Dice uses 5 dice per player (so 15 dice for three people, 20 dice for four people, and so on). The object of the game is to guess how many of a particular die sides are showing among all the players, knowing only your own set. Each player’s guess has to increase the number of die sides on the table. Guessing continues until a player is called out as a “liar” and all the dice are revealed.
+A modern C++23 implementation of the classic Liar's Dice game with a professional library structure, comprehensive testing, and development tools.
 
-# Background
-_Most of the information below came from this [article](https://www.thoughtco.com/how-to-play-liars-dice-687532)._
+[![C++23](https://img.shields.io/badge/C%2B%2B-23-blue.svg)](https://en.cppreference.com/w/cpp/23)
+[![CMake](https://img.shields.io/badge/CMake-3.21+-green.svg)](https://cmake.org/)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-Throughout China, Liar’s Dice (說謊者的骰子, shuōhuǎng zhě de shǎizi) is played during holidays, especially Chinese New Year. The fast-paced game can be played by two or more players and the number of rounds is limitless. Players usually agree to a predetermined number of rounds or set a time limit but none of that is set in stone; new players and additional rounds can be added as the game goes along. While the number of players and rounds may be casual, Liar’s Dice can also be quite intense as it's traditionally a drinking game. In China, in addition to holiday celebrations, it's also common to see it being played at bars, in clubs, and even outdoors at sidewalk restaurants.
+## 📖 About the Game
 
-When played not digitally, you would typically have:
-- One cup per player
-- Five dice per player
-- One table
+Liar's Dice is a multiplayer dice game with a minimum of two players and no upper limit on participants. The goal is to make correct guesses about the total dice values across all players or successfully call another player a liar.
 
-# Rules
-- The first player calls out two numbers: first, how many dice on the table he or she thinks have
-been rolled as a number between one and six. For example, player one could say “two fives,”
-which means he or she thinks there are at least two dice that are fives among all the players’
-dice (including his or her own).
-o At this point, all players can accept what has been called out and move on to player two
-or call player one out, which will end the round and result in a winner or loser for the
-round.
-- If player one calls out “two fives,” it does not matter whether player one has a five or not as
-bluffing is allowed in Liar’s Dice. It only matters if another player believes player one is bluffing
-and calls him or her out on it. In that instance, all dice must be revealed. If player one is correct,
-the player wins. If player one is wrong, then the player who called him/her out is the winner.
-The round is then over.
-- If player one’s call is accepted, then player two calls out a number. The first number must be
-greater than what player one called. For example, if player one called out “two fives,” player
-two must call out three or higher for his or her first number, so “three fives,” “three fours,” or
-four twos” would all be acceptable. “One five” or “two sixes” would be unacceptable.
-- Game play continues until someone is called out.
+### Game Rules
 
-# Project Structure
-```md
-LiarDiceGame/
-│
-├── src/
-│   ├── controller/
-│   │   └── Game.cpp
-│   ├── model/
-│   │   ├── Player.cpp
-│   │   └── Dice.cpp
-│   └── main.cpp
-│
-├── include/
-│   ├── controller/
-│   │   └── Game.hpp
-│   ├── model/
-│   │   ├── Player.hpp
-│   │   └── Dice.hpp
-│   └── exceptions
-│   │   ├── CustomException.hpp
-│   │   ├── FileException.hpp
-│   │   ├── GameLogicException.hpp
-│   │   └── InputException.hpp
-│
-├── assets/
-│   └── rules.txt
-│
-├── build/
-│
-├── CMakeLists.txt
-│
-└── README.md
+- Each player starts with 5 dice
+- Players take turns guessing how many dice of a specific value exist across all players' dice
+- Each guess must be higher than the previous (more dice or higher value)
+- Players can call "liar" instead of making a guess
+- When "liar" is called, all dice are revealed to determine the winner
+
+### Cultural Background
+
+Throughout China, Liar's Dice (說謊者的骰子, shuōhuǎng zhě de shǎizi) is played during holidays, especially Chinese New Year. It's traditionally a social drinking game played at celebrations, bars, and restaurants.
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- **C++23 compatible compiler** (GCC 12+, Clang 15+, or MSVC 2022+)
+- **CMake 3.21+**
+- **Git** (for cloning)
+
+### Installation & Build
+
+```bash
+# Clone the repository
+git clone <repository-url>
+cd LiarsDice
+
+# Build the project (Release mode)
+./scripts/build.sh
+
+# Or build manually
+cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
+cmake --build build
 ```
+
+### Running the Game
+
+```bash
+# Run the interactive CLI game
+./build/bin/liarsdice-cli
+
+# Run the library example
+./build/bin/basic_game
+
+# Run tests
+./scripts/test.sh
+```
+
+## 🏗️ Project Architecture
+
+This project follows modern C++ best practices with a clean separation between library and application code:
+
+```
+LiarsDice/
+├── src/                          # Library implementation
+│   └── liarsdice/
+│       ├── core/                 # Core game logic
+│       │   ├── dice.cpp         # Dice implementation
+│       │   ├── player.cpp       # Player management  
+│       │   └── game.cpp         # Game controller
+│       ├── exceptions/           # Custom exceptions
+│       └── utils/                # Utility functions
+├── include/                      # Public API headers
+│   └── liarsdice/
+│       ├── core/                 # Core interfaces
+│       ├── exceptions/           # Exception hierarchy
+│       └── liarsdice.hpp        # Main convenience header
+├── apps/                         # Executable applications
+│   └── liarsdice-cli/           # Command-line interface
+├── tests/                        # Test suite (Google Test)
+│   └── unit/core/               # Unit tests
+├── examples/                     # Usage examples
+├── cmake/                        # CMake modules
+├── scripts/                      # Build automation
+└── assets/                       # Game resources
+```
+
+### Library Design
+
+- **`liarsdice::core`** - Reusable game logic library
+- **Modern C++23** - Uses latest language features
+- **Exception Safety** - Custom exception hierarchy
+- **RAII** - Proper resource management
+- **Testing** - Comprehensive unit test coverage
+
+## 🛠️ Development
+
+### Build Options
+
+```bash
+# Development build with debug info
+./scripts/build.sh Debug
+
+# Manual configuration with options
+cmake -B build -S . \
+  -DCMAKE_BUILD_TYPE=Debug \
+  -DLIARSDICE_BUILD_TESTS=ON \
+  -DLIARSDICE_BUILD_EXAMPLES=ON \
+  -DLIARSDICE_BUILD_BENCHMARKS=OFF
+```
+
+### Available CMake Options
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `LIARSDICE_BUILD_TESTS` | `ON` | Build the test suite |
+| `LIARSDICE_BUILD_EXAMPLES` | `ON` | Build example programs |
+| `LIARSDICE_BUILD_BENCHMARKS` | `OFF` | Build performance benchmarks |
+| `LIARSDICE_BUILD_DOCS` | `OFF` | Build documentation |
+| `LIARSDICE_INSTALL` | `ON` | Generate install targets |
+| `LIARSDICE_USE_SANITIZERS` | `ON` | Enable sanitizers in debug builds |
+
+### Testing
+
+```bash
+# Run all tests
+./scripts/test.sh
+
+# Run tests manually
+ctest --test-dir build --output-on-failure
+
+# Run specific test categories
+./build/bin/unit_tests --gtest_filter="DiceTest.*"
+```
+
+### Code Quality
+
+```bash
+# Format code (requires clang-format)
+find . -name "*.cpp" -o -name "*.hpp" | xargs clang-format -i
+
+# Lint code (requires clang-tidy)  
+clang-tidy src/**/*.cpp -p build
+
+# Generate compile commands for IDE support
+cmake -B build -S . -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+```
+
+## 🔧 IDE Setup
+
+### Visual Studio Code
+
+The project includes VSCode configuration for:
+- **IntelliSense** - C++23 support with proper include paths
+- **Debugging** - Ready-to-use launch configurations
+- **Building** - Integrated build tasks
+- **Testing** - Google Test integration
+
+Open the project in VSCode and use:
+- `Ctrl+Shift+P` → "CMake: Configure" to set up the build
+- `F5` to debug the application
+- `Ctrl+Shift+P` → "Test: Run All Tests" to run tests
+
+### Other IDEs
+
+- **CLion** - Import as CMake project
+- **Visual Studio** - Open folder or import CMake
+- **Qt Creator** - Open CMakeLists.txt
+
+## 📚 Using as a Library
+
+```cpp
+#include "liarsdice/liarsdice.hpp"
+
+int main() {
+    // Create dice
+    liarsdice::Dice die;
+    die.Roll();
+    std::cout << "Rolled: " << die.GetFaceValue() << std::endl;
+    
+    // Create player
+    liarsdice::Player player(1);
+    player.RollDice();
+    
+    // Access player's dice
+    const auto& dice = player.GetDice();
+    for (const auto& d : dice) {
+        std::cout << d.GetFaceValue() << " ";
+    }
+    
+    return 0;
+}
+```
+
+### Integration
+
+#### CMake
+
+```cmake
+find_package(LiarsDice REQUIRED)
+target_link_libraries(your_target PRIVATE liarsdice::core)
+```
+
+#### Manual Linking
+
+```bash
+g++ -std=c++23 your_app.cpp -I/path/to/include -L/path/to/lib -lliarsdice_core
+```
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+**Build fails with C++23 errors:**
+- Ensure you have a modern compiler (GCC 12+, Clang 15+)
+- Check that CMake is version 3.21 or higher
+
+**Tests fail to build:**
+- Google Test is automatically fetched, ensure internet connectivity
+- For offline builds, install Google Test system-wide
+
+**Missing compile_commands.json:**
+```bash
+cmake -B build -S . -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+```
+
+**Asset loading errors:**
+- Assets are automatically copied to build directory
+- Ensure `assets/rules.txt` exists in the source directory
+
+### Performance
+
+- **Release builds** use IPO/LTO optimization automatically
+- **Debug builds** include sanitizers for memory safety
+- **Profiling** builds can be created with `-DCMAKE_BUILD_TYPE=RelWithDebInfo`
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Follow the existing code style (`.clang-format` provided)
+4. Add tests for new functionality
+5. Ensure all tests pass (`./scripts/test.sh`)
+6. Commit changes (`git commit -m 'Add amazing feature'`)
+7. Push to branch (`git push origin feature/amazing-feature`)
+8. Open a Pull Request
+
+### Code Standards
+
+- **C++23** standard compliance
+- **Google style** formatting (automated with `.clang-format`)
+- **Comprehensive testing** for new features
+- **Exception safety** and RAII principles
+- **Clear documentation** and comments
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- Game rules and cultural background from [ThoughtCo](https://www.thoughtco.com/how-to-play-liars-dice-687532)
+- Modern C++ project structure inspired by industry best practices
+- CMake configuration follows conventions from major C++ libraries
+
+## 📞 Support
+
+- **Issues** - Report bugs and request features via GitHub Issues
+- **Documentation** - See `CLAUDE.md` for detailed development guidance
+- **Examples** - Check the `examples/` directory for usage patterns
+
+---
+
+**Happy gaming! 🎲**

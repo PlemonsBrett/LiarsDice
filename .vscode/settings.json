@@ -1,8 +1,109 @@
 {
+    "cmake.buildDirectory": "${workspaceFolder}/build",
+    "cmake.sourceDirectory": "${workspaceFolder}",
+    "cmake.generator": "Unix Makefiles",
+    "cmake.buildBeforeRun": true,
+    "cmake.clearOutputBeforeBuild": true,
+    "cmake.configureOnOpen": true,
+    "cmake.configureOnEdit": true,
+    "cmake.buildTask": true,
+    
+    "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+    "C_Cpp.default.compileCommands": "${workspaceFolder}/build/compile_commands.json",
+    "C_Cpp.default.cppStandard": "c++23",
+    "C_Cpp.default.intelliSenseMode": "macos-clang-x64",
+    "C_Cpp.default.includePath": [
+        "${workspaceFolder}/include",
+        "${workspaceFolder}/src/include"
+    ],
+    
+    "files.associations": {
+        "*.hpp": "cpp",
+        "*.cpp": "cpp",
+        "*.h": "c",
+        "*.c": "c",
+        "CMakeLists.txt": "cmake",
+        "*.cmake": "cmake"
+    },
+    
+    "files.exclude": {
+        "**/build": true,
+        "**/.cache": true,
+        "**/compile_commands.json": true
+    },
+    
+    "editor.formatOnSave": true,
+    "editor.formatOnType": true,
+    "editor.codeActionsOnSave": {
+        "source.fixAll": "explicit"
+    },
+    
+    "clang-format.executable": "clang-format",
+    "clang-format.style": "file",
+    
+    "clang-tidy.executable": "clang-tidy",
+    "clang-tidy.compilerArgs": [
+        "-std=c++23"
+    ],
+    "clang-tidy.compilerArgsBefore": [
+        "-I${workspaceFolder}/include"
+    ],
+    
+    "testMate.cpp.test.executables": [
+        {
+            "name": "Unit Tests",
+            "pattern": "{build,Build,BUILD,out,Out,OUT}/**/unit_tests{,.exe}",
+            "cwd": "${absDirpath}",
+            "env": {}
+        }
+    ],
+    
+    "terminal.integrated.cwd": "${workspaceFolder}",
+    "terminal.integrated.defaultProfile.osx": "bash",
+    
+    "search.exclude": {
+        "**/build": true,
+        "**/.cache": true,
+        "**/node_modules": true,
+        "**/*.o": true,
+        "**/*.a": true,
+        "**/*.so": true,
+        "**/*.dylib": true
+    },
+    
     "cSpell.words": [
         "GAMELOGICEXCEPTION",
         "LIARSDICE",
         "STREQUAL",
-        "VARCHAR"
-    ]
+        "VARCHAR",
+        "liarsdice",
+        "DLIARSDICE",
+        "DCMAKE",
+        "RAII",
+        "ctest",
+        "gtest",
+        "lldb",
+        "cmake",
+        "hpp",
+        "cpp",
+        "endl",
+        "cout",
+        "MSVC",
+        "shǎizi",
+        "shuōhuǎng",
+        "lliarsdice"
+    ],
+    
+    "cmake.options.statusBarVisibility": "visible",
+    "cmake.options.advanced": {
+        "build": {
+            "statusBarVisibility": "visible"
+        },
+        "launch": {
+            "statusBarVisibility": "visible"
+        },
+        "debug": {
+            "statusBarVisibility": "visible"
+        }
+    }
 }

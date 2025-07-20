@@ -1,0 +1,19 @@
+{
+    "recommendations": [
+        "ms-vscode.cpptools",
+        "ms-vscode.cmake-tools",
+        "twxs.cmake",
+        "xaver.clang-format",
+        "notskm.clang-tidy",
+        "ms-vscode.cpptools-extension-pack",
+        "matepek.vscode-catch2-test-adapter",
+        "streetsidesoftware.code-spell-checker",
+        "eamodio.gitlens",
+        "github.copilot",
+        "ms-vscode.hexeditor",
+        "vadimcn.vscode-lldb"
+    ],
+    "unwantedRecommendations": [
+        "ms-vscode.vscode-json"
+    ]
+}
