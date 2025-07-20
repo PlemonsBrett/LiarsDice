@@ -62,6 +62,7 @@
         "**/*.dylib": true
     },
     "cSpell.words": [
+        "anyofallof",
         "Celero",
         "cmake",
         "cout",

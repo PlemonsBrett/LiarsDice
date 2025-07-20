@@ -79,7 +79,7 @@ LiarsDice/
 │       └── liarsdice.hpp        # Main convenience header
 ├── apps/                         # Executable applications
 │   └── liarsdice-cli/           # Command-line interface
-├── tests/                        # Test suite (Google Test)
+├── tests/                        # Test suite (Catch2)
 │   └── unit/core/               # Unit tests
 ├── examples/                     # Usage examples
 ├── cmake/                        # CMake modules
@@ -128,11 +128,26 @@ cmake -B build -S . \
 # Run all tests
 ./scripts/test.sh
 
-# Run tests manually
+# Run specific test categories
+./scripts/test.sh --filter "[dice]"
+
+# Run tests matching a pattern  
+./scripts/test.sh --filter "*constructor*"
+
+# List all available tests
+./scripts/test.sh --list
+
+# Run tests with verbose output
+./scripts/test.sh --verbose
+
+# Get help with test script options
+./scripts/test.sh --help
+
+# Run tests manually with ctest
 ctest --test-dir build --output-on-failure
 
-# Run specific test categories
-./build/bin/unit_tests --gtest_filter="DiceTest.*"
+# Run tests directly with Catch2
+./build/bin/unit_tests "[dice]"
 ```
 
 ### Code Quality
@@ -156,7 +171,7 @@ The project includes VSCode configuration for:
 - **IntelliSense** - C++23 support with proper include paths
 - **Debugging** - Ready-to-use launch configurations
 - **Building** - Integrated build tasks
-- **Testing** - Google Test integration
+- **Testing** - Catch2 integration
 
 Open the project in VSCode and use:
 - `Ctrl+Shift+P` → "CMake: Configure" to set up the build
@@ -218,8 +233,8 @@ g++ -std=c++23 your_app.cpp -I/path/to/include -L/path/to/lib -lliarsdice_core
 - Check that CMake is version 3.21 or higher
 
 **Tests fail to build:**
-- Google Test is automatically fetched, ensure internet connectivity
-- For offline builds, install Google Test system-wide
+- Catch2 is automatically fetched, ensure internet connectivity
+- For offline builds, install Catch2 system-wide
 
 **Missing compile_commands.json:**
 ```bash

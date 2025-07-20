@@ -1,37 +1,26 @@
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 #include "liarsdice/core/player.hpp"
 
-class PlayerTest : public ::testing::Test {
- protected:
-  void SetUp() override {
-    // Setup code if needed
-  }
-
-  void TearDown() override {
-    // Cleanup code if needed
-  }
-};
-
-TEST_F(PlayerTest, IdConstructor) {
+TEST_CASE("Player ID constructor", "[player]") {
   Player player(42);
-  EXPECT_EQ(player.get_player_id(), 42);
+  REQUIRE(player.get_player_id() == 42);
 }
 
-TEST_F(PlayerTest, GetPlayerId) {
+TEST_CASE("Player get player ID", "[player]") {
   Player player(123);
-  EXPECT_EQ(player.get_player_id(), 123);
+  REQUIRE(player.get_player_id() == 123);
 }
 
-TEST_F(PlayerTest, GetDice) {
+TEST_CASE("Player get dice", "[player]") {
   Player player(1);
   
   const auto& dice = player.get_dice();
   // Player should have some initial dice (check the implementation)
   // For now, just verify we can access the dice vector
-  EXPECT_TRUE(dice.size() >= 0);  // Should be non-negative
+  REQUIRE(dice.size() >= 0);  // Should be non-negative
 }
 
-TEST_F(PlayerTest, RollAllDice) {
+TEST_CASE("Player roll all dice", "[player]") {
   Player player(1);
   
   // Roll all dice
@@ -40,8 +29,8 @@ TEST_F(PlayerTest, RollAllDice) {
   // Check that all dice have valid values
   const auto& dice = player.get_dice();
   for (const auto& die : dice) {
-    EXPECT_GE(die.get_face_value(), 1);
-    EXPECT_LE(die.get_face_value(), 6);
+    REQUIRE(die.get_face_value() >= 1);
+    REQUIRE(die.get_face_value() <= 6);
   }
 }
 

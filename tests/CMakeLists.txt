@@ -1,22 +1,20 @@
-# Find or fetch Google Test
-find_package(GTest QUIET)
+# Find or fetch Catch2
+find_package(Catch2 3 QUIET)
 
-if(NOT GTest_FOUND)
-    message(STATUS "Google Test not found. Fetching from GitHub...")
+if(NOT Catch2_FOUND)
+    message(STATUS "Catch2 not found. Fetching from GitHub...")
     include(FetchContent)
     FetchContent_Declare(
-        googletest
-        GIT_REPOSITORY https://github.com/google/googletest.git
-        GIT_TAG        v1.14.0
+        catch2
+        GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+        GIT_TAG        v3.4.0
     )
-    # For Windows: Prevent overriding the parent project's compiler/linker settings
-    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-    FetchContent_MakeAvailable(googletest)
+    FetchContent_MakeAvailable(catch2)
 endif()
 
 # Enable testing
 enable_testing()
-include(GoogleTest)
+include(Catch)
 
 # Add subdirectories
 add_subdirectory(unit)

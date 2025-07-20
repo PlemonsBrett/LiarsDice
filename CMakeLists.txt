@@ -40,9 +40,9 @@ include(cmake/CompilerWarnings.cmake)
 
 # Find packages if needed
 if(LIARSDICE_BUILD_TESTS)
-    find_package(GTest QUIET)
-    if(NOT GTest_FOUND)
-        message(STATUS "GoogleTest not found. Tests will use FetchContent.")
+    find_package(Catch2 3 QUIET)
+    if(NOT Catch2_FOUND)
+        message(STATUS "Catch2 not found. Tests will use FetchContent.")
     endif()
 endif()
 
