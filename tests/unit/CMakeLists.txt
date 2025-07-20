@@ -4,6 +4,7 @@ add_executable(unit_tests
     core/dice_test.cpp
     core/player_test.cpp
     core/game_test.cpp
+    di/service_container_test.cpp
 )
 
 target_link_libraries(unit_tests
