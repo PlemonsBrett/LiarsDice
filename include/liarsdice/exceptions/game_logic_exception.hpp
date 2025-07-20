@@ -5,7 +5,7 @@
 #ifndef LIARSDICE_INCLUDE_EXCEPTIONS_GAMELOGICEXCEPTION_HPP
 #define LIARSDICE_INCLUDE_EXCEPTIONS_GAMELOGICEXCEPTION_HPP
 
-#include "CustomException.hpp"
+#include "liarsdice/exceptions/exception_base.hpp"
 
 class GameLogicException : public CustomException {
 public:

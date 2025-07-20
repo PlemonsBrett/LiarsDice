@@ -5,7 +5,7 @@
 #ifndef LIARSDICE_INCLUDE_EXCEPTIONS_INPUTEXCEPTION_HPP
 #define LIARSDICE_INCLUDE_EXCEPTIONS_INPUTEXCEPTION_HPP
 
-#include "CustomException.hpp"
+#include "liarsdice/exceptions/exception_base.hpp"
 
 class InputException : public CustomException {
 public:

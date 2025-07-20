@@ -3,7 +3,7 @@
 // This file contains the implementation of the Dice class, which represents a dice in the game of Liar's Dice.
 //
 
-#include "model/Dice.hpp"
+#include "liarsdice/core/dice.hpp"
 
 // Constructor initializes the random number generator and rolls the dice
 Dice::Dice() : rd(), gen(rd()), dis(1, 6) {

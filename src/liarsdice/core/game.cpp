@@ -3,8 +3,8 @@
 // This file contains the implementation of the Game class, which handles the game logic for Liar's Dice.
 //
 
-#include "controller/Game.hpp"
-#include "exceptions/FileException.hpp"
+#include "liarsdice/core/game.hpp"
+#include "liarsdice/exceptions/file_exception.hpp"
 #include <iostream>
 #include <string>
 #include <fstream>

@@ -1,4 +1,4 @@
-#include "controller/Game.hpp"
+#include "liarsdice/core/game.hpp"
 #include <iostream>
 #include <limits>
 

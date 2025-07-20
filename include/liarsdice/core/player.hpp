@@ -7,7 +7,7 @@
 #define PLAYER_HPP
 
 #include <vector>
-#include "Dice.hpp"
+#include "liarsdice/core/dice.hpp"
 
 class Player {
 public:

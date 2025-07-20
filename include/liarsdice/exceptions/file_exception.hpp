@@ -5,7 +5,7 @@
 #ifndef LIARSDICE_INCLUDE_EXCEPTIONS_FILEEXCEPTION_HPP
 #define LIARSDICE_INCLUDE_EXCEPTIONS_FILEEXCEPTION_HPP
 
-#include "CustomException.hpp"
+#include "liarsdice/exceptions/exception_base.hpp"
 
 class FileException : public CustomException {
 public:

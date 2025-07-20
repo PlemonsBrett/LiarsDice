@@ -9,7 +9,7 @@
 #include <vector>
 #include <string>
 #include <utility>
-#include "model/Player.hpp"
+#include "liarsdice/core/player.hpp"
 
 // Struct to represent a guess
 struct Guess {

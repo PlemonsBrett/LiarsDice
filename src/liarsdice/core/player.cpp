@@ -3,7 +3,7 @@
 // This file contains the implementation of the Player class, which represents a player in the game of Liar's Dice.
 //
 
-#include "model/Player.hpp"
+#include "liarsdice/core/player.hpp"
 #include <iostream>
 #include <sstream>
 #include <utility>
