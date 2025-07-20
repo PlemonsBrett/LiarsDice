@@ -1,7 +1,5 @@
-#include "liarsdice/adapters/dice_adapter.hpp"
 #include "liarsdice/adapters/random_generator.hpp"
 #include "liarsdice/di/simple_container.hpp"
-#include "liarsdice/interfaces/interfaces.hpp"
 #include <iostream>
 #include <vector>
 

@@ -2,9 +2,8 @@
 #include <gtest/gtest.h>
 
 // Dependency injection container and related interfaces
-#include "liarsdice/di/di.hpp"
-#include "liarsdice/interfaces/interfaces.hpp"
 #include "liarsdice/adapters/random_generator.hpp"
+#include "liarsdice/di/service_container.hpp"
 
 using namespace liarsdice::di;
 using namespace liarsdice::interfaces;
