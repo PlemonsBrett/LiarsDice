@@ -378,16 +378,10 @@ private:
 
       switch (descriptor.lifetime) {
         case ServiceLifetime::kSingleton: {
-          // Thread-safe singleton initialization using std::call_once
-          std::call_once(descriptor.singleton_flag, [&descriptor]() {
-            if (!descriptor.singleton_instance) {
-              descriptor.singleton_instance = descriptor.factory->create();
-            }
-          });
-
-          // Create a new instance for return (maintaining unique ownership)
-          void *new_instance = descriptor.factory->create();
-          return std::unique_ptr<T>(static_cast<T *>(new_instance));
+          // For unique_ptr semantics, we create a new instance each time
+          // In a real DI container, singletons would use shared_ptr instead
+          void *instance = descriptor.factory->create();
+          return std::unique_ptr<T>(static_cast<T *>(instance));
         }
         case ServiceLifetime::kTransient: {
           // Transient: create new instance each time

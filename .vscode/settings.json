@@ -74,6 +74,7 @@
         "endfunction",
         "endl",
         "GAMELOGICEXCEPTION",
+        "graphviz",
         "gtest",
         "hpp",
         "INCLUDEDIR",

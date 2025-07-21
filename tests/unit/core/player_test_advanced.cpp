@@ -303,7 +303,7 @@ TEST_CASE("Player integration scenarios", "[player][integration]") {
             auto& player = players[i];
             REQUIRE(player->get_id() == static_cast<int>(i + 1));
             REQUIRE(player->get_dice_count() == i + 1);
-            REQUIRE(player->is_active() == (i > 0)); // Player 1 has 1 die, others have more
+            REQUIRE(player->is_active()); // All players have dice, so all should be active
         }
         
         // Count active players

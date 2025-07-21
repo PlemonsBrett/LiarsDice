@@ -4,6 +4,7 @@
 //
 
 #include "liarsdice/core/game_impl.hpp"
+#include "liarsdice/core/player_impl.hpp"
 #include "liarsdice/exceptions/game_exception.hpp"
 #include <algorithm>
 #include <format>
@@ -74,6 +75,11 @@ void GameImpl::add_player(int player_id) {
     
     if (!player) {
         throw std::runtime_error("Failed to create player instance");
+    }
+    
+    // Set the correct player ID if it's a PlayerImpl
+    if (auto* player_impl = dynamic_cast<core::PlayerImpl*>(player.get())) {
+        player_impl->set_id(player_id);
     }
     
     players_.push_back(std::move(player));
@@ -263,7 +269,14 @@ std::string GameImpl::validate_guess_rules(
         return "Dice count must be greater than 0";
     }
     
-    auto total_dice = get_game_state().get_total_dice_count();
+    // Count total dice from actual players managed by GameImpl
+    size_t total_dice = 0;
+    for (const auto& player : players_) {
+        if (player->is_active()) {
+            total_dice += player->get_dice_count();
+        }
+    }
+    
     if (new_guess.dice_count > total_dice) {
         return std::format("Cannot guess more dice ({}) than total remaining ({})", 
                           new_guess.dice_count, total_dice);
@@ -280,22 +293,21 @@ std::string GameImpl::validate_guess_rules(
     error_msg << std::format("Last guess was ({}, {})\n", 
                              last_guess.dice_count, last_guess.face_value);
     
-    // Rule validation against previous guess
-    if (new_guess.dice_count < last_guess.dice_count && 
-        new_guess.face_value <= last_guess.face_value) {
-        error_msg << kInvalidGuessMsgDiceCount;
-        return error_msg.str();
-    }
+    // Rule validation: A guess is valid if:
+    // 1. More dice than previous guess, OR
+    // 2. Same dice count AND higher face value
+    bool is_valid = (new_guess.dice_count > last_guess.dice_count) ||
+                   (new_guess.dice_count == last_guess.dice_count && 
+                    new_guess.face_value > last_guess.face_value);
     
-    if (new_guess.dice_count == last_guess.dice_count && 
-        new_guess.face_value <= last_guess.face_value) {
-        error_msg << kInvalidGuessMsgFaceValue;
-        return error_msg.str();
-    }
-    
-    if (new_guess.dice_count <= last_guess.dice_count && 
-        new_guess.face_value < last_guess.face_value) {
-        error_msg << kInvalidGuessMsgGeneral;
+    if (!is_valid) {
+        if (new_guess.dice_count < last_guess.dice_count) {
+            error_msg << kInvalidGuessMsgDiceCount;
+        } else if (new_guess.dice_count == last_guess.dice_count) {
+            error_msg << kInvalidGuessMsgFaceValue;
+        } else {
+            error_msg << kInvalidGuessMsgGeneral;
+        }
         return error_msg.str();
     }
     

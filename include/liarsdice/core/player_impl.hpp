@@ -62,6 +62,7 @@ public:
 
     // IPlayer interface implementation
     [[nodiscard]] int get_id() const override;
+    void set_id(int player_id); // For testing purposes - not part of interface
     [[nodiscard]] size_t get_dice_count() const override;
     void roll_dice() override;
     void add_die() override;

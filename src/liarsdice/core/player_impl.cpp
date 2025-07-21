@@ -35,6 +35,13 @@ int PlayerImpl::get_id() const {
     return player_id_;
 }
 
+void PlayerImpl::set_id(int player_id) {
+    if (player_id <= 0) {
+        throw std::invalid_argument("Player ID must be positive");
+    }
+    player_id_ = player_id;
+}
+
 size_t PlayerImpl::get_dice_count() const {
     return dice_.size();
 }
