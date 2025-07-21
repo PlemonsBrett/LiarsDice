@@ -85,8 +85,12 @@ cmake --build build
 Comprehensive documentation including:
 
 - **Developer Guide** - Setup, building, and contribution guidelines
-- **API Reference** - Complete C++23 interface documentation  
+- **API Reference** - Complete C++23 interface documentation
+  - [Logging System API](docs/api/logging.md) - Structured logging with spdlog
+  - [Configuration System API](docs/api/configuration.md) - Type-safe configuration management
 - **Architecture** - Modern C++23 design patterns and dependency injection
+  - [Logging & Configuration Architecture](docs/architecture/logging-and-configuration.md) - System design rationale
+- **Development Guide** - [Logging and Configuration Guide](docs/development/logging-and-configuration-guide.md)
 - **UML Diagrams** - Visual system architecture and data flow
 - **Performance** - Benchmarks and optimization strategies
 
@@ -104,17 +108,24 @@ LiarsDice/
 │       │   ├── dice.cpp         # Dice implementation
 │       │   ├── player.cpp       # Player management  
 │       │   └── game.cpp         # Game controller
+│       ├── logging/              # Structured logging system
+│       ├── config/               # Configuration management
 │       ├── exceptions/           # Custom exceptions
 │       └── utils/                # Utility functions
 ├── include/                      # Public API headers
 │   └── liarsdice/
 │       ├── core/                 # Core interfaces
+│       ├── logging/              # Logging interfaces
+│       ├── config/               # Configuration interfaces  
 │       ├── exceptions/           # Exception hierarchy
 │       └── liarsdice.hpp        # Main convenience header
 ├── apps/                         # Executable applications
 │   └── liarsdice-cli/           # Command-line interface
 ├── tests/                        # Test suite (Catch2)
-│   └── unit/core/               # Unit tests
+│   └── unit/
+│       ├── core/                # Core game logic tests
+│       ├── logging/             # Logging system tests
+│       └── config/              # Configuration system tests
 ├── examples/                     # Usage examples
 ├── cmake/                        # CMake modules
 ├── scripts/                      # Build automation
@@ -124,7 +135,9 @@ LiarsDice/
 ### Library Design
 
 - **`liarsdice::core`** - Reusable game logic library
-- **Modern C++23** - Uses latest language features
+- **`liarsdice::logging`** - Structured logging with spdlog integration
+- **`liarsdice::config`** - Type-safe configuration management
+- **Modern C++23** - Uses latest language features (concepts, std::variant, constexpr)
 - **Exception Safety** - Custom exception hierarchy
 - **RAII** - Proper resource management
 - **Testing** - Comprehensive unit test coverage
@@ -175,6 +188,8 @@ conan create . --build=missing -o build_tests=True
 | `LIARSDICE_BUILD_DOCS` | `OFF` | Build documentation |
 | `LIARSDICE_INSTALL` | `ON` | Generate install targets |
 | `LIARSDICE_USE_SANITIZERS` | `ON` | Enable sanitizers in debug builds |
+| `LIARSDICE_ENABLE_LOGGING` | `ON` | Enable structured logging system |
+| `LIARSDICE_ENABLE_CONFIG` | `ON` | Enable configuration management |
 
 ### Testing
 
@@ -244,21 +259,30 @@ Open the project in VSCode and use:
 
 ```cpp
 #include "liarsdice/liarsdice.hpp"
+#include "liarsdice/logging/logging.hpp"
+#include "liarsdice/config/config_manager.hpp"
 
 int main() {
-    // Create dice
+    // Initialize logging and configuration
+    LoggingSystem logging("development");
+    ConfigManager config;
+    config.add_source(std::make_unique<DefaultsSource>());
+    
+    // Create dice with logging
     liarsdice::Dice die;
     die.Roll();
-    std::cout << "Rolled: " << die.GetFaceValue() << std::endl;
+    DICE_LOG_INFO("Rolled: {}", die.GetFaceValue());
     
-    // Create player
+    // Create player with configuration
+    auto max_players = config.get_value_or<uint32_t>(
+        ConfigPath{"game.max_players"}, 6);
     liarsdice::Player player(1);
     player.RollDice();
     
-    // Access player's dice
+    // Access player's dice with structured logging
     const auto& dice = player.GetDice();
     for (const auto& d : dice) {
-        std::cout << d.GetFaceValue() << " ";
+        PLAYER_LOG_DEBUG("Player dice: {}", d.GetFaceValue());
     }
     
     return 0;

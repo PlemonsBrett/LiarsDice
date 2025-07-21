@@ -75,7 +75,7 @@ class LiarsDiceConan(ConanFile):
         # Core dependencies
         self.requires("spdlog/1.12.0")
         # Note: spdlog comes with its own fmt - no need for separate fmt dependency
-        self.requires("nlohmann_json/3.11.2")  # For structured logging
+        self.requires("nlohmann_json/3.11.2")  # For structured logging and configuration
         
         # Test dependencies
         if self.options.build_tests:

@@ -18,3 +18,14 @@ target_link_libraries(di_example
 )
 
 target_compile_features(di_example PRIVATE cxx_std_23)
+
+# Add configuration example if enabled
+if(LIARSDICE_ENABLE_CONFIG)
+    add_executable(config_example config_example.cpp)
+    target_link_libraries(config_example
+        PRIVATE
+            liarsdice::core
+            liarsdice::warnings
+    )
+    target_compile_features(config_example PRIVATE cxx_std_23)
+endif()

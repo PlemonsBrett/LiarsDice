@@ -33,6 +33,7 @@ option(LIARSDICE_BUILD_DOCS "Build documentation" OFF)
 option(LIARSDICE_INSTALL "Generate installation target" ON)
 option(LIARSDICE_USE_SANITIZERS "Enable sanitizers in debug builds" ON)
 option(LIARSDICE_ENABLE_LOGGING "Enable comprehensive logging with spdlog" ON)
+option(LIARSDICE_ENABLE_CONFIG "Enable modern C++23 configuration system" ON)
 
 # Logging configuration
 set(LIARSDICE_LOG_LEVEL "INFO" CACHE STRING "Set compile-time log level")
@@ -65,18 +66,32 @@ else()
 endif()
 
 # Find packages if needed
-if(LIARSDICE_ENABLE_LOGGING)
+if(LIARSDICE_ENABLE_LOGGING OR LIARSDICE_ENABLE_CONFIG)
     if(USING_CONAN)
-        find_package(spdlog REQUIRED)
+        if(LIARSDICE_ENABLE_LOGGING)
+            find_package(spdlog REQUIRED)
+        endif()
         find_package(nlohmann_json REQUIRED)
-        message(STATUS "Using spdlog and nlohmann_json from Conan")
+        message(STATUS "Using dependencies from Conan")
     else()
-        find_package(spdlog QUIET)
+        if(LIARSDICE_ENABLE_LOGGING)
+            find_package(spdlog QUIET)
+        endif()
         find_package(nlohmann_json QUIET)
-        if(NOT spdlog_FOUND OR NOT nlohmann_json_FOUND)
-            message(STATUS "Some logging dependencies not found. Using FetchContent.")
+        
+        set(NEED_FETCH_CONTENT FALSE)
+        if(LIARSDICE_ENABLE_LOGGING AND NOT spdlog_FOUND)
+            set(NEED_FETCH_CONTENT TRUE)
+        endif()
+        if(NOT nlohmann_json_FOUND)
+            set(NEED_FETCH_CONTENT TRUE)
+        endif()
+        
+        if(NEED_FETCH_CONTENT)
+            message(STATUS "Some dependencies not found. Using FetchContent.")
             include(FetchContent)
-            if(NOT spdlog_FOUND)
+            
+            if(LIARSDICE_ENABLE_LOGGING AND NOT spdlog_FOUND)
                 FetchContent_Declare(
                     spdlog
                     GIT_REPOSITORY https://github.com/gabime/spdlog.git
@@ -84,6 +99,7 @@ if(LIARSDICE_ENABLE_LOGGING)
                 )
                 FetchContent_MakeAvailable(spdlog)
             endif()
+            
             if(NOT nlohmann_json_FOUND)
                 FetchContent_Declare(
                     nlohmann_json

@@ -6,6 +6,14 @@ add_executable(unit_tests
     di/service_container_test.cpp
 )
 
+# Add configuration tests if enabled
+if(LIARSDICE_ENABLE_CONFIG)
+    target_sources(unit_tests PRIVATE
+        config/config_value_test.cpp
+        config/config_manager_test.cpp
+    )
+endif()
+
 # Advanced test suite with modern C++23 features
 add_executable(advanced_tests
     core/dice_test_advanced.cpp

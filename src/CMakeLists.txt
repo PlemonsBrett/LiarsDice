@@ -16,6 +16,24 @@ if(LIARSDICE_ENABLE_LOGGING)
     )
 endif()
 
+# Add configuration sources if enabled
+if(LIARSDICE_ENABLE_CONFIG)
+    target_sources(liarsdice_core PRIVATE
+        liarsdice/config/config_value.cpp
+        liarsdice/config/config_manager.cpp
+        liarsdice/config/config_sources.cpp
+        liarsdice/config/game_config.cpp
+    )
+    
+    # Add compile definition for nlohmann_json availability
+    if(TARGET nlohmann_json::nlohmann_json)
+        target_compile_definitions(liarsdice_core PRIVATE LIARSDICE_HAS_NLOHMANN_JSON)
+        target_link_libraries(liarsdice_core PRIVATE nlohmann_json::nlohmann_json)
+    endif()
+    
+    target_compile_definitions(liarsdice_core PRIVATE LIARSDICE_ENABLE_CONFIG)
+endif()
+
 add_library(liarsdice::core ALIAS liarsdice_core)
 
 target_include_directories(liarsdice_core
