@@ -85,23 +85,21 @@ private:
     void *singleton_instance{};
     std::type_index service_type;
     std::string service_name;
-    mutable std::once_flag singleton_flag;  ///< Thread-safe singleton initialization
+    mutable std::once_flag singleton_flag; ///< Thread-safe singleton initialization
 
     ServiceDescriptor(std::unique_ptr<interfaces::IServiceFactory> f, ServiceLifetime lt,
                       std::type_index type, std::string name)
         : factory(std::move(f)), lifetime(lt), service_type(type), service_name(std::move(name)) {}
-    
+
     // Make movable for container operations
-    ServiceDescriptor(ServiceDescriptor&& other) noexcept 
-        : factory(std::move(other.factory)),
-          lifetime(other.lifetime),
-          singleton_instance(other.singleton_instance),
-          service_type(other.service_type),
+    ServiceDescriptor(ServiceDescriptor &&other) noexcept
+        : factory(std::move(other.factory)), lifetime(other.lifetime),
+          singleton_instance(other.singleton_instance), service_type(other.service_type),
           service_name(std::move(other.service_name)) {
       // std::once_flag is not movable, so we leave it in default state
     }
-    
-    ServiceDescriptor& operator=(ServiceDescriptor&& other) noexcept {
+
+    ServiceDescriptor &operator=(ServiceDescriptor &&other) noexcept {
       if (this != &other) {
         factory = std::move(other.factory);
         lifetime = other.lifetime;
@@ -112,15 +110,16 @@ private:
       }
       return *this;
     }
-    
+
     // Delete copy operations
-    ServiceDescriptor(const ServiceDescriptor&) = delete;
-    ServiceDescriptor& operator=(const ServiceDescriptor&) = delete;
+    ServiceDescriptor(const ServiceDescriptor &) = delete;
+    ServiceDescriptor &operator=(const ServiceDescriptor &) = delete;
   };
 
   std::unordered_map<std::type_index, ServiceDescriptor> services_;
   std::unordered_map<std::string, ServiceDescriptor> named_services_;
-  thread_local static std::unordered_set<std::type_index> resolution_stack_;  ///< Track resolution for circular dependency detection
+  thread_local static std::unordered_set<std::type_index>
+      resolution_stack_; ///< Track resolution for circular dependency detection
 
 public:
   ServiceContainer() = default;
@@ -356,13 +355,13 @@ private:
 
     // Add to resolution stack for circular dependency detection
     resolution_stack_.insert(type_index);
-    
+
     auto &descriptor = it->second;
     auto result = resolve_internal<T>(descriptor);
-    
+
     // Remove from resolution stack
     resolution_stack_.erase(type_index);
-    
+
     return result;
   }
 
@@ -377,20 +376,20 @@ private:
       }
 
       switch (descriptor.lifetime) {
-        case ServiceLifetime::kSingleton: {
-          // For unique_ptr semantics, we create a new instance each time
-          // In a real DI container, singletons would use shared_ptr instead
-          void *instance = descriptor.factory->create();
-          return std::unique_ptr<T>(static_cast<T *>(instance));
-        }
-        case ServiceLifetime::kTransient: {
-          // Transient: create new instance each time
-          void *instance = descriptor.factory->create();
-          return std::unique_ptr<T>(static_cast<T *>(instance));
-        }
-        default:
-          // This should never be reached with valid enum values
-          std::unreachable();
+      case ServiceLifetime::kSingleton: {
+        // For unique_ptr semantics, we create a new instance each time
+        // In a real DI container, singletons would use shared_ptr instead
+        void *instance = descriptor.factory->create();
+        return std::unique_ptr<T>(static_cast<T *>(instance));
+      }
+      case ServiceLifetime::kTransient: {
+        // Transient: create new instance each time
+        void *instance = descriptor.factory->create();
+        return std::unique_ptr<T>(static_cast<T *>(instance));
+      }
+      default:
+        // This should never be reached with valid enum values
+        std::unreachable();
       }
     } catch (...) {
       return std::unexpected(DIError::kCreationFailed);

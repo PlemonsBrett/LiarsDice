@@ -29,7 +29,7 @@ const std::string kInvalidGuessMsgDiceCount =
 // Constructor implementation
 Game::Game() : current_player_index_(0), last_guess_({0, 0}) {
 #ifdef LIARSDICE_ENABLE_LOGGING
-    GAME_LOG_INFO("Game instance created");
+  GAME_LOG_INFO("Game instance created");
 #endif
 }
 
@@ -100,7 +100,7 @@ void Game::setup_players() {
     std::cout << "Please enter a number greater than 1: ";
     get_setup_input(num_players);
   }
-  
+
 #ifdef LIARSDICE_ENABLE_LOGGING
   GAME_LOG_INFO("Creating {} players", num_players);
 #endif
@@ -141,7 +141,8 @@ void Game::play_game() {
 
     if (!validation_error.empty()) {
 #ifdef LIARSDICE_ENABLE_LOGGING
-      GAME_LOG_DEBUG("Invalid guess by Player {}: {}", current_player.get_player_id(), validation_error);
+      GAME_LOG_DEBUG("Invalid guess by Player {}: {}", current_player.get_player_id(),
+                     validation_error);
 #endif
       std::cout << validation_error;
       continue;
@@ -149,7 +150,8 @@ void Game::play_game() {
 
     last_guess_ = guess;
 #ifdef LIARSDICE_ENABLE_LOGGING
-    GAME_LOG_INFO("Valid guess accepted: quantity={}, face_value={}", guess.dice_count, guess.dice_value);
+    GAME_LOG_INFO("Valid guess accepted: quantity={}, face_value={}", guess.dice_count,
+                  guess.dice_value);
 #endif
 
     if (Player::call_liar()) {
@@ -214,7 +216,8 @@ std::string Game::validate_guess(const Guess &new_guess, const Guess &last_guess
 std::string Game::check_guess_against_dice(const Guess &last_guess) {
 #ifdef LIARSDICE_ENABLE_LOGGING
   PERF_TIMER("Dice verification");
-  GAME_LOG_DEBUG("Checking guess: {} dice with face value {}", last_guess.dice_count, last_guess.dice_value);
+  GAME_LOG_DEBUG("Checking guess: {} dice with face value {}", last_guess.dice_count,
+                 last_guess.dice_value);
 #endif
   int counter = 0;
   for (const auto &player : players_) {
@@ -225,8 +228,8 @@ std::string Game::check_guess_against_dice(const Guess &last_guess) {
     }
   }
 #ifdef LIARSDICE_ENABLE_LOGGING
-  GAME_LOG_INFO("Dice verification: found {} dice with face value {} (needed {})", 
-                counter, last_guess.dice_value, last_guess.dice_count);
+  GAME_LOG_INFO("Dice verification: found {} dice with face value {} (needed {})", counter,
+                last_guess.dice_value, last_guess.dice_count);
 #endif
   std::string winner = (counter >= last_guess.dice_count) ? "Guessing Player" : "Calling Player";
 #ifdef LIARSDICE_ENABLE_LOGGING

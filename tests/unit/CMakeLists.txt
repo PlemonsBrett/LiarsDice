@@ -11,8 +11,23 @@ if(LIARSDICE_ENABLE_CONFIG)
     target_sources(unit_tests PRIVATE
         config/config_value_test.cpp
         config/config_manager_test.cpp
+        config/config_sources_test.cpp
+        config/game_config_test.cpp
     )
 endif()
+
+# Add logging tests if enabled
+if(LIARSDICE_ENABLE_LOGGING)
+    target_sources(unit_tests PRIVATE
+        logging/logger_test.cpp
+    )
+endif()
+
+# Add validation tests
+target_sources(unit_tests PRIVATE
+    validation/validator_test.cpp
+    validation/fuzz_test.cpp
+)
 
 # Advanced test suite with modern C++23 features
 add_executable(advanced_tests

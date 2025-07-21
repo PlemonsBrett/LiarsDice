@@ -1,8 +1,18 @@
 name: Build and Deploy Documentation (Full Build)
 
 on:
-  # Only run on manual trigger or main branch to avoid conflicts
+  # Manual trigger from any branch
   workflow_dispatch:
+    inputs:
+      deploy_to_pages:
+        description: 'Deploy documentation to GitHub Pages'
+        required: false
+        default: 'true'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+  # Automatic trigger only on main branch
   push:
     branches: [ main ]
 
@@ -103,7 +113,12 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     needs: build-docs
-    if: github.ref == 'refs/heads/main'
+    # Deploy if:
+    # 1. It's a push to main branch, OR
+    # 2. It's a manual workflow dispatch with deploy_to_pages set to 'true'
+    if: |
+      github.ref == 'refs/heads/main' || 
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_to_pages == 'true')
     steps:
       - name: Deploy to GitHub Pages
         id: deployment

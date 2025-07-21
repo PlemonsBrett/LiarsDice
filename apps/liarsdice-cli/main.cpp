@@ -16,7 +16,7 @@ int main() {
   // Initialize logging system for development environment
   liarsdice::logging::LoggingSystem logging_system("development");
   auto logger = liarsdice::logging::get_default_logger();
-  
+
   LOG_INFO(*logger, "=== LiarsDice CLI Application Started ===");
   LOG_INFO(*logger, "Logging system initialized successfully");
 #endif
@@ -49,7 +49,8 @@ int main() {
 
     should_continue = (play_again == kPlayAgainYes);
 #ifdef LIARSDICE_ENABLE_LOGGING
-    LOG_INFO(*logger, "User play again response: '{}', continuing: {}", play_again, should_continue);
+    LOG_INFO(*logger, "User play again response: '{}', continuing: {}", play_again,
+             should_continue);
 #endif
   }
 

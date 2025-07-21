@@ -77,8 +77,10 @@ class LiarsDiceConan(ConanFile):
 
     def requirements(self):
         # Core dependencies
-        self.requires("spdlog/1.12.0")
-        # Note: spdlog comes with its own fmt - no need for separate fmt dependency
+        if self.options.enable_logging:
+            self.requires("spdlog/1.12.0", override=True)
+            # Force a newer fmt that's compatible with C++23
+            self.requires("fmt/10.2.1", override=True)
         self.requires("nlohmann_json/3.11.2")  # For structured logging and configuration
         
         # Test dependencies

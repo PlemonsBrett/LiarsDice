@@ -34,6 +34,13 @@ if(LIARSDICE_ENABLE_CONFIG)
     target_compile_definitions(liarsdice_core PRIVATE LIARSDICE_ENABLE_CONFIG)
 endif()
 
+# Add validation and UI sources
+target_sources(liarsdice_core PRIVATE
+    liarsdice/validation/validators.cpp
+    liarsdice/validation/sanitizers.cpp
+    liarsdice/ui/fuzzy_match.cpp
+)
+
 add_library(liarsdice::core ALIAS liarsdice_core)
 
 target_include_directories(liarsdice_core
