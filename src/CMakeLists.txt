@@ -9,6 +9,13 @@ add_library(liarsdice_core
     liarsdice/di/service_container.cpp
 )
 
+# Add logging sources if enabled
+if(LIARSDICE_ENABLE_LOGGING)
+    target_sources(liarsdice_core PRIVATE
+        liarsdice/logging/logger_manager.cpp
+    )
+endif()
+
 add_library(liarsdice::core ALIAS liarsdice_core)
 
 target_include_directories(liarsdice_core
@@ -26,6 +33,9 @@ target_link_libraries(liarsdice_core
     PRIVATE
         liarsdice::warnings
 )
+
+# Setup logging
+setup_logging(liarsdice_core)
 
 # Enable IPO/LTO for release builds
 enable_ipo(liarsdice_core)

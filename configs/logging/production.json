@@ -1,0 +1,83 @@
+{
+  "loggers": {
+    "default": {
+      "level": "info",
+      "sinks": ["file", "syslog"]
+    },
+    "game": {
+      "level": "info",
+      "sinks": ["file", "json_file"],
+      "pattern": "[%Y-%m-%d %H:%M:%S.%e] [%n] [%l] %v"
+    },
+    "error": {
+      "level": "error",
+      "sinks": ["error_file", "syslog"],
+      "pattern": "[%Y-%m-%d %H:%M:%S.%e] [ERROR] [%t] [%s:%#] %v"
+    },
+    "audit": {
+      "level": "info",
+      "sinks": ["audit_file"],
+      "pattern": "[%Y-%m-%d %H:%M:%S.%e] [AUDIT] %v"
+    },
+    "performance": {
+      "level": "warn",
+      "sinks": ["perf_file"],
+      "pattern": "[%Y-%m-%d %H:%M:%S.%e] [PERF] %v"
+    }
+  },
+  "sinks": {
+    "file": {
+      "type": "rotating_file_mt",
+      "filename": "/var/log/liarsdice/app.log",
+      "max_size": "50MB",
+      "max_files": 10,
+      "level": "info",
+      "pattern": "[%Y-%m-%d %H:%M:%S.%e] [%n] [%l] [%t] %v"
+    },
+    "json_file": {
+      "type": "rotating_file_mt",
+      "filename": "/var/log/liarsdice/structured.log",
+      "max_size": "100MB",
+      "max_files": 5,
+      "level": "info"
+    },
+    "error_file": {
+      "type": "rotating_file_mt",
+      "filename": "/var/log/liarsdice/error.log",
+      "max_size": "20MB",
+      "max_files": 5,
+      "level": "error",
+      "pattern": "[%Y-%m-%d %H:%M:%S.%e] [ERROR] [%t] [%s:%#] [%!] %v"
+    },
+    "audit_file": {
+      "type": "daily_file_mt",
+      "filename": "/var/log/liarsdice/audit_%Y%m%d.log",
+      "level": "info"
+    },
+    "perf_file": {
+      "type": "rotating_file_mt",
+      "filename": "/var/log/liarsdice/performance.log",
+      "max_size": "25MB",
+      "max_files": 3,
+      "level": "warn"
+    },
+    "syslog": {
+      "type": "syslog_mt",
+      "ident": "liarsdice",
+      "facility": "local0",
+      "level": "info"
+    }
+  },
+  "async": {
+    "enabled": true,
+    "queue_size": 16384,
+    "thread_count": 2,
+    "overflow_policy": "overrun_oldest"
+  },
+  "global": {
+    "level": "info",
+    "flush_on": "warn",
+    "flush_interval_seconds": 10,
+    "error_handler": "default"
+  }
+}

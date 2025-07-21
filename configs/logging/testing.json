@@ -1,0 +1,47 @@
+{
+  "loggers": {
+    "default": {
+      "level": "warn",
+      "sinks": ["test_file"]
+    },
+    "test": {
+      "level": "debug",
+      "sinks": ["test_file", "test_console"],
+      "pattern": "[TEST] [%H:%M:%S.%e] [%l] %v"
+    },
+    "benchmark": {
+      "level": "info",
+      "sinks": ["benchmark_file"],
+      "pattern": "[BENCH] [%H:%M:%S.%e] %v"
+    }
+  },
+  "sinks": {
+    "test_console": {
+      "type": "stdout_color_mt",
+      "level": "debug",
+      "pattern": "[%^%l%$] %v"
+    },
+    "test_file": {
+      "type": "basic_file_mt",
+      "filename": "test_logs/test_run.log",
+      "level": "debug",
+      "pattern": "[%Y-%m-%d %H:%M:%S.%e] [%n] [%l] [%t] %v",
+      "truncate": true
+    },
+    "benchmark_file": {
+      "type": "basic_file_mt", 
+      "filename": "test_logs/benchmark.log",
+      "level": "info",
+      "pattern": "[%Y-%m-%d %H:%M:%S.%e] %v",
+      "truncate": true
+    }
+  },
+  "async": {
+    "enabled": false
+  },
+  "global": {
+    "level": "debug",
+    "flush_on": "debug",
+    "flush_interval_seconds": 1
+  }
+}

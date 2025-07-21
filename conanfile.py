@@ -23,6 +23,8 @@ class LiarsDiceConan(ConanFile):
         "build_tests": [True, False],
         "build_examples": [True, False],
         "build_benchmarks": [True, False],
+        "enable_logging": [True, False],
+        "log_level": ["trace", "debug", "info", "warn", "error", "critical", "off"],
     }
     default_options = {
         "shared": False,
@@ -30,6 +32,8 @@ class LiarsDiceConan(ConanFile):
         "build_tests": True,
         "build_examples": True,
         "build_benchmarks": False,
+        "enable_logging": True,
+        "log_level": "info",
     }
 
     # Sources are located in the same place as this recipe, copy them to the recipe
@@ -68,6 +72,11 @@ class LiarsDiceConan(ConanFile):
                 )
 
     def requirements(self):
+        # Core dependencies
+        self.requires("spdlog/1.12.0")
+        # Note: spdlog comes with its own fmt - no need for separate fmt dependency
+        self.requires("nlohmann_json/3.11.2")  # For structured logging
+        
         # Test dependencies
         if self.options.build_tests:
             self.requires("catch2/3.4.0")
@@ -87,6 +96,8 @@ class LiarsDiceConan(ConanFile):
         tc.variables["LIARSDICE_BUILD_BENCHMARKS"] = self.options.build_benchmarks
         tc.variables["LIARSDICE_INSTALL"] = True
         tc.variables["LIARSDICE_USE_SANITIZERS"] = self.settings.build_type == "Debug"
+        tc.variables["LIARSDICE_ENABLE_LOGGING"] = self.options.enable_logging
+        tc.variables["LIARSDICE_LOG_LEVEL"] = str(self.options.log_level).upper()
         
         # Ensure C++23 standard
         tc.variables["CMAKE_CXX_STANDARD"] = "23"
@@ -121,3 +132,22 @@ class LiarsDiceConan(ConanFile):
         self.cpp_info.components["core"].libs = ["liarsdice_core"]
         self.cpp_info.components["core"].includedirs = ["include"]
         self.cpp_info.components["core"].cppstd = "23"
+        self.cpp_info.components["core"].requires = ["spdlog::spdlog", "nlohmann_json::nlohmann_json"]
+        
+        # Add logging configuration defines
+        if self.options.enable_logging:
+            self.cpp_info.defines.append("LIARSDICE_ENABLE_LOGGING")
+            log_level_map = {
+                "trace": "SPDLOG_LEVEL_TRACE",
+                "debug": "SPDLOG_LEVEL_DEBUG", 
+                "info": "SPDLOG_LEVEL_INFO",
+                "warn": "SPDLOG_LEVEL_WARN",
+                "error": "SPDLOG_LEVEL_ERROR",
+                "critical": "SPDLOG_LEVEL_CRITICAL",
+                "off": "SPDLOG_LEVEL_OFF"
+            }
+            log_level = str(self.options.log_level).lower()
+            if log_level in log_level_map:
+                self.cpp_info.defines.append(f"SPDLOG_ACTIVE_LEVEL={log_level_map[log_level]}")
+        else:
+            self.cpp_info.defines.append("SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_OFF")

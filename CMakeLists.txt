@@ -32,6 +32,12 @@ option(LIARSDICE_BUILD_BENCHMARKS "Build benchmarks" OFF)
 option(LIARSDICE_BUILD_DOCS "Build documentation" OFF)
 option(LIARSDICE_INSTALL "Generate installation target" ON)
 option(LIARSDICE_USE_SANITIZERS "Enable sanitizers in debug builds" ON)
+option(LIARSDICE_ENABLE_LOGGING "Enable comprehensive logging with spdlog" ON)
+
+# Logging configuration
+set(LIARSDICE_LOG_LEVEL "INFO" CACHE STRING "Set compile-time log level")
+set_property(CACHE LIARSDICE_LOG_LEVEL PROPERTY STRINGS 
+    "TRACE" "DEBUG" "INFO" "WARN" "ERROR" "CRITICAL" "OFF")
 
 # Export compile commands for better IDE support
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -40,6 +46,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(cmake/StandardProjectSettings.cmake)
 include(cmake/CompilerWarnings.cmake)
+include(cmake/Logging.cmake)
 
 # Documentation support
 if(LIARSDICE_BUILD_DOCS)
@@ -58,6 +65,37 @@ else()
 endif()
 
 # Find packages if needed
+if(LIARSDICE_ENABLE_LOGGING)
+    if(USING_CONAN)
+        find_package(spdlog REQUIRED)
+        find_package(nlohmann_json REQUIRED)
+        message(STATUS "Using spdlog and nlohmann_json from Conan")
+    else()
+        find_package(spdlog QUIET)
+        find_package(nlohmann_json QUIET)
+        if(NOT spdlog_FOUND OR NOT nlohmann_json_FOUND)
+            message(STATUS "Some logging dependencies not found. Using FetchContent.")
+            include(FetchContent)
+            if(NOT spdlog_FOUND)
+                FetchContent_Declare(
+                    spdlog
+                    GIT_REPOSITORY https://github.com/gabime/spdlog.git
+                    GIT_TAG v1.12.0
+                )
+                FetchContent_MakeAvailable(spdlog)
+            endif()
+            if(NOT nlohmann_json_FOUND)
+                FetchContent_Declare(
+                    nlohmann_json
+                    GIT_REPOSITORY https://github.com/nlohmann/json.git
+                    GIT_TAG v3.11.2
+                )
+                FetchContent_MakeAvailable(nlohmann_json)
+            endif()
+        endif()
+    endif()
+endif()
+
 if(LIARSDICE_BUILD_TESTS)
     if(USING_CONAN)
         find_package(Catch2 REQUIRED)
@@ -104,9 +142,11 @@ if(LIARSDICE_INSTALL)
     install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
     # Install interface library for warnings
-    install(TARGETS liarsdice_warnings
-        EXPORT LiarsDiceTargets
-    )
+    if(TARGET liarsdice_warnings)
+        install(TARGETS liarsdice_warnings
+            EXPORT LiarsDiceTargets
+        )
+    endif()
 
     # Generate and install CMake config files
     install(EXPORT LiarsDiceTargets
@@ -145,6 +185,8 @@ set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
 set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
 
 # Status messages
+print_logging_status()
+
 message(STATUS "")
 message(STATUS "LiarsDice configuration summary:")
 message(STATUS "  Version:          ${PROJECT_VERSION}")
