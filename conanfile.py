@@ -46,6 +46,10 @@ class LiarsDiceConan(ConanFile):
     def configure(self):
         if self.options.shared:
             self.options.rm_safe("fPIC")
+        
+        # Ensure C++23 standard is set if not provided by profile
+        if not self.settings.compiler.get_safe("cppstd"):
+            self.settings.compiler.cppstd = "23"
 
     def layout(self):
         cmake_layout(self)

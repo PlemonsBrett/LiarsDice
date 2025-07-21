@@ -176,6 +176,9 @@ conan install . --build=missing
 
 # Build with specific Conan options
 conan create . --build=missing -o build_tests=True
+
+# For CI environments, use the CI profile
+conan install . --build=missing --profile=profiles/ci
 ```
 
 ### Available CMake Options
