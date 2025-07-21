@@ -17,7 +17,112 @@ permissions:
   contents: write
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          cmake \
+          ninja-build \
+          build-essential \
+          clang-15 \
+          libc++-15-dev \
+          libc++abi-15-dev \
+          gcovr \
+          lcov
+          
+    - name: Install Conan
+      run: |
+        pip install "conan>=2.0"
+        conan profile detect --force
+        
+    - name: Configure Conan profile for tests
+      run: |
+        cat > ~/.conan2/profiles/test << EOF
+        [settings]
+        os=Linux
+        arch=x86_64
+        compiler=clang
+        compiler.version=15
+        compiler.libcxx=libc++
+        compiler.cppstd=23
+        build_type=Debug
+        [buildenv]
+        CC=clang-15
+        CXX=clang++-15
+        CXXFLAGS=-fprofile-instr-generate -fcoverage-mapping
+        LDFLAGS=-fprofile-instr-generate -fcoverage-mapping
+        EOF
+        
+    - name: Install Conan dependencies
+      run: |
+        conan install . --output-folder=build --build=missing --profile=test
+        
+    - name: Configure CMake with coverage
+      run: |
+        cmake -B build -S . \
+          -DCMAKE_TOOLCHAIN_FILE=build/conan_toolchain.cmake \
+          -DCMAKE_BUILD_TYPE=Debug \
+          -DLIARSDICE_BUILD_TESTS=ON \
+          -DLIARSDICE_BUILD_EXAMPLES=OFF \
+          -DLIARSDICE_BUILD_BENCHMARKS=OFF \
+          -DLIARSDICE_BUILD_DOCS=OFF \
+          -DCMAKE_CXX_FLAGS="-fprofile-instr-generate -fcoverage-mapping" \
+          -DCMAKE_C_FLAGS="-fprofile-instr-generate -fcoverage-mapping" \
+          -G Ninja
+          
+    - name: Build tests
+      run: cmake --build build --parallel
+      
+    - name: Run tests
+      run: |
+        cd build
+        LLVM_PROFILE_FILE="tests.profraw" ctest --output-on-failure -j$(nproc)
+        cd ..
+        
+    - name: Generate coverage report
+      run: |
+        cd build
+        llvm-profdata-15 merge -sparse tests.profraw -o tests.profdata
+        llvm-cov-15 show ./bin/unit_tests \
+          -instr-profile=tests.profdata \
+          -format=html \
+          -output-dir=coverage_html \
+          -ignore-filename-regex=".*/(tests|examples|build)/.*" \
+          -ignore-filename-regex=".*/conan/.*"
+        llvm-cov-15 report ./bin/unit_tests \
+          -instr-profile=tests.profdata \
+          -ignore-filename-regex=".*/(tests|examples|build)/.*" \
+          -ignore-filename-regex=".*/conan/.*" \
+          > coverage_summary.txt
+        echo "### Test Coverage Summary" >> $GITHUB_STEP_SUMMARY
+        echo '```' >> $GITHUB_STEP_SUMMARY
+        cat coverage_summary.txt >> $GITHUB_STEP_SUMMARY
+        echo '```' >> $GITHUB_STEP_SUMMARY
+        cd ..
+        
+    - name: Upload coverage report
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-report
+        path: |
+          build/coverage_html/
+          build/coverage_summary.txt
+        retention-days: 30
+
   build:
+    needs: test
     strategy:
       matrix:
         include:
