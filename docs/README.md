@@ -4,7 +4,7 @@ This directory contains the source files and configuration for the LiarsDice pro
 
 ## 📚 Documentation Structure
 
-```
+```sh
 docs/
 ├── README.md                 # This file
 ├── requirements.txt          # Python dependencies for building docs
@@ -73,7 +73,7 @@ The documentation is automatically deployed to GitHub Pages via GitHub Actions:
 - **Primary Workflow**: `.github/workflows/docs-simple.yml` (lightweight, reliable)
 - **Alternative Workflow**: `.github/workflows/docs.yml` (full CMake build, manual trigger only)
 - **Trigger**: Push to `main` or `Enhancements-SoftwareEngineeringAndDesign` branches
-- **Output**: Available at `https://[username].github.io/LiarsDice/`
+- **Output**: Available at `https://plemonsBrett.github.io/LiarsDice/`
 
 ### Manual Deployment
 
@@ -196,6 +196,7 @@ Main configuration in `docs/sphinx/conf.py`:
 ### Common Issues
 
 **Sphinx build fails**:
+
 ```bash
 # Check dependencies
 pip install -r docs/requirements.txt
@@ -206,16 +207,19 @@ cmake --build build --target sphinx-html
 ```
 
 **Mermaid diagrams not rendering**:
+
 ```bash
 # Ensure extension is installed
 pip install sphinxcontrib-mermaid
 ```
 
 **Missing cross-references**:
+
 - Check file paths in `:doc:` directives
 - Ensure target files exist and are in toctree
 
 **GitHub Pages deployment fails**:
+
 - Check workflow file syntax
 - Verify repository has Pages enabled
 - Check workflow permissions in repository settings

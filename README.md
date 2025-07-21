@@ -78,11 +78,25 @@ cmake --build build
 ./scripts/test.sh
 ```
 
+## 📚 Documentation
+
+**[View Complete Documentation →](https://[your-username].github.io/LiarsDice/)**
+
+Comprehensive documentation including:
+
+- **Developer Guide** - Setup, building, and contribution guidelines
+- **API Reference** - Complete C++23 interface documentation  
+- **Architecture** - Modern C++23 design patterns and dependency injection
+- **UML Diagrams** - Visual system architecture and data flow
+- **Performance** - Benchmarks and optimization strategies
+
+> **Note**: Replace `[your-username]` with your GitHub username in the URL above.
+
 ## 🏗️ Project Architecture
 
 This project follows modern C++ best practices with a clean separation between library and application code:
 
-```
+```sh
 LiarsDice/
 ├── src/                          # Library implementation
 │   └── liarsdice/
@@ -208,12 +222,14 @@ cmake -B build -S . -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 ### Visual Studio Code
 
 The project includes VSCode configuration for:
+
 - **IntelliSense** - C++23 support with proper include paths
 - **Debugging** - Ready-to-use launch configurations
 - **Building** - Integrated build tasks
 - **Testing** - Catch2 integration
 
 Open the project in VSCode and use:
+
 - `Ctrl+Shift+P` → "CMake: Configure" to set up the build
 - `F5` to debug the application
 - `Ctrl+Shift+P` → "Test: Run All Tests" to run tests
@@ -269,20 +285,24 @@ g++ -std=c++23 your_app.cpp -I/path/to/include -L/path/to/lib -lliarsdice_core
 ### Common Issues
 
 **Build fails with C++23 errors:**
+
 - Ensure you have a modern compiler (GCC 12+, Clang 15+)
 - Check that CMake is version 3.28 or higher
 
 **Tests fail to build:**
+
 - With Conan: Check `conan install . --build=missing` runs successfully
 - With FetchContent: Catch2 is automatically fetched, ensure internet connectivity
 - For offline builds, install Catch2 system-wide or use Conan with local cache
 
 **Missing compile_commands.json:**
+
 ```bash
 cmake -B build -S . -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 ```
 
 **Asset loading errors:**
+
 - Assets are automatically copied to build directory
 - Ensure `assets/rules.txt` exists in the source directory
 
@@ -324,7 +344,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 📞 Support
 
 - **Issues** - Report bugs and request features via GitHub Issues
-- **Documentation** - See `CLAUDE.md` for detailed development guidance
+- **Documentation** - See [comprehensive developer documentation](https://plemonsBrett.github.io/LiarsDice/) for detailed guidance
 - **Examples** - Check the `examples/` directory for usage patterns
 
 ---
