@@ -1,0 +1,229 @@
+name: Build and Release
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to create release for (optional, auto-generated if not provided)'
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            name: linux
+            binary: liarsdice-cli
+          - os: macos-latest
+            name: macos
+            binary: liarsdice-cli
+          - os: windows-latest
+            name: windows
+            binary: liarsdice-cli.exe
+    
+    runs-on: ${{ matrix.os }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: Install Conan
+      run: |
+        pip install "conan>=2.0"
+        conan profile detect --force
+        
+    - name: Install system dependencies (Linux)
+      if: runner.os == 'Linux'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          cmake \
+          ninja-build \
+          build-essential \
+          clang-15 \
+          libc++-15-dev \
+          libc++abi-15-dev
+          
+    - name: Install system dependencies (macOS)
+      if: runner.os == 'macOS'
+      run: |
+        brew install cmake ninja
+        
+    - name: Install system dependencies (Windows)
+      if: runner.os == 'Windows'
+      run: |
+        choco install cmake ninja
+        
+    - name: Configure Conan profile (Linux)
+      if: runner.os == 'Linux'
+      run: |
+        cat > ~/.conan2/profiles/release << EOF
+        [settings]
+        os=Linux
+        arch=x86_64
+        compiler=clang
+        compiler.version=15
+        compiler.libcxx=libc++
+        compiler.cppstd=23
+        build_type=Release
+        [buildenv]
+        CC=clang-15
+        CXX=clang++-15
+        EOF
+        
+    - name: Configure Conan profile (macOS)
+      if: runner.os == 'macOS'
+      run: |
+        cat > ~/.conan2/profiles/release << EOF
+        [settings]
+        os=Macos
+        arch=armv8
+        compiler=apple-clang
+        compiler.version=15
+        compiler.libcxx=libc++
+        compiler.cppstd=23
+        build_type=Release
+        EOF
+        
+    - name: Configure Conan profile (Windows)
+      if: runner.os == 'Windows'
+      shell: bash
+      run: |
+        cat > ~/.conan2/profiles/release << EOF
+        [settings]
+        os=Windows
+        arch=x86_64
+        compiler=msvc
+        compiler.version=193
+        compiler.runtime=dynamic
+        compiler.cppstd=23
+        build_type=Release
+        EOF
+        
+    - name: Install Conan dependencies
+      run: |
+        conan install . --output-folder=build --build=missing --profile=release
+        
+    - name: Configure CMake (Unix)
+      if: runner.os != 'Windows'
+      run: |
+        cmake -B build -S . \
+          -DCMAKE_TOOLCHAIN_FILE=build/conan_toolchain.cmake \
+          -DCMAKE_BUILD_TYPE=Release \
+          -DLIARSDICE_BUILD_TESTS=OFF \
+          -DLIARSDICE_BUILD_EXAMPLES=OFF \
+          -DLIARSDICE_BUILD_BENCHMARKS=OFF \
+          -DLIARSDICE_BUILD_DOCS=OFF \
+          -G Ninja
+          
+    - name: Configure CMake (Windows)
+      if: runner.os == 'Windows'
+      run: |
+        cmake -B build -S . `
+          -DCMAKE_TOOLCHAIN_FILE=build/conan_toolchain.cmake `
+          -DCMAKE_BUILD_TYPE=Release `
+          -DLIARSDICE_BUILD_TESTS=OFF `
+          -DLIARSDICE_BUILD_EXAMPLES=OFF `
+          -DLIARSDICE_BUILD_BENCHMARKS=OFF `
+          -DLIARSDICE_BUILD_DOCS=OFF `
+          -G Ninja
+          
+    - name: Build
+      run: cmake --build build --config Release --parallel
+      
+    - name: Create distribution directory
+      run: |
+        mkdir -p dist
+        cp build/bin/${{ matrix.binary }} dist/
+        cp -r assets dist/
+        
+    - name: Create archive (Unix)
+      if: runner.os != 'Windows'
+      run: |
+        cd dist
+        tar -czf ../liarsdice-${{ matrix.name }}.tar.gz *
+        cd ..
+        
+    - name: Create archive (Windows)
+      if: runner.os == 'Windows'
+      run: |
+        cd dist
+        Compress-Archive -Path * -DestinationPath ../liarsdice-${{ matrix.name }}.zip
+        cd ..
+        
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: liarsdice-${{ matrix.name }}
+        path: |
+          liarsdice-${{ matrix.name }}.tar.gz
+          liarsdice-${{ matrix.name }}.zip
+        retention-days: 1
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Need full history for tag generation
+      
+    - name: Download artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: artifacts
+        
+    - name: Generate version tag
+      id: version
+      run: |
+        # Check if this is a tag push
+        if [[ "${{ github.ref }}" == refs/tags/* ]]; then
+          echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          echo "create_tag=false" >> $GITHUB_OUTPUT
+        elif [ -n "${{ github.event.inputs.tag }}" ]; then
+          echo "tag=${{ github.event.inputs.tag }}" >> $GITHUB_OUTPUT
+          echo "create_tag=true" >> $GITHUB_OUTPUT
+        else
+          # Auto-generate version based on date and commit
+          VERSION="v$(date +'%Y.%m.%d')-$(git rev-parse --short HEAD)"
+          echo "tag=$VERSION" >> $GITHUB_OUTPUT
+          echo "create_tag=true" >> $GITHUB_OUTPUT
+        fi
+        
+    - name: Create tag if needed
+      if: steps.version.outputs.create_tag == 'true'
+      run: |
+        git config user.name github-actions
+        git config user.email github-actions@github.com
+        git tag ${{ steps.version.outputs.tag }}
+        git push origin ${{ steps.version.outputs.tag }}
+        
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ steps.version.outputs.tag }}
+        name: Release ${{ steps.version.outputs.tag }}
+        draft: false
+        prerelease: false
+        generate_release_notes: true
+        files: |
+          artifacts/liarsdice-linux/liarsdice-linux.tar.gz
+          artifacts/liarsdice-macos/liarsdice-macos.tar.gz
+          artifacts/liarsdice-windows/liarsdice-windows.zip

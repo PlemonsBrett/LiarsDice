@@ -21,7 +21,7 @@ using namespace liarsdice::ui;
 
 class EnhancedLiarsDiceApp {
 public:
-  EnhancedLiarsDiceApp() : prompt_(create_default_style()) {
+  EnhancedLiarsDiceApp() : prompt_(create_default_style()), game_(nullptr) {
 #ifdef LIARSDICE_ENABLE_LOGGING
     logging_system_ = std::make_unique<logging::LoggingSystem>("production");
     logger_ = logging::get_default_logger();
@@ -39,7 +39,15 @@ public:
     }
   }
 
-  ~EnhancedLiarsDiceApp() {
+  ~EnhancedLiarsDiceApp() = default;
+
+  // Delete copy/move operations
+  EnhancedLiarsDiceApp(const EnhancedLiarsDiceApp&) = delete;
+  EnhancedLiarsDiceApp& operator=(const EnhancedLiarsDiceApp&) = delete;
+  EnhancedLiarsDiceApp(EnhancedLiarsDiceApp&&) = delete;
+  EnhancedLiarsDiceApp& operator=(EnhancedLiarsDiceApp&&) = delete;
+
+  void cleanup() {
     // Save history
     auto history_path = get_history_path();
     prompt_.history().save_to_file(history_path);
@@ -62,6 +70,7 @@ public:
     }
 
     show_goodbye();
+    cleanup();
   }
 
 private:
@@ -98,7 +107,7 @@ private:
     }
 #else
     const char *home = std::getenv("HOME");
-    if (home) {
+    if (home != nullptr) {
       home_dir = home;
     }
 #endif
@@ -153,7 +162,7 @@ private:
   }
 #endif
 
-  void show_welcome() {
+  void show_welcome() const {
     Terminal::clear();
     prompt_.draw_box("Welcome to Liar's Dice!");
 
@@ -205,7 +214,7 @@ private:
     // Get number of players
     auto player_count_validator = create_player_count_validator(2, 6);
     auto player_count_result =
-        prompt_.prompt_validated<uint32_t>("How many players", player_count_validator, 2u);
+        prompt_.prompt_validated<uint32_t>("How many players", player_count_validator, 2U);
 
     if (!player_count_result) {
       prompt_.show_error("Failed to get player count");
@@ -244,7 +253,7 @@ private:
     }
   }
 
-  void show_statistics() {
+  void show_statistics() const {
     prompt_.draw_box("Game Statistics");
 
     // Analyze command frequency
@@ -264,7 +273,7 @@ private:
     std::cin.get();
   }
 
-  void show_settings() {
+  void show_settings() const {
     prompt_.draw_box("Settings");
 
 #ifdef LIARSDICE_ENABLE_CONFIG
@@ -281,7 +290,7 @@ private:
     std::cin.get();
   }
 
-  void show_help() {
+  void show_help() const {
     prompt_.draw_box("Help");
 
     std::cout << R"(
@@ -303,7 +312,7 @@ Tips:
     std::cin.get();
   }
 
-  void show_goodbye() {
+  void show_goodbye() const {
     Terminal::clear();
 
     std::cout << colors::bright_cyan;

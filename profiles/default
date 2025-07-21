@@ -8,7 +8,9 @@ compiler.cppstd=23
 build_type=Release
 
 [options]
-
+liarsdice/*:enable_logging=True
+liarsdice/*:build_tests=True
+liarsdice/*:build_examples=True
 
 [buildenv]
 CC=/opt/homebrew/opt/llvm/bin/clang

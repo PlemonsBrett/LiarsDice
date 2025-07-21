@@ -21,8 +21,6 @@ WarningsAsErrors: ''
 HeaderFilterRegex: '^(?!.*/opt/homebrew/).*'
 SystemHeaders: false
 FormatStyle: file
-ExtraArgs: 
-  - '-std=c++2b'
 
 CheckOptions:
   - key: readability-identifier-naming.ClassCase

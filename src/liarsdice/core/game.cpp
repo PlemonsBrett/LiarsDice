@@ -27,7 +27,7 @@ const std::string kInvalidGuessMsgDiceCount =
     "greater than the last guess.\n";
 
 // Constructor implementation
-Game::Game() : current_player_index_(0), last_guess_({0, 0}) {
+Game::Game() : players_{}, current_player_index_(0), last_guess_({0, 0}) {
 #ifdef LIARSDICE_ENABLE_LOGGING
   GAME_LOG_INFO("Game instance created");
 #endif
@@ -72,9 +72,8 @@ std::string Game::read_rules_from_file(const std::string &filename) {
     throw FileException("Could not open rules.txt");
   }
 
-  std::string line;
-  size_t line_count = 0;
-  while (std::getline(file_handle, line)) {
+  [[maybe_unused]] size_t line_count = 0;
+  for (std::string line; std::getline(file_handle, line);) {
     rules_content += line + '\n';
     ++line_count;
   }
@@ -114,9 +113,15 @@ void Game::setup_players() {
 }
 
 void Game::get_setup_input(int &num_players) {
-  std::cin >> num_players;
-  std::cin.clear();
-  std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+  if (!(std::cin >> num_players)) {
+    // Input failed - clear error state and discard bad input
+    std::cin.clear();
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    num_players = 0; // Ensure invalid value
+  } else {
+    // Successfully read a number - clear remaining input
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+  }
 }
 
 void Game::play_game() {
@@ -136,10 +141,9 @@ void Game::play_game() {
 #endif
     display_current_state(current_player);
 
-    auto guess = Guess(Player::make_guess());
-    std::string validation_error = validate_guess(guess, last_guess_);
-
-    if (!validation_error.empty()) {
+    auto guess = Guess(current_player.make_guess());
+    if (std::string validation_error = validate_guess(guess, last_guess_);
+        !validation_error.empty()) {
 #ifdef LIARSDICE_ENABLE_LOGGING
       GAME_LOG_DEBUG("Invalid guess by Player {}: {}", current_player.get_player_id(),
                      validation_error);
@@ -154,12 +158,8 @@ void Game::play_game() {
                   guess.dice_value);
 #endif
 
-    if (Player::call_liar()) {
-      std::string winner = check_guess_against_dice(last_guess_);
-#ifdef LIARSDICE_ENABLE_LOGGING
-      GAME_LOG_INFO("Game ended - winner: {}", winner);
-#endif
-      std::cout << "The winner is " << winner << '\n';
+    if (current_player.call_liar()) {
+      std::cout << "The winner is " << check_guess_against_dice(last_guess_) << '\n';
       break;
     }
 
@@ -231,9 +231,5 @@ std::string Game::check_guess_against_dice(const Guess &last_guess) {
   GAME_LOG_INFO("Dice verification: found {} dice with face value {} (needed {})", counter,
                 last_guess.dice_value, last_guess.dice_count);
 #endif
-  std::string winner = (counter >= last_guess.dice_count) ? "Guessing Player" : "Calling Player";
-#ifdef LIARSDICE_ENABLE_LOGGING
-  GAME_LOG_INFO("Winner determined: {}", winner);
-#endif
-  return winner;
+  return (counter >= last_guess.dice_count) ? "Guessing Player" : "Calling Player";
 }

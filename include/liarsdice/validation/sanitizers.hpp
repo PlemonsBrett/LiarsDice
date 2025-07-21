@@ -22,9 +22,9 @@ namespace liarsdice::validation {
  */
 class SanitizerBase {
 public:
-  using sanitizer_func = std::function<std::string(std::string_view)>;
+  using SanitizerFunc = std::function<std::string(std::string_view)>;
 
-  explicit SanitizerBase(sanitizer_func func, std::string name = "sanitizer")
+  explicit SanitizerBase(SanitizerFunc func, std::string name = "sanitizer")
       : sanitizer_(std::move(func)), name_(std::move(name)) {}
 
   /**
@@ -43,7 +43,7 @@ public:
   [[nodiscard]] const std::string &name() const { return name_; }
 
 private:
-  sanitizer_func sanitizer_;
+  SanitizerFunc sanitizer_;
   std::string name_;
 };
 
@@ -362,7 +362,7 @@ namespace sanitizers {
         result.reserve(input.size());
 
         std::ranges::copy_if(input, std::back_inserter(result), [](char c) {
-          unsigned char uc = static_cast<unsigned char>(c);
+          auto uc = static_cast<unsigned char>(c);
           return !std::iscntrl(uc) || uc == '\t' || uc == '\n' || uc == '\r';
         });
 

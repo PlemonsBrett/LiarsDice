@@ -20,10 +20,10 @@ namespace liarsdice::validation {
  */
 template <typename T> class ValidatorBase {
 public:
-  using value_type = T;
-  using validator_func = std::function<std::optional<ValidationError>(const T &)>;
+  using ValueType = T;
+  using ValidatorFunc = std::function<std::optional<ValidationError>(const T &)>;
 
-  explicit ValidatorBase(validator_func func, std::string name = "")
+  explicit ValidatorBase(ValidatorFunc func, std::string name = "")
       : validator_(std::move(func)), name_(std::move(name)) {}
 
   /**
@@ -92,7 +92,7 @@ public:
   [[nodiscard]] const std::string &name() const { return name_; }
 
 private:
-  validator_func validator_;
+  ValidatorFunc validator_;
   std::string name_;
 };
 

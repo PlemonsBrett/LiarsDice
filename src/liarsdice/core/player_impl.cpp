@@ -17,7 +17,7 @@ using DiceFactory = interfaces::ServiceFactory<interfaces::IDice>;
 PlayerImpl::PlayerImpl(int player_id,
                        std::unique_ptr<interfaces::IRandomGenerator> random_generator,
                        std::unique_ptr<DiceFactory> dice_factory)
-    : player_id_(player_id), random_generator_(std::move(random_generator)),
+    : player_id_(player_id), dice_{}, random_generator_(std::move(random_generator)),
       dice_factory_(std::move(dice_factory)) {
 
   if (!random_generator_ || !dice_factory_) {
@@ -110,12 +110,14 @@ bool PlayerImpl::is_active() const { return has_dice(); }
 // Private methods
 std::unique_ptr<interfaces::IDice> PlayerImpl::create_die() {
   try {
-    void *raw_die = dice_factory_->create();
+    void *raw_die = nullptr;
+    raw_die = dice_factory_->create();
     auto die = std::unique_ptr<interfaces::IDice>(static_cast<interfaces::IDice *>(raw_die));
 
     // Initialize the die with a random roll
     if (die && random_generator_) {
-      unsigned int initial_value = static_cast<unsigned int>(random_generator_->generate(
+      unsigned int initial_value = 0;
+      initial_value = static_cast<unsigned int>(random_generator_->generate(
           static_cast<int>(kMinDiceValue), static_cast<int>(kMaxDiceValue)));
       die->set_face_value(initial_value);
     }

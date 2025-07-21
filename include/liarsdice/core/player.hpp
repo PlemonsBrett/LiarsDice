@@ -21,10 +21,10 @@ public:
   void display_dice();
 
   // Allows the player to make a guess
-  static std::pair<int, int> make_guess();
+  std::pair<int, int> make_guess();
 
   // Allows the player to call "Liar" on another player's guess
-  static bool call_liar();
+  bool call_liar();
 
   // Returns a const reference to the player's dice to avoid copying
   [[nodiscard]] const std::vector<Dice> &get_dice() const { return dice_; }
