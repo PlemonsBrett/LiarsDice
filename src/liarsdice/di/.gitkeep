@@ -1,0 +1,36 @@
+# Dependency Injection Implementation Directory
+
+This directory contains implementation files for the dependency injection
+system that manages object creation and lifetime throughout the application.
+
+# DI system implementations:
+# - ServiceContainer implementation for service registration and resolution
+# - ServiceFactory implementations for complex object creation
+# - Lifecycle management for singleton, transient, and scoped services
+# - Configuration-based service registration
+# - Automatic dependency resolution and circular dependency detection
+# - Plugin system support for modular architecture
+# - Service decorators and interceptors for cross-cutting concerns
+
+# Core DI components:
+# - Container implementation (.cpp files for SimpleContainer, etc.)
+# - Factory pattern implementations for service creation
+# - Service locator patterns for legacy code integration
+# - Configuration parsers for external service definitions
+# - Reflection utilities for automatic service discovery
+
+# Design patterns supported:
+# - Constructor injection (primary pattern)
+# - Property/setter injection for optional dependencies
+# - Method injection for specific scenarios
+# - Factory pattern for complex service creation
+# - Decorator pattern for service enhancement
+
+# Implementation standards:
+# - Thread-safe service resolution and registration
+# - Exception-safe object construction and cleanup
+# - Memory-efficient container implementation
+# - Clear error messages for configuration issues
+
+Keep this directory in version control to house the dependency injection
+implementation that enables loose coupling and testable architecture.

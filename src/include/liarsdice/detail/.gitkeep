@@ -1,0 +1,43 @@
+# Implementation Detail Headers Directory
+
+This directory contains internal implementation details and private headers
+that are not part of the public API but may be shared between source files.
+
+## Types of implementation details
+
+### - Internal helper classes and functions
+
+### - Template metaprogramming utilities
+
+### - Platform-specific implementation details
+
+### - Performance optimization code
+
+### - Internal data structures and algorithms
+
+### - Private member function implementations
+
+### - Compiler-specific workarounds and optimizations
+
+## Design principles
+
+### - Headers in this directory are NEVER included by public headers
+
+### - All symbols should be in anonymous namespaces or detail namespaces
+
+### - Code here can break compatibility between versions
+
+### - No external dependencies should rely on these headers
+
+### - Prefer inline/header-only implementations for small utilities
+
+## Naming conventions
+
+### - Use detail:: namespace for all symbols
+
+### - Prefix file names with module name (e.g., core_utils.hpp)
+
+### - Include comprehensive comments explaining internal logic
+
+Keep this directory in version control to provide a structured location
+for implementation details while maintaining clear API boundaries.

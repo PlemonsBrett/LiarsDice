@@ -1,0 +1,128 @@
+/* Custom CSS for LiarsDice Documentation */
+
+/* Improve code block readability */
+.highlight {
+    background-color: #f8f8f8;
+    border: 1px solid #e1e4e5;
+    border-radius: 4px;
+    margin: 1em 0;
+}
+
+/* Style for C++ code blocks */
+.highlight-cpp .hll { background-color: #ffffcc; }
+.highlight-cpp .c { color: #408080; font-style: italic; } /* Comment */
+.highlight-cpp .k { color: #008000; font-weight: bold; } /* Keyword */
+.highlight-cpp .o { color: #666666; } /* Operator */
+.highlight-cpp .cm { color: #408080; font-style: italic; } /* Comment.Multiline */
+.highlight-cpp .cp { color: #BC7A00; } /* Comment.Preproc */
+.highlight-cpp .c1 { color: #408080; font-style: italic; } /* Comment.Single */
+.highlight-cpp .cs { color: #408080; font-style: italic; } /* Comment.Special */
+
+/* Improve table styling */
+.rst-content table.docutils {
+    border: 1px solid #e1e4e5;
+    border-collapse: collapse;
+    margin: 1em 0;
+}
+
+.rst-content table.docutils th,
+.rst-content table.docutils td {
+    border: 1px solid #e1e4e5;
+    padding: 8px 12px;
+}
+
+.rst-content table.docutils th {
+    background-color: #f1f1f1;
+    font-weight: bold;
+}
+
+/* Style for admonitions */
+.rst-content .admonition {
+    margin: 1em 0;
+    padding: 12px;
+    border-left: 4px solid #ccc;
+    background-color: #f9f9f9;
+}
+
+.rst-content .admonition.note {
+    border-left-color: #3498db;
+}
+
+.rst-content .admonition.warning {
+    border-left-color: #f39c12;
+}
+
+.rst-content .admonition.important {
+    border-left-color: #e74c3c;
+}
+
+.rst-content .admonition.tip {
+    border-left-color: #2ecc71;
+}
+
+/* Improve navigation */
+.wy-nav-side {
+    background: #2c3e50;
+}
+
+.wy-menu-vertical li.current {
+    background: #34495e;
+}
+
+.wy-menu-vertical li.current a {
+    border: none;
+}
+
+/* Code inline styling */
+.rst-content code {
+    background-color: #f8f8f8;
+    border: 1px solid #e1e4e5;
+    border-radius: 3px;
+    padding: 2px 4px;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 90%;
+}
+
+/* UML and diagram styling */
+.mermaid {
+    text-align: center;
+    margin: 1em 0;
+}
+
+/* API documentation styling */
+.rst-content dl:not(.docutils) dt {
+    background: #f8f8f8;
+    border-top: solid 3px #3498db;
+    color: #555;
+    font-weight: bold;
+}
+
+.rst-content dl:not(.docutils) dd {
+    margin: 0 0 12px 24px;
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 768px) {
+    .rst-content table.docutils {
+        font-size: 0.9em;
+    }
+    
+    .rst-content .admonition {
+        margin: 0.5em 0;
+        padding: 8px;
+    }
+}
+
+/* Print styles */
+@media print {
+    .wy-nav-side,
+    .wy-nav-content-wrap .wy-nav-top,
+    .rst-content .headerlink,
+    .rst-versions {
+        display: none !important;
+    }
+    
+    .wy-nav-content {
+        margin-left: 0 !important;
+    }
+}

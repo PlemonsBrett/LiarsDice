@@ -1,0 +1,19 @@
+[settings]
+os=Macos
+arch=armv8
+compiler=clang
+compiler.version=20
+compiler.libcxx=libc++
+compiler.cppstd=23
+build_type=Release
+
+[options]
+
+
+[buildenv]
+CC=/opt/homebrew/opt/llvm/bin/clang
+CXX=/opt/homebrew/opt/llvm/bin/clang++
+
+[conf]
+tools.cmake.cmaketoolchain:generator=Unix Makefiles
+tools.build:jobs=8

@@ -1,0 +1,46 @@
+# Integration Tests Directory
+
+This directory contains integration tests that verify component interactions
+and end-to-end functionality across the LiarsDice system.
+
+# Integration test categories:
+# - Component integration tests (Core + DI + Adapters)
+# - API integration tests for public library interfaces
+# - Database integration tests for persistence functionality
+# - Network integration tests for multiplayer scenarios
+# - Configuration integration tests for system setup
+# - Performance integration tests for system-wide behavior
+# - Cross-platform integration tests for portability verification
+
+# Test scenarios covered:
+# - Complete game lifecycle from start to finish
+# - Player management and interaction workflows
+# - Dice rolling and statistical validation
+# - Game state persistence and recovery
+# - Multi-threaded game execution
+# - Error handling and recovery across components
+# - Memory management and resource cleanup
+
+# Testing frameworks and tools:
+# - Google Test for C++ test structure
+# - Custom test harnesses for game simulation
+# - Mock servers for network testing
+# - Database containers for persistence testing
+# - Performance profiling integration
+# - Automated test environment setup
+
+# Test execution patterns:
+# - Containerized test environments for consistency
+# - Automated test data generation and cleanup
+# - Parallel test execution for efficiency
+# - Continuous integration pipeline integration
+# - Regression test automation
+
+# Documentation requirements:
+# - Test scenario descriptions and expected outcomes
+# - Environment setup and prerequisite documentation
+# - Troubleshooting guides for test failures
+# - Performance baseline documentation
+
+Keep this directory in version control to maintain comprehensive integration
+testing that validates system behavior across component boundaries.

@@ -1,0 +1,28 @@
+# Design Documentation Directory
+
+This directory contains architectural design documents, specifications,
+and technical decision records for the LiarsDice project.
+
+# Design document types:
+# - Architecture decision records (ADRs)
+# - System design specifications
+# - Class and component diagrams
+# - Database schema designs (if applicable)
+# - Interface specifications and contracts
+# - Performance and scalability considerations
+# - Security design documents
+# - Testing strategies and approaches
+
+# Documentation format:
+# - Markdown files for text-based documentation
+# - PlantUML or Mermaid diagrams for visual representations
+# - JSON/YAML schemas for data structure definitions
+# - Protocol buffer definitions for API contracts
+
+# Naming conventions:
+# - ADR-YYYY-MM-DD-decision-title.md for decision records
+# - architecture-overview.md for high-level system design
+# - component-MODULE-design.md for module-specific designs
+
+Keep this directory in version control to maintain design documentation
+alongside the codebase and track architectural evolution over time.

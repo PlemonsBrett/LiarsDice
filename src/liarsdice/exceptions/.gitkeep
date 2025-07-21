@@ -1,0 +1,38 @@
+# Exceptions Implementation Directory
+
+This directory contains implementation files for the custom exception
+hierarchy that provides structured error handling throughout the library.
+
+# Exception implementations include:
+# - ExceptionBase implementation with error categorization
+# - Game-specific exceptions (InvalidMoveException, GameStateException)
+# - Player-related exceptions (PlayerNotFoundException, InvalidPlayerState)
+# - Dice-related exceptions (InvalidDiceValueException, DiceConfigurationError)
+# - System exceptions (ResourceNotAvailableException, ConfigurationError)
+# - Network exceptions for multiplayer scenarios (ConnectionError, TimeoutException)
+# - Persistence exceptions for save/load operations
+
+# Exception hierarchy features:
+# - Structured error codes and categories
+# - Detailed error messages with context information
+# - Stack trace capture and reporting capabilities
+# - Localization support for user-facing error messages
+# - Integration with logging systems for error tracking
+# - Serialization support for network error transmission
+
+# Implementation standards:
+# - All exceptions inherit from ExceptionBase
+# - Provide both error codes and human-readable messages
+# - Include contextual information (player ID, game state, etc.)
+# - Support exception chaining for complex error scenarios
+# - Maintain exception safety guarantees in all operations
+# - Follow C++ exception handling best practices
+
+# Error handling philosophy:
+# - Use exceptions for exceptional conditions only
+# - Prefer error codes for expected failure scenarios
+# - Provide recovery mechanisms where possible
+# - Log all exceptions with appropriate severity levels
+
+Keep this directory in version control to maintain structured exception
+handling implementation that supports robust error management.
