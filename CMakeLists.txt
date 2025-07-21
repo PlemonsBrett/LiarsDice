@@ -41,6 +41,11 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(cmake/StandardProjectSettings.cmake)
 include(cmake/CompilerWarnings.cmake)
 
+# Documentation support
+if(LIARSDICE_BUILD_DOCS)
+    include(cmake/Documentation.cmake)
+endif()
+
 # Conan integration (if available)
 if(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/conan_toolchain.cmake" OR 
    EXISTS "${CMAKE_CURRENT_BINARY_DIR}/Release/generators/conan_toolchain.cmake" OR
@@ -87,9 +92,8 @@ if(LIARSDICE_BUILD_BENCHMARKS)
     add_subdirectory(benchmarks)
 endif()
 
-if(LIARSDICE_BUILD_DOCS)
-    add_subdirectory(docs)
-endif()
+# Documentation is handled by cmake/Documentation.cmake
+# No need for docs subdirectory
 
 # Installation
 if(LIARSDICE_INSTALL)

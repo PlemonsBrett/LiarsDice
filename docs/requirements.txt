@@ -1,0 +1,31 @@
+# Documentation build requirements
+# Install with: pip install -r docs/requirements.txt
+
+# Core documentation tools
+sphinx>=4.0.0
+sphinx-rtd-theme>=1.0.0
+breathe>=4.34.0
+myst-parser>=0.18.0
+
+# Additional Sphinx extensions
+sphinx-copybutton>=0.5.0
+sphinx-autobuild>=2021.3.0
+sphinxcontrib-mermaid>=0.7.0
+
+# Development and utility tools
+doc8>=0.11.0  # RST linting
+rstcheck>=6.0.0  # RST validation
+sphinx-lint>=0.6.0  # Sphinx-specific linting
+
+# Optional tools for enhanced documentation
+recommonmark>=0.7.0  # Markdown support (alternative to myst-parser)
+sphinx-tabs>=3.4.0  # Tabbed content
+sphinx-togglebutton>=0.3.0  # Collapsible content
+
+# For generating diagrams (if using sphinx-diagrammers)
+sphinxcontrib-plantuml>=0.24
+sphinxcontrib-blockdiag>=3.0.0
+
+# For API documentation enhancement
+sphinx-autodoc-typehints>=1.19.0
+sphinx-paramlinks>=0.5.0
