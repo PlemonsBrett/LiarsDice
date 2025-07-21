@@ -1,4 +1,4 @@
-name: Documentation (Simple Build)
+name: Build and Deploy Documentation
 
 on:
   push:
@@ -39,6 +39,15 @@ jobs:
     - name: Create minimal build structure
       run: |
         mkdir -p build/docs
+        # Verify required files exist
+        if [ ! -f "docs/sphinx/conf.py" ]; then
+          echo "Error: docs/sphinx/conf.py not found"
+          exit 1
+        fi
+        if [ ! -f "docs/requirements.txt" ]; then
+          echo "Error: docs/requirements.txt not found"
+          exit 1
+        fi
         
     - name: Build Sphinx documentation
       run: |

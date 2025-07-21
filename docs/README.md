@@ -70,8 +70,9 @@ The documentation is automatically deployed to GitHub Pages via GitHub Actions:
 
 ### Automatic Deployment
 
+- **Primary Workflow**: `.github/workflows/docs-simple.yml` (lightweight, reliable)
+- **Alternative Workflow**: `.github/workflows/docs.yml` (full CMake build, manual trigger only)
 - **Trigger**: Push to `main` or `Enhancements-SoftwareEngineeringAndDesign` branches
-- **Workflow**: `.github/workflows/docs.yml` or `.github/workflows/docs-simple.yml`
 - **Output**: Available at `https://[username].github.io/LiarsDice/`
 
 ### Manual Deployment

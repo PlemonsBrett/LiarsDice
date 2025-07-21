@@ -1,9 +1,9 @@
-name: Build and Deploy Documentation
+name: Build and Deploy Documentation (Full Build)
 
 on:
+  # Only run on manual trigger or main branch to avoid conflicts
+  workflow_dispatch:
   push:
-    branches: [ main, Enhancements-SoftwareEngineeringAndDesign ]
-  pull_request:
     branches: [ main ]
 
 permissions:
@@ -54,15 +54,24 @@ jobs:
         
     - name: Configure Conan profile for CI
       run: |
-        conan profile update settings.compiler=clang default
-        conan profile update settings.compiler.version=15 default
-        conan profile update settings.compiler.libcxx=libc++ default
-        conan profile update settings.build_type=Release default
+        # Create a custom profile for CI
+        cat > ~/.conan2/profiles/ci << EOF
+        [settings]
+        os=Linux
+        arch=x86_64
+        compiler=clang
+        compiler.version=15
+        compiler.libcxx=libc++
+        build_type=Release
+        [buildenv]
+        CC=clang-15
+        CXX=clang++-15
+        EOF
         
     - name: Install Conan dependencies
       run: |
         mkdir build && cd build
-        conan install .. --output-folder=. --build=missing -s build_type=Release
+        conan install .. --output-folder=. --build=missing --profile=ci
         
     - name: Configure CMake
       run: |
