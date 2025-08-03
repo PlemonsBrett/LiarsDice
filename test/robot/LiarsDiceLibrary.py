@@ -30,23 +30,40 @@ class LiarsDiceLibrary:
         self.cli_path = path
         
     @keyword
-    def start_liarsdice(self, timeout=30):
+    def start_liarsdice(self, timeout=30, args=None):
         """Start the LiarsDice CLI application."""
         if not self.cli_path:
             raise ValueError("CLI path not set. Use 'Set CLI Path' keyword first.")
         
         self.timeout = int(timeout)
-        self.process = pexpect.spawn(self.cli_path, encoding='utf-8', timeout=self.timeout)
+
+        # Build command with optional arguments
+        if args:
+            cmd = f"{self.cli_path} {args}"
+            self.process = pexpect.spawn(cmd, encoding='utf-8', timeout=self.timeout)
+        else:
+            self.process = pexpect.spawn(self.cli_path, encoding='utf-8', timeout=self.timeout)
+            
         self._start_time = time.time()
         return self.process
+
+    @keyword
+    def start_liarsdice_with_args(self, args, timeout=30):
+        """Start the LiarsDice CLI with command line arguments."""
+        return self.start_liarsdice(timeout=timeout, args=args)
         
     @keyword
     def expect_prompt(self, prompt, timeout=None):
         """Wait for a specific prompt."""
         if not self.process:
             raise ValueError("Process not started")
-        
-        timeout = timeout or self.timeout
+
+        # Convert timeout to float if it's a string
+        if timeout is not None:
+            timeout = float(timeout)
+        else:
+            timeout = self.timeout
+            
         try:
             self.process.expect(prompt, timeout=timeout)
             return True
@@ -62,8 +79,8 @@ class LiarsDiceLibrary:
         """Send input to the CLI."""
         if not self.process:
             raise ValueError("Process not started")
-        
-        self.process.sendline(text)
+
+        self.process.sendline(str(text))
         
     @keyword
     def send_control_c(self):
@@ -180,8 +197,13 @@ class LiarsDiceLibrary:
         """Wait for a regex pattern in the output."""
         if not self.process:
             raise ValueError("Process not started")
-        
-        timeout = timeout or self.timeout
+
+        # Convert timeout to float if it's a string
+        if timeout is not None:
+            timeout = float(timeout)
+        else:
+            timeout = self.timeout
+            
         try:
             self.process.expect(pattern, timeout=timeout)
             return self.process.match.group(0) if self.process.match else ""
@@ -192,7 +214,12 @@ class LiarsDiceLibrary:
     @keyword
     def simulate_ai_game(self, num_ai_players=1):
         """Start a game with AI players."""
-        total_players = int(num_ai_players) + 1  # Convert to int first
+        # Ensure num_ai_players is an integer
+        num_ai_players = int(num_ai_players)
+        total_players = num_ai_players + 1
+
+        # Wait for the prompt first
+        self.expect_prompt("Enter the number of players")
         self.send_input(str(total_players))  # Total players
         
         if total_players == 1:
@@ -204,6 +231,11 @@ class LiarsDiceLibrary:
             # Multi-player mode - asks for AI count
             self.expect_prompt("How many AI players")
             self.send_input(str(num_ai_players))
+            # Wait for game to start
+            try:
+                self.process.expect("Game starting", timeout=5)
+            except:
+                pass  # Continue even if we don't see this exact message
         
     @keyword
     def make_guess(self, dice_count, face_value):

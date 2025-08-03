@@ -111,7 +111,9 @@ po::options_description Application::setup_program_options() {
         ("starting-dice", po::value<unsigned int>(&config_.starting_dice)->default_value(5), 
          "Number of dice each player starts with")
         ("ai-think-time", po::value<unsigned int>(&config_.ai_think_time)->default_value(1000), 
-         "AI thinking time in milliseconds");
+         "AI thinking time in milliseconds")
+        ("seed", po::value<unsigned int>(), 
+         "Random seed for deterministic gameplay (useful for testing)");
     
     return desc;
 }
@@ -130,6 +132,11 @@ bool Application::parse_command_line(int argc, char* argv[], AppConfig& config) 
         
         config.verbose = vm.count("verbose");
         config.demo_mode = vm.count("demo");
+        
+        // Handle optional seed
+        if (vm.count("seed")) {
+            config.random_seed = vm["seed"].as<unsigned int>();
+        }
         
         return true;
         
@@ -177,6 +184,7 @@ void Application::setup_game(int total_players, int ai_players) {
     game_config.starting_dice = config_.starting_dice;
     game_config.allow_ones_wild = config_.allow_ones_wild;
     game_config.ai_think_time_ms = config_.ai_think_time;
+    game_config.random_seed = config_.random_seed;  // Pass seed if provided
     
     game_ = std::make_unique<core::Game>(game_config);
     players_.clear();
@@ -215,8 +223,8 @@ void Application::setup_game(int total_players, int ai_players) {
         on_liar_called(player);
     });
     
-    game_->events().on_round_result.connect([this](const core::Player& caller, const core::Player& loser) {
-        on_round_result(caller, loser);
+    game_->events().on_round_result.connect([this](const core::Player& caller, const core::Player& loser, int points_lost) {
+        on_round_result(caller, loser, points_lost);
     });
     
     game_->events().on_player_eliminated.connect([this](const core::Player& player) {
@@ -359,30 +367,27 @@ core::Guess Application::get_player_guess(const std::optional<core::Guess>& last
         face_value = get_validated_input(FACE_VALUE_PROMPT, 1, 6);
         if (should_exit.load()) break;
         
-        // Validate against previous guess
-        if (last_guess.has_value()) {
-            bool valid = false;
-            if (face_value > last_guess->face_value) {
-                valid = true;
-            } else if (face_value == last_guess->face_value && dice_count > last_guess->dice_count) {
-                valid = true;
-            } else if (face_value < last_guess->face_value && dice_count > last_guess->dice_count) {
-                valid = true;
+        auto current_player = game_->get_current_player();
+        core::Guess guess{static_cast<unsigned int>(dice_count), 
+                         static_cast<unsigned int>(face_value), 
+                         current_player ? current_player->get_id() : 0};
+        
+        // Use game's validation
+        if (!game_->is_valid_guess(guess)) {
+            print_with_flush(INVALID_MSG);
+            if (last_guess.has_value()) {
+                std::cout << "You must either increase the dice count or keep the same count with a higher face value." << std::endl;
+                std::cout << "Previous guess was: " << last_guess->dice_count 
+                         << " dice showing " << last_guess->face_value << std::endl;
             }
-            
-            if (!valid) {
-                print_with_flush(INVALID_MSG);
-                continue;
-            }
+            continue;
         }
         
-        break;
+        return guess;
     }
     
-    auto current_player = game_->get_current_player();
-    return core::Guess{static_cast<unsigned int>(dice_count), 
-                      static_cast<unsigned int>(face_value), 
-                      current_player ? current_player->get_id() : 0};
+    // Return a dummy guess if exiting
+    return core::Guess{1, 1, 0};
 }
 
 void Application::show_game_state() {
@@ -391,8 +396,8 @@ void Application::show_game_state() {
     std::cout << "Total dice in play: " << game_->get_total_dice_count() << std::endl;
     
     for (const auto& player : game_->get_players()) {
-        if (player->get_dice_count() > 0) {
-            std::cout << player->get_name() << ": " << player->get_dice_count() << " dice" << std::endl;
+        if (!player->is_eliminated()) {
+            std::cout << player->get_name() << ": " << player->get_points() << " points" << std::endl;
         }
     }
     
@@ -447,8 +452,10 @@ void Application::on_liar_called(const core::Player& player) {
     std::cout << player.get_name() << " calls LIAR!" << std::endl;
 }
 
-void Application::on_round_result(const core::Player& caller, const core::Player& loser) {
-    std::cout << loser.get_name() << " loses a die!" << std::endl;
+void Application::on_round_result(const core::Player& caller, const core::Player& loser, int points_lost) {
+    std::cout << loser.get_name() << " loses " << points_lost << " point" 
+              << (points_lost > 1 ? "s" : "") << "!" << std::endl;
+    std::cout << loser.get_name() << " now has " << loser.get_points() << " points remaining." << std::endl;
 }
 
 void Application::on_player_eliminated(const core::Player& player) {

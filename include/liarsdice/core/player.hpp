@@ -38,6 +38,11 @@ public:
     [[nodiscard]] std::vector<unsigned int> get_dice_values() const;
     [[nodiscard]] size_t count_dice_with_value(unsigned int face_value) const;
     
+    // Points system
+    [[nodiscard]] int get_points() const { return points_; }
+    void lose_points(int points_lost);
+    [[nodiscard]] bool is_eliminated() const { return points_ <= 0; }
+    
     // Game actions
     virtual Guess make_guess(const std::optional<Guess>& last_guess) = 0;
     virtual bool decide_call_liar(const Guess& last_guess) = 0;
@@ -59,13 +64,15 @@ private:
     
     template<class Archive>
     void serialize(Archive& ar, const unsigned int version) {
-        ar & id_ & name_ & dice_;
+        ar & id_ & name_ & dice_ & points_;
     }
     
     unsigned int id_;
     std::string name_;
     std::vector<Dice> dice_;
+    int points_;
     static constexpr size_t INITIAL_DICE_COUNT = 5;
+    static constexpr int INITIAL_POINTS = 5;
 };
 
 // Human player implementation

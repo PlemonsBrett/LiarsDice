@@ -146,7 +146,6 @@ BOOST_AUTO_TEST_CASE(CallLiarScenario) {
 
 BOOST_AUTO_TEST_CASE(PlayerElimination) {
     GameConfig config;
-    config.starting_dice = 1; // Start with only 1 die for quick elimination
     
     Game game(config);
     bool player_eliminated = false;
@@ -167,13 +166,28 @@ BOOST_AUTO_TEST_CASE(PlayerElimination) {
     game.add_player(player2);
     game.start_game();
     
-    // Force a liar call to eliminate someone
-    auto current_player = game.get_current_player();
-    Guess bad_guess{10, 6, current_player->get_id()};
-    game.process_guess(bad_guess);
-    game.process_call_liar();
+    // With point system, players start with 5 points
+    // Make a very unlikely guess to guarantee liar will be called correctly
+    // This ensures someone loses points and gets eliminated
+    for (int round = 0; round < 6 && !player_eliminated && !game_ended; ++round) {
+        auto current_player = game.get_current_player();
+        
+        if (round % 2 == 0) {
+            // Make an obviously false guess (more dice than exist)
+            Guess bad_guess{15, 6, current_player->get_id()};
+            game.process_guess(bad_guess);
+            // Next player will correctly call liar (guesser loses 1 point)
+            game.process_call_liar();
+        } else {
+            // Make a reasonable guess
+            Guess ok_guess{3, 4, current_player->get_id()};
+            game.process_guess(ok_guess);
+            // Force a false liar call (caller loses 2 points)
+            game.process_call_liar();
+        }
+    }
     
-    // Check if elimination/game end occurred
+    // Someone should be eliminated by now
     BOOST_CHECK(player_eliminated || game_ended);
     
     if (game_ended) {

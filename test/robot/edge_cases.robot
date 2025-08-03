@@ -9,7 +9,7 @@ Test Setup       Start Test
 Test Teardown    Cleanup Process
 
 *** Variables ***
-${CLI_PATH}      ${CURDIR}/../../build/bin/liarsdice-cli
+${CLI_PATH}      ${CURDIR}/../../build/standalone/liarsdice
 ${TIMEOUT}       10
 
 *** Test Cases ***
@@ -115,8 +115,13 @@ Setup Test Suite
 Start Test
     Start LiarsDice    timeout=${TIMEOUT}
 
+Cleanup Test Suite
+    [Documentation]    One-time cleanup for the test suite
+    Cleanup Process
+
 Simulate AI Game
     [Arguments]    ${num_ai_players}=1
-    Send Input    ${num_ai_players + 1}
+    ${total_players}=    Evaluate    str(int(${num_ai_players}) + 1)
+    Send Input    ${total_players}
     Expect Prompt    How many AI players
     Send Input    ${num_ai_players}

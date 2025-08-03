@@ -18,6 +18,9 @@ public:
     void roll();
     [[nodiscard]] unsigned int get_value() const noexcept { return value_; }
     
+    // Set seed for deterministic testing
+    static void set_seed(unsigned int seed);
+    
     bool operator==(const Dice& other) const noexcept { return value_ == other.value_; }
     bool operator!=(const Dice& other) const noexcept { return !(*this == other); }
     

@@ -12,6 +12,12 @@ Game::Game(const GameConfig& config) : config_(config) {
     BOOST_LOG_TRIVIAL(info) << "Game created with config: min_players=" << config_.min_players 
                            << ", max_players=" << config_.max_players 
                            << ", starting_dice=" << config_.starting_dice;
+    
+    // Set random seed if provided
+    if (config_.random_seed.has_value()) {
+        Dice::set_seed(config_.random_seed.value());
+        BOOST_LOG_TRIVIAL(info) << "Random seed set to: " << config_.random_seed.value();
+    }
 }
 
 void Game::add_player(std::shared_ptr<Player> player) {
@@ -224,24 +230,28 @@ void Game::process_call_liar() {
     BOOST_LOG_TRIVIAL(info) << "Actual count: " << actual_count 
                            << ", Guessed: " << last_guess_->dice_count;
     
-    // Determine who loses a die
+    // Determine who loses points
     std::shared_ptr<Player> loser;
+    int points_lost = 0;
+    
     if (actual_count >= last_guess_->dice_count) {
-        // Guess was correct, caller loses
+        // Guess was correct, caller loses (false accusation)
         loser = current_player;
-        BOOST_LOG_TRIVIAL(info) << "Liar call failed - caller loses a die";
+        points_lost = 2; // Lose 2 points for false accusation
+        BOOST_LOG_TRIVIAL(info) << "Liar call failed - caller loses " << points_lost << " points for false accusation";
     } else {
-        // Guess was wrong, guesser loses
+        // Guess was wrong, guesser loses (caught lying)
         loser = get_player(last_guess_->player_id);
-        BOOST_LOG_TRIVIAL(info) << "Liar call succeeded - guesser loses a die";
+        points_lost = 1; // Lose 1 point for being caught lying
+        BOOST_LOG_TRIVIAL(info) << "Liar call succeeded - guesser loses " << points_lost << " point for lying";
     }
     
     if (loser) {
-        loser->remove_die();
-        events_.on_round_result(*current_player, *loser);
+        loser->lose_points(points_lost);
+        events_.on_round_result(*current_player, *loser, points_lost);
         
         // Check if player is eliminated
-        if (loser->get_dice_count() == 0) {
+        if (loser->is_eliminated()) {
             eliminate_player(loser);
         }
     }
@@ -335,20 +345,19 @@ bool Game::is_valid_guess(const Guess& guess) const {
     if (last_guess_.has_value()) {
         const auto& prev = *last_guess_;
         
-        // Higher face value is always valid
-        if (guess.face_value > prev.face_value) {
+        // Valid moves in Liar's Dice:
+        // 1. Increase quantity (dice count) - face value can be anything
+        if (guess.dice_count > prev.dice_count) {
             return true;
         }
         
-        // Same face value requires more dice
-        if (guess.face_value == prev.face_value) {
-            return guess.dice_count > prev.dice_count;
+        // 2. Same quantity, but must increase face value
+        if (guess.dice_count == prev.dice_count && guess.face_value > prev.face_value) {
+            return true;
         }
         
-        // Lower face value requires significantly more dice
-        if (guess.face_value < prev.face_value) {
-            return guess.dice_count > prev.dice_count;
-        }
+        // All other cases are invalid (can't decrease quantity)
+        return false;
     }
     
     return true;

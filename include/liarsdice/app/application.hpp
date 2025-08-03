@@ -27,6 +27,7 @@ struct AppConfig {
     unsigned int starting_dice = 5;
     bool allow_ones_wild = true;
     unsigned int ai_think_time = 1000;
+    std::optional<unsigned int> random_seed;  // For deterministic testing
 };
 
 class Application {
@@ -77,7 +78,7 @@ private:
     void on_player_turn(const core::Player& player);
     void on_guess_made(const core::Player& player, const core::Guess& guess);
     void on_liar_called(const core::Player& player);
-    void on_round_result(const core::Player& caller, const core::Player& loser);
+    void on_round_result(const core::Player& caller, const core::Player& loser, int points_lost);
     void on_player_eliminated(const core::Player& player);
     void on_game_winner(const core::Player& winner);
     

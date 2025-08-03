@@ -16,7 +16,7 @@ struct GameEvents {
     boost::signals2::signal<void(const Player&)> on_player_turn;
     boost::signals2::signal<void(const Player&, const Guess&)> on_guess_made;
     boost::signals2::signal<void(const Player&)> on_liar_called;
-    boost::signals2::signal<void(const Player&, const Player&)> on_round_result;
+    boost::signals2::signal<void(const Player& caller, const Player& loser, int points_lost)> on_round_result;
     boost::signals2::signal<void(const Player&)> on_player_eliminated;
     boost::signals2::signal<void(const Player&)> on_game_winner;
 };
@@ -28,6 +28,7 @@ struct GameConfig {
     unsigned int starting_dice = 5;
     bool allow_ones_wild = true;
     unsigned int ai_think_time_ms = 1000;
+    std::optional<unsigned int> random_seed;  // For deterministic testing
 };
 
 class Game {
@@ -82,7 +83,11 @@ private:
     
     void advance_to_next_player();
     void eliminate_player(std::shared_ptr<Player> player);
+public:
+    // Validation (made public for use by UI layer)
     bool is_valid_guess(const Guess& guess) const;
+    
+private:
     void log_game_state() const;
 };
 

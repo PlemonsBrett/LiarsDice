@@ -202,9 +202,9 @@ The Medium AI uses balanced statistical techniques:
    - Moderate bluffing based on configuration
 
 3. **Adaptive Calling**:
-   - Adjusts call threshold based on game progress
+   - Adjusts the call threshold based on game progress
    - More likely to call when fewer dice remain
-   - Considers risk vs reward
+   - Considers risk vs. reward
 
 ### Decision Flow
 
@@ -311,7 +311,7 @@ Configuration is set through:
 
 2. **Stress Tests**:
     - Multiple AI players (6+)
-    - Rapid decision making
+   - Rapid decision-making
     - Long game sessions
 
 ## Future Enhancements

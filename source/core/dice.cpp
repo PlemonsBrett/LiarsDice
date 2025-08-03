@@ -22,4 +22,8 @@ void Dice::roll() {
     value_ = dist(rng_);
 }
 
+void Dice::set_seed(unsigned int seed) {
+    rng_.seed(seed);
+}
+
 } // namespace liarsdice::core

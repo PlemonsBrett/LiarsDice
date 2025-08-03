@@ -1,11 +1,13 @@
 *** Settings ***
 Documentation     Test suite for AI strategy behaviors and patterns
 Library           ./LiarsDiceLibrary.py
+Library           OperatingSystem
 Suite Setup       Check CLI Exists
 Test Tags         ai    strategies
 
 *** Variables ***
 ${TIMEOUT}        30
+${CLI_PATH}       ${CURDIR}/../../build/standalone/liarsdice
 
 *** Test Cases ***
 Test AI Strategy Registration
@@ -85,9 +87,7 @@ Test Multiple AI Strategies In Same Game
 Check CLI Exists
     File Should Exist    ${CLI_PATH}    CLI executable not found at ${CLI_PATH}. Build the project first.
 
-Skip
-    [Arguments]    ${reason}
-    Skip Test    ${reason}
+# Skip keyword removed - using built-in Skip instead
 
 # Future Keywords (to be implemented when AI strategies are integrated)
 

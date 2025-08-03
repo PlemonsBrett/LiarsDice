@@ -7,13 +7,13 @@
 namespace liarsdice::core {
 
 Player::Player(unsigned int id, const std::string& name) 
-    : id_(id), name_(name.empty() ? "Player " + std::to_string(id) : name) {
+    : id_(id), name_(name.empty() ? "Player " + std::to_string(id) : name), points_(INITIAL_POINTS) {
     // Initialize with 5 dice
     dice_.reserve(INITIAL_DICE_COUNT);
     for (size_t i = 0; i < INITIAL_DICE_COUNT; ++i) {
         dice_.emplace_back();
     }
-    BOOST_LOG_TRIVIAL(debug) << "Created player: " << name_ << " (ID: " << id_ << ")";
+    BOOST_LOG_TRIVIAL(debug) << "Created player: " << name_ << " (ID: " << id_ << ") with " << points_ << " points";
 }
 
 void Player::roll_dice() {
@@ -58,6 +58,12 @@ bool Player::remove_die() {
     dice_.pop_back();
     BOOST_LOG_TRIVIAL(debug) << "Player " << name_ << " lost a die (remaining: " << dice_.size() << ")";
     return true;
+}
+
+void Player::lose_points(int points_lost) {
+    points_ -= points_lost;
+    BOOST_LOG_TRIVIAL(info) << "Player " << name_ << " lost " << points_lost 
+                           << " points (remaining: " << points_ << ")";
 }
 
 // HumanPlayer implementation

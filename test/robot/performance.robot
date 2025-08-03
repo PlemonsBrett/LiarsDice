@@ -10,7 +10,7 @@ Test Setup       Start Test
 Test Teardown    Cleanup Process
 
 *** Variables ***
-${CLI_PATH}          ${CURDIR}/../../build/bin/liarsdice-cli
+${CLI_PATH}          ${CURDIR}/../../build/standalone/liarsdice
 ${TIMEOUT}           30
 ${MAX_STARTUP_TIME}  1.0    # seconds
 ${MAX_TURN_TIME}     0.5    # seconds
@@ -118,7 +118,7 @@ Test Input Processing Speed
         Send Input    ${input}
         Wait For Pattern    (Invalid|How many AI)    timeout=2
         ${end}=    Get Time    epoch
-        ${response_time}=    Evaluate    ${end} - ${start}
+        ${response_time}=    Evaluate    float(${end}) - float(${start})
         Append To List    ${response_times}    ${response_time}
     END
     
@@ -137,7 +137,7 @@ Test Large Game Performance
     ${start}=    Get Time    epoch
     Wait For Pattern    Game starting
     ${setup_end}=    Get Time    epoch
-    ${setup_time}=    Evaluate    ${setup_end} - ${start}
+    ${setup_time}=    Evaluate    float(${setup_end}) - float(${start})
     
     Log    Game setup time for 6 players: ${setup_time}s
     Should Be True    ${setup_time} < 2.0
@@ -146,7 +146,7 @@ Test Large Game Performance
     ${turn_start}=    Get Time    epoch
     Wait For Pattern    Your turn    timeout=30
     ${turn_end}=    Get Time    epoch
-    ${full_cycle_time}=    Evaluate    ${turn_end} - ${turn_start}
+    ${full_cycle_time}=    Evaluate    float(${turn_end}) - float(${turn_start})
     
     Log    Full turn cycle time (5 AI players): ${full_cycle_time}s
     Should Be True    ${full_cycle_time} < 5.0    Turn cycle too slow
@@ -174,7 +174,7 @@ Test Stress Load
     END
     
     ${stress_end}=    Get Time    epoch
-    ${stress_duration}=    Evaluate    ${stress_end} - ${stress_start}
+    ${stress_duration}=    Evaluate    float(${stress_end}) - float(${stress_start})
     
     Process Should Be Running
     Memory Usage Should Be Less Than    ${MAX_MEMORY_MB}
@@ -192,7 +192,8 @@ Start Test
 
 Simulate AI Game
     [Arguments]    ${num_ai_players}=1
-    Send Input    ${num_ai_players + 1}
+    ${total_players}=    Evaluate    str(int(${num_ai_players}) + 1)
+    Send Input    ${total_players}
     Expect Prompt    How many AI players
     Send Input    ${num_ai_players}
 
@@ -206,3 +207,7 @@ Make Quick Decision
         Expect Prompt    face value
         Send Input    4
     END
+
+Cleanup Test Suite
+    [Documentation]    One-time cleanup for the test suite
+    Cleanup Process

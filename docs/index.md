@@ -44,13 +44,13 @@ libraries.
 
 LiarsDice is a comprehensive implementation featuring:
 
-- 🎲 **Core Game Engine** - Complete game logic with Boost.Signals2 event system
+- 🎲 **Core Game Engine** — Complete game logic with Boost.Signals2 event system
 - 🤖 **AI Players** - Multiple difficulty levels with configurable strategies
 - 🎮 **Interactive CLI** - Menu-driven interface with input validation
-- 🔧 **Dependency Injection** - Modern DI container for flexible architecture
+- 🔧 **Dependency Injection** — Modern DI container for flexible architecture
 - 📊 **Logging System** - Boost.Log integration for debugging and monitoring
-- ⚙️ **Configuration** - Boost.PropertyTree-based configuration system
-- 🧪 **Comprehensive Testing** - Unit tests, integration tests, and benchmarks
+- ⚙️ **Configuration** — Boost.PropertyTree-based configuration system
+- 🧪 **Comprehensive Testing** — Unit tests, integration tests, and benchmarks
 
 ## Technology Stack
 
@@ -65,7 +65,7 @@ LiarsDice is a comprehensive implementation featuring:
 - **Boost.Random** - Random number generation
 - **Boost.Log** - Logging infrastructure
 - **Boost.PropertyTree** - Configuration management
-- **Catch2** - Testing framework
+- **Boost.Test** - Testing framework
 
 ## Contributing
 

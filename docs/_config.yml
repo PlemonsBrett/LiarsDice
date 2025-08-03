@@ -2,8 +2,8 @@
 
 title: LiarsDice Documentation
 description: A modern C++ implementation of the classic Liar's Dice game using Boost libraries
-baseurl: "/LiarsDice" # the subpath of your site, e.g. /blog
-url: "https://plemonsbrett.github.io" # the base hostname & protocol for your site
+baseurl: "/LiarsDice"
+url: "https://plemonsbrett.github.io"
 show_downloads: true
 
 # Build settings
@@ -19,8 +19,6 @@ markdown: kramdown
 kramdown:
   input: GFM
   syntax_highlighter: rouge
-  syntax_highlighter_opts:
-    css_class: 'highlight'
 
 # Collections
 collections:
