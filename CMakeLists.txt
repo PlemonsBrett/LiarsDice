@@ -35,6 +35,7 @@ find_package(Boost 1.70.0 REQUIRED COMPONENTS
   filesystem
   serialization
   thread
+        container
 )
 
 # Add Boost.DI (header-only library)
@@ -80,6 +81,7 @@ target_link_libraries(${PROJECT_NAME}
     Boost::filesystem
     Boost::serialization
     Boost::thread
+        Boost::container
   PUBLIC
     Boost::boost
 )

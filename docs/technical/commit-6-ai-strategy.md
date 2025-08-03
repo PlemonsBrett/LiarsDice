@@ -4,26 +4,26 @@
 
 ### Document Information
 
-- **Version**: 0.1.0
-- **Date**: 2025-07-21
+- **Version**: 1.0.0
+- **Date**: 2025-08-03
 - **Author**: Brett Plemons
-- **Commit**: AI Strategy System Architecture
+- **Commit**: AI Strategy System Implementation
 
 ---
 
 ## Executive Summary
 
-This document details the implementation of a sophisticated AI strategy system for the LiarsDice project using the
-Strategy pattern, modern C++23 features, and game theory principles. The system provides multiple difficulty levels with
-configurable behaviors, comprehensive testing infrastructure, and a flexible architecture for future AI enhancements.
+This document details the implementation of the AI strategy system for the LiarsDice project. The system provides two AI
+difficulty levels (Easy and Medium) with configurable behaviors, integrating with the game state storage and history
+systems for informed decision-making.
 
 ### Key Deliverables
 
-1. **Strategy Pattern Architecture** — Flexible AI system with interface-based design
-2. **Multiple AI Strategies** — Easy and Medium difficulty implementations
-3. **Decision Context System** — Structured game state for AI decisions
-4. **Configuration Integration** — Runtime-configurable AI parameters
-5. **Comprehensive Testing** — Statistical validation and performance benchmarks
+1. **Enhanced AI Base Class** — AIPlayer with configurable strategy parameters
+2. **Easy AI Strategy** — Simple heuristics with configurable parameters
+3. **Medium AI Strategy** — Statistical analysis with Bayesian probability and opponent modeling
+4. **Command-Line Integration** — Simple --medium-ai flag for strategy selection
+5. **Game State Integration** — AI strategies utilize GameHistory for pattern analysis
 
 ---
 
@@ -31,33 +31,31 @@ configurable behaviors, comprehensive testing infrastructure, and a flexible arc
 
 ### Functional Requirements
 
-#### AI Architecture (Step 6.1)
+#### AI Architecture
 
-- **REQ-AI-001**: Pure virtual IAIStrategy interface with decision methods
-- **REQ-AI-002**: Strategy factory with difficulty-based instantiation
-- **REQ-AI-003**: Decision context containing complete game state
-- **REQ-AI-004**: Configuration system integration for parameters
-- **REQ-AI-005**: Type-safe decision variants (Guess, CallLiar)
-- **REQ-AI-006**: Strategy cloning for stateful AI
-- **REQ-AI-007**: Performance metrics collection
+- **REQ-AI-001**: AIPlayer base class with virtual decision methods
+- **REQ-AI-002**: Configurable Strategy struct with common parameters
+- **REQ-AI-003**: Integration with GameHistory and GameStateStorage
+- **REQ-AI-004**: Command-line flag for AI difficulty selection
+- **REQ-AI-005**: Inheritance-based strategy implementation
 
-#### Easy AI Strategy (Step 6.2)
+#### Easy AI Strategy
 
-- **REQ-EASY-001**: Simple heuristic-based decision making
-- **REQ-EASY-002**: Basic probability calculations
-- **REQ-EASY-003**: Configurable risk tolerance (0.0-1.0)
-- **REQ-EASY-004**: Random variation to prevent predictability
-- **REQ-EASY-005**: Bluff frequency configuration
-- **REQ-EASY-006**: Call threshold parameters
+- **REQ-EASY-001**: Simple heuristic-based decision-making
+- **REQ-EASY-002**: Basic probability calculations using normal distribution approximation
+- **REQ-EASY-003**: Configurable risk tolerance (0.2 default)
+- **REQ-EASY-004**: Configurable bluff frequency (0.1 default)
+- **REQ-EASY-005**: Configurable call threshold (0.8 default)
+- **REQ-EASY-006**: Optional statistical analysis toggle
 
-#### Medium AI Strategy (Step 6.3)
+#### Medium AI Strategy
 
-- **REQ-MED-001**: Statistical probability models
-- **REQ-MED-002**: Opponent behavior analysis
-- **REQ-MED-003**: Pattern recognition algorithms
-- **REQ-MED-004**: Bluff detection mechanisms
-- **REQ-MED-005**: Game history analysis
-- **REQ-MED-006**: Adaptive strategy based on opponents
+- **REQ-MED-001**: Bayesian probability calculations
+- **REQ-MED-002**: Opponent behavior modeling with pattern tracking
+- **REQ-MED-003**: Pattern recognition using game history
+- **REQ-MED-004**: Bluff detection based on opponent statistics
+- **REQ-MED-005**: Configurable pattern weight and history size
+- **REQ-MED-006**: Integration with GameHistory for informed decisions
 
 ### Non-Functional Requirements
 
@@ -86,95 +84,77 @@ configurable behaviors, comprehensive testing infrastructure, and a flexible arc
 
 ## Architectural Decisions
 
-### ADR-001: Strategy Pattern for AI Implementation
+### ADR-001: Inheritance-Based AI Strategy
 
 **Status**: Accepted
 
-**Context**: Need flexible AI system supporting multiple difficulty levels.
+**Context**: Need to implement multiple AI difficulty levels while maintaining compatibility with existing system.
 
-**Decision**: Implement Strategy pattern with polymorphic AI strategies.
+**Decision**: Use inheritance from AIPlayer base class rather than a separate strategy pattern.
 
 **Rationale**:
 
-- Runtime strategy selection
-- Easy addition of new AI types
-- Clear separation of concerns
-- Testable individual strategies
+- Simpler integration with existing game system
+- Direct access to player state and methods
+- Minimal refactoring required
+- Clear class hierarchy
 
 **Consequences**:
 
-- **Positive**: Flexible, extensible, testable
-- **Negative**: Virtual function overhead
-- **Mitigation**: Use final keyword for optimization
+- **Positive**: Simple, straightforward implementation
+- **Positive**: Easy integration with existing Player interface
+- **Negative**: Less flexibility than pure strategy pattern
+- **Mitigation**: Virtual methods allow polymorphic behavior
 
-### ADR-002: std::variant for Type-Safe Decisions
+### ADR-002: Configuration Structures
 
 **Status**: Accepted
 
-**Context**: AI decisions need to be type-safe and exhaustive.
+**Context**: AI strategies need configurable parameters.
 
-**Decision**: Use std::variant for AI decision types.
-
-**Rationale**:
-
-- Compile-time exhaustiveness checking
-- No dynamic allocation
-- Clear decision types
-- Pattern matching support
+**Decision**: Use nested configuration structs for each AI strategy type.
 
 **Implementation**:
 
 ```cpp
-using AIDecision = std::variant<
-    AIGuessAction,
-    AICallLiarAction
->;
+struct EasyConfig {
+    double risk_tolerance = 0.2;
+    double bluff_frequency = 0.1;
+    double call_threshold = 0.8;
+    bool use_statistical_analysis = false;
+    unsigned int think_time_ms = 500;
+};
 ```
 
-### ADR-003: Immutable Decision Context
+### ADR-003: Command-Line Integration
 
 **Status**: Accepted
 
-**Context**: AI needs consistent game state for decision making.
+**Context**: Need simple way to select AI difficulty without complex menus.
 
-**Decision**: Pass immutable context structure to AI strategies.
+**Decision**: Add --medium-ai command-line flag, defaulting to Easy AI.
 
 **Rationale**:
 
-- Thread-safe by design
-- Clear data dependencies
-- Easier testing
-- Prevents side effects
+- Simple user interface
+- No interactive menus needed
+- Clear default behavior
+- Easy to extend for future AI levels
 
-### ADR-004: Factory Pattern with Type Erasure
+### ADR-004: Game State Integration
 
 **Status**: Accepted
 
-**Context**: Need flexible AI creation without exposing implementations.
+**Context**: Medium AI needs access to game history for pattern analysis.
 
-**Decision**: Implement factory with type erasure for strategy creation.
-
-**Rationale**:
-
-- Hides implementation details
-- Supports dynamic registration
-- Configuration-driven creation
-- Enables plugin architecture
-
-### ADR-005: Statistical Analysis with C++23 Ranges
-
-**Status**: Accepted
-
-**Context**: AI needs efficient game history analysis.
-
-**Decision**: Use C++23 ranges for statistical computations.
+**Decision**: Pass pointers to GameHistory and GameStateStorage to Medium AI.
 
 **Rationale**:
 
-- Lazy evaluation
-- Composable algorithms
-- Memory efficient
-- Expressive code
+- Direct access to historical data
+- No copying of large data structures
+- Efficient pattern analysis
+- Leverages existing state storage system
 
 ---
 
@@ -182,139 +162,44 @@ using AIDecision = std::variant<
 
 ### Core AI Architecture
 
-#### IAIStrategy Interface
+#### AIPlayer Base Class
 
 ```cpp
 namespace liarsdice::ai {
 
-class IAIStrategy {
+class AIPlayer : public Player {
 public:
-    virtual ~IAIStrategy() = default;
+    struct Strategy {
+        double risk_tolerance = 0.5;
+        double bluff_frequency = 0.2;
+        double call_threshold = 0.7;
+        unsigned int think_time_ms = 1000;
+    };
     
-    // Core decision-making method
-    virtual AIDecision make_decision(const AIDecisionContext& context) = 0;
+    AIPlayer(unsigned int id, const std::string& name, const Strategy& strategy);
     
-    // Strategy identification
-    virtual std::string_view get_name() const = 0;
-    virtual Difficulty get_difficulty() const = 0;
+    // Core decision methods from Player interface
+    core::Guess make_guess(const std::optional<core::Guess>& last_guess) override;
+    bool decide_call_liar(const core::Guess& last_guess) override;
     
-    // Configuration
-    virtual void configure(const AIConfig& config) = 0;
-    virtual AIConfig get_config() const = 0;
+protected:
+    // Probability calculations
+    double calculate_probability(const core::Guess& guess, size_t total_dice) const;
     
-    // Cloning for stateful strategies
-    virtual std::unique_ptr<IAIStrategy> clone() const = 0;
+    // Guess generation strategies
+    core::Guess generate_safe_guess(const std::optional<core::Guess>& last_guess) const;
+    core::Guess generate_bluff_guess(const std::optional<core::Guess>& last_guess) const;
     
-    // Optional: Learning/adaptation
-    virtual void update_opponent_model(
-        PlayerID player, 
-        const PlayerAction& action) {}
+    // Utility methods
+    void simulate_thinking() const;
+    
+    Strategy strategy_;
+    mutable std::mt19937 rng_;
+    mutable std::uniform_real_distribution<> probability_dist_{0.0, 1.0};
+    mutable std::uniform_int_distribution<> face_dist_{1, 6};
 };
 
 } // namespace liarsdice::ai
-```
-
-#### AI Decision Types
-
-```cpp
-struct AIGuessAction {
-    uint32_t quantity;
-    uint8_t face_value;
-    double confidence;  // 0.0 to 1.0
-    
-    // Conversion to game action
-    explicit operator Bid() const {
-        return Bid{quantity, face_value};
-    }
-};
-
-struct AICallLiarAction {
-    double certainty;   // 0.0 to 1.0
-    std::string reason; // For logging/debugging
-};
-
-using AIDecision = std::variant<AIGuessAction, AICallLiarAction>;
-```
-
-#### Decision Context
-
-```cpp
-struct AIDecisionContext {
-    // Current game state
-    GameState game_state;
-    Bid current_bid;
-    PlayerID current_player;
-    std::vector<PlayerInfo> all_players;
-    
-    // AI player information
-    PlayerID ai_player_id;
-    std::span<const Die> ai_dice;
-    uint32_t ai_dice_count;
-    
-    // Game history
-    std::span<const GameRound> previous_rounds;
-    std::span<const PlayerAction> current_round_actions;
-    
-    // Derived information
-    uint32_t total_dice_in_play;
-    uint32_t rounds_played;
-    std::optional<PlayerID> last_caller;
-    
-    // Helper methods
-    [[nodiscard]] bool is_first_bid() const {
-        return !current_bid.is_valid();
-    }
-    
-    [[nodiscard]] uint32_t get_opponent_dice_count() const {
-        return total_dice_in_play - ai_dice_count;
-    }
-};
-```
-
-#### Strategy Factory
-
-```cpp
-class AIStrategyFactory {
-private:
-    using CreatorFunc = std::function<std::unique_ptr<IAIStrategy>()>;
-    std::unordered_map<Difficulty, CreatorFunc> creators_;
-    
-    AIStrategyFactory() = default;
-    
-public:
-    static AIStrategyFactory& instance() {
-        static AIStrategyFactory instance;
-        return instance;
-    }
-    
-    template<typename T>
-        requires std::derived_from<T, IAIStrategy>
-    void register_strategy(Difficulty difficulty) {
-        creators_[difficulty] = []() {
-            return std::make_unique<T>();
-        };
-    }
-    
-    std::expected<std::unique_ptr<IAIStrategy>, AIError> 
-    create(Difficulty difficulty, const AIConfig& config) {
-        auto it = creators_.find(difficulty);
-        if (it == creators_.end()) {
-            return std::unexpected(AIError::UnknownDifficulty);
-        }
-        
-        auto strategy = it->second();
-        strategy->configure(config);
-        return strategy;
-    }
-    
-    std::vector<Difficulty> get_available_difficulties() const {
-        std::vector<Difficulty> result;
-        for (const auto& [difficulty, _] : creators_) {
-            result.push_back(difficulty);
-        }
-        return result;
-    }
-};
 ```
 
 ### Easy AI Strategy Implementation
@@ -322,637 +207,339 @@ public:
 #### Strategy Class
 
 ```cpp
-class EasyAIStrategy final : public IAIStrategy {
-private:
-    struct Config {
-        double risk_tolerance = 0.3;      // 0.0 = conservative, 1.0 = aggressive
-        double bluff_frequency = 0.2;     // Chance to bluff
-        double call_threshold = 0.7;      // Confidence needed to call
-        bool use_statistics = true;       // Use basic probability
-    } config_;
-    
-    mutable std::mt19937 rng_{std::random_device{}()};
-    
+class EasyAIStrategy : public AIPlayer {
 public:
-    AIDecision make_decision(const AIDecisionContext& context) override {
-        // Analyze current situation
-        auto analysis = analyze_situation(context);
-        
-        // Decide whether to call or make a bid
-        if (should_call_liar(context, analysis)) {
-            return make_call_decision(context, analysis);
-        }
-        
-        return make_bid_decision(context, analysis);
-    }
-    
-    std::string_view get_name() const override { 
-        return "Easy AI"; 
-    }
-    
-    Difficulty get_difficulty() const override { 
-        return Difficulty::Easy; 
-    }
-    
-    void configure(const AIConfig& config) override {
-        config_.risk_tolerance = config.get_value<double>(
-            "risk_tolerance", 0.3);
-        config_.bluff_frequency = config.get_value<double>(
-            "bluff_frequency", 0.2);
-        config_.call_threshold = config.get_value<double>(
-            "call_threshold", 0.7);
-        config_.use_statistics = config.get_value<bool>(
-            "use_statistics", true);
-    }
-    
-    std::unique_ptr<IAIStrategy> clone() const override {
-        return std::make_unique<EasyAIStrategy>(*this);
-    }
-    
-private:
-    struct SituationAnalysis {
-        double bid_probability;
-        double bluff_chance;
-        bool is_desperate;
-        uint32_t safe_quantity;
+    struct EasyConfig {
+        double risk_tolerance = 0.2;       // 0.0-1.0 (conservative to aggressive)
+        double bluff_frequency = 0.1;      // How often to bluff (0.0-1.0)
+        double call_threshold = 0.8;       // Probability threshold to call liar
+        bool use_statistical_analysis = false; // Toggle for basic statistics
+        unsigned int think_time_ms = 500;  // Simulated thinking time
     };
     
-    SituationAnalysis analyze_situation(const AIDecisionContext& context) {
-        SituationAnalysis analysis{};
-        
-        if (config_.use_statistics) {
-            analysis.bid_probability = calculate_bid_probability(
-                context.current_bid, 
-                context.ai_dice, 
-                context.total_dice_in_play
-            );
-        } else {
-            // Simple heuristic
-            analysis.bid_probability = 0.5;
-        }
-        
-        analysis.bluff_chance = should_bluff(context);
-        analysis.is_desperate = context.ai_dice_count <= 2;
-        analysis.safe_quantity = calculate_safe_quantity(context);
-        
-        return analysis;
-    }
+    explicit EasyAIStrategy(unsigned int id, const EasyConfig& config);
+    explicit EasyAIStrategy(unsigned int id);
     
-    bool should_call_liar(const AIDecisionContext& context, 
-                         const SituationAnalysis& analysis) {
-        if (context.is_first_bid()) {
-            return false;
-        }
-        
-        // Check confidence threshold
-        double call_confidence = 1.0 - analysis.bid_probability;
-        
-        // Adjust for game state
-        if (analysis.is_desperate) {
-            call_confidence *= 0.8; // More likely to call when desperate
-        }
-        
-        return call_confidence >= config_.call_threshold;
-    }
+    core::Guess make_guess(const std::optional<core::Guess>& last_guess) override;
+    bool decide_call_liar(const core::Guess& last_guess) override;
     
-    AIGuessAction make_bid_decision(const AIDecisionContext& context,
-                                   const SituationAnalysis& analysis) {
-        AIGuessAction action;
-        
-        if (context.is_first_bid()) {
-            // Make conservative opening bid
-            action = make_opening_bid(context);
-        } else if (should_bluff(context)) {
-            // Make aggressive bid
-            action = make_bluff_bid(context, analysis);
-        } else {
-            // Make safe bid based on actual dice
-            action = make_safe_bid(context, analysis);
-        }
-        
-        action.confidence = calculate_bid_confidence(action, context);
-        return action;
-    }
+protected:
+    // Calculate simple probability based on known dice
+    double calculate_simple_probability(
+        const core::Guess& guess, 
+        size_t total_dice
+    ) const;
     
-    double calculate_bid_probability(const Bid& bid,
-                                   std::span<const Die> my_dice,
-                                   uint32_t total_dice) {
-        // Count matching dice
-        uint32_t my_count = std::ranges::count_if(my_dice,
-            [&](const Die& die) {
-                return die.get_value() == bid.face_value || 
-                       die.is_wild();
-            });
-        
-        // Simple probability calculation
-        uint32_t unknown_dice = total_dice - my_dice.size();
-        double expected_matches = unknown_dice / 6.0; // Assuming fair dice
-        
-        if (bid.quantity <= my_count) {
-            return 1.0; // We already have enough
-        }
-        
-        uint32_t needed = bid.quantity - my_count;
-        return std::min(1.0, expected_matches / needed);
-    }
+    // Generate conservative guess based on own dice
+    core::Guess generate_conservative_guess(
+        const std::optional<core::Guess>& last_guess
+    ) const;
     
-    bool should_bluff(const AIDecisionContext& context) {
-        std::uniform_real_distribution<> dist(0.0, 1.0);
-        return dist(rng_) < config_.bluff_frequency;
-    }
+    // Apply basic statistical analysis if enabled
+    double apply_statistical_adjustment(
+        double base_probability,
+        const core::Guess& guess
+    ) const;
+    
+private:
+    EasyConfig config_;
 };
+```
+
+#### Key Methods
+
+```cpp
+double EasyAIStrategy::calculate_simple_probability(
+    const core::Guess& guess, 
+    size_t total_dice) const {
+    
+    // Count our own dice matching the guess
+    auto my_dice = get_dice_values();
+    unsigned int my_matches = std::count(my_dice.begin(), my_dice.end(), guess.face_value);
+    
+    // Calculate probability for remaining dice
+    size_t other_dice = total_dice - my_dice.size();
+    if (other_dice == 0) return my_matches >= guess.dice_count ? 1.0 : 0.0;
+    
+    // Simple binomial probability
+    double p = 1.0 / 6.0; // Probability of any specific face
+    unsigned int needed = guess.dice_count > my_matches ? 
+                         guess.dice_count - my_matches : 0;
+    
+    if (needed > other_dice) return 0.0;
+    if (needed == 0) return 1.0;
+    
+    // Approximate using normal distribution for larger numbers
+    double mean = other_dice * p;
+    double variance = other_dice * p * (1 - p);
+    double std_dev = std::sqrt(variance);
+    
+    // Z-score
+    double z = (needed - mean) / std_dev;
+    
+    // Approximate cumulative probability
+    return 1.0 / (1.0 + std::exp(1.5976 * z + 0.070566 * z * z * z));
+}
 ```
 
 ### Medium AI Strategy Implementation
 
-#### Enhanced Strategy Class
+#### Strategy Class
 
-{% raw %}
 ```cpp
-class MediumAIStrategy final : public IAIStrategy {
-private:
-    struct Config {
-        double risk_tolerance = 0.5;
-        double bluff_frequency = 0.3;
-        double call_threshold = 0.6;
-        bool use_opponent_modeling = true;
-        size_t pattern_history_size = 10;
-        double pattern_weight = 0.3;
-    } config_;
-    
-    // Opponent modeling
-    struct OpponentModel {
-        struct BehaviorStats {
-            uint32_t total_bids = 0;
-            uint32_t bluffs_detected = 0;
-            uint32_t conservative_bids = 0;
-            uint32_t aggressive_bids = 0;
-            double average_bid_increase = 0.0;
-            
-            double get_bluff_rate() const {
-                return total_bids > 0 ? 
-                    static_cast<double>(bluffs_detected) / total_bids : 0.0;
-            }
-            
-            double get_aggression_score() const {
-                if (total_bids == 0) return 0.5;
-                return static_cast<double>(aggressive_bids) / total_bids;
-            }
-        };
-        
-        std::unordered_map<PlayerID, BehaviorStats> player_stats;
-        std::deque<PlayerAction> recent_actions;
-    };
-    
-    mutable OpponentModel opponent_model_;
-    mutable std::mt19937 rng_{std::random_device{}()};
-    
+class MediumAIStrategy : public AIPlayer {
 public:
-    AIDecision make_decision(const AIDecisionContext& context) override {
-        // Update opponent models
-        update_models_from_history(context);
-        
-        // Perform deep analysis
-        auto analysis = perform_deep_analysis(context);
-        
-        // Make decision based on analysis
-        if (should_call_with_analysis(context, analysis)) {
-            return make_analyzed_call(context, analysis);
-        }
-        
-        return make_strategic_bid(context, analysis);
-    }
+    struct MediumConfig {
+        double risk_tolerance = 0.5;       // 0.0-1.0 (conservative to aggressive)
+        double bluff_frequency = 0.25;     // How often to bluff (0.0-1.0)
+        double call_threshold = 0.65;      // Probability threshold to call liar
+        double pattern_weight = 0.3;       // Weight for pattern-based adjustments
+        size_t history_size = 20;          // Number of states to analyze
+        bool use_bayesian = true;          // Enable Bayesian probability
+        bool track_opponents = true;       // Enable opponent modeling
+        unsigned int think_time_ms = 1000; // Simulated thinking time
+    };
     
-    void update_opponent_model(PlayerID player, 
-                             const PlayerAction& action) override {
-        auto& stats = opponent_model_.player_stats[player];
-        
-        if (auto* bid = std::get_if<Bid>(&action)) {
-            stats.total_bids++;
-            
-            // Analyze bid characteristics
-            if (is_aggressive_bid(*bid, stats.average_bid_increase)) {
-                stats.aggressive_bids++;
-            } else {
-                stats.conservative_bids++;
-            }
-            
-            // Update average bid increase
-            update_average_bid_increase(stats, *bid);
-        }
-        
-        // Keep recent actions for pattern analysis
-        opponent_model_.recent_actions.push_back(action);
-        if (opponent_model_.recent_actions.size() > config_.pattern_history_size) {
-            opponent_model_.recent_actions.pop_front();
-        }
-    }
+    explicit MediumAIStrategy(unsigned int id, const MediumConfig& config);
+    explicit MediumAIStrategy(unsigned int id);
+    
+    core::Guess make_guess(const std::optional<core::Guess>& last_guess) override;
+    bool decide_call_liar(const core::Guess& last_guess) override;
+    
+    // Game context integration
+    void set_game_history(const core::GameHistory* history) { game_history_ = history; }
+    void set_game_state(const core::GameStateStorage* state) { game_state_ = state; }
+    
+protected:
+    // Calculate Bayesian probability for a guess
+    double calculate_bayesian_probability(
+        const core::Guess& guess,
+        size_t total_dice
+    ) const;
+    
+    // Model opponent behavior patterns
+    struct OpponentPattern {
+        std::deque<core::Guess> recent_guesses;
+        std::unordered_map<unsigned int, double> face_frequency;
+        double bluff_rate = 0.0;
+        double aggression_level = 0.0;
+        size_t total_guesses = 0;
+        size_t successful_bluffs = 0;
+    };
+    
+    // Update opponent model based on revealed information
+    void update_opponent_model(
+        unsigned int player_id,
+        const core::Guess& guess,
+        bool was_bluff
+    );
+    
+    // Detect bluff patterns in opponent behavior
+    double detect_bluff_probability(const core::Guess& guess) const;
+    
+    // Analyze game history for patterns
+    std::vector<double> analyze_dice_patterns() const;
+    
+    // Generate strategic guess based on analysis
+    core::Guess generate_strategic_guess(
+        const std::optional<core::Guess>& last_guess
+    ) const;
     
 private:
-    struct DeepAnalysis {
-        double bid_probability;
-        double bluff_likelihood;
-        std::unordered_map<PlayerID, double> player_bluff_rates;
-        std::vector<std::pair<Bid, double>> probable_bids;
-        double game_phase_factor; // Early/mid/late game adjustment
-        PatternMatch detected_pattern;
-    };
+    MediumConfig config_;
+    const core::GameHistory* game_history_ = nullptr;
+    const core::GameStateStorage* game_state_ = nullptr;
     
-    struct PatternMatch {
-        enum Type { None, Conservative, Aggressive, Erratic, Bluffer };
-        Type type = None;
-        double confidence = 0.0;
-        PlayerID player = 0;
-    };
+    // Opponent modeling data
+    std::unordered_map<unsigned int, OpponentPattern> opponent_models_;
     
-    DeepAnalysis perform_deep_analysis(const AIDecisionContext& context) {
-        DeepAnalysis analysis;
-        
-        // Bayesian probability calculation
-        analysis.bid_probability = calculate_bayesian_probability(context);
-        
-        // Analyze each opponent
-        for (const auto& [player_id, stats] : opponent_model_.player_stats) {
-            analysis.player_bluff_rates[player_id] = stats.get_bluff_rate();
-        }
-        
-        // Detect patterns in recent play
-        analysis.detected_pattern = detect_play_patterns(context);
-        
-        // Calculate probable next bids
-        analysis.probable_bids = calculate_probable_bids(context);
-        
-        // Adjust for game phase
-        analysis.game_phase_factor = calculate_game_phase_factor(context);
-        
-        // Overall bluff likelihood
-        analysis.bluff_likelihood = calculate_bluff_likelihood(
-            context, analysis);
-        
-        return analysis;
+    // Pattern recognition cache
+    mutable std::vector<double> cached_face_probabilities_;
+    mutable bool cache_valid_ = false;
+};
+```
+
+#### Key Methods
+
+```cpp
+double MediumAIStrategy::calculate_bayesian_probability(
+    const core::Guess& guess,
+    size_t total_dice) const {
+    
+    // Prior probability based on uniform distribution
+    double prior = 1.0 / 6.0;
+    
+    // Adjust prior based on game history patterns
+    if (cache_valid_ && guess.face_value <= cached_face_probabilities_.size()) {
+        prior = cached_face_probabilities_[guess.face_value - 1];
     }
     
-    double calculate_bayesian_probability(const AIDecisionContext& context) {
-        if (context.is_first_bid()) return 0.5;
-        
-        const auto& bid = context.current_bid;
-        
-        // Prior probability based on dice distribution
-        double prior = calculate_prior_probability(bid, context);
-        
-        // Likelihood based on opponent behavior
-        double likelihood = calculate_likelihood_from_behavior(bid, context);
-        
-        // Evidence (normalizing constant)
-        double evidence = calculate_evidence(context);
-        
-        // Bayes' theorem: P(A|B) = P(B|A) * P(A) / P(B)
-        return (likelihood * prior) / evidence;
+    // Count our own dice
+    auto my_dice = get_dice_values();
+    unsigned int my_matches = std::count(my_dice.begin(), my_dice.end(), guess.face_value);
+    
+    // Calculate likelihood using binomial distribution
+    size_t other_dice = total_dice - my_dice.size();
+    unsigned int needed = guess.dice_count > my_matches ? 
+                         guess.dice_count - my_matches : 0;
+    
+    if (needed > other_dice) return 0.0;
+    if (needed == 0) return 1.0;
+    
+    // Bayesian update
+    double likelihood = 0.0;
+    for (unsigned int k = needed; k <= other_dice; ++k) {
+        // Binomial probability
+        double binom_coeff = 1.0;
+        for (unsigned int i = 0; i < k; ++i) {
+            binom_coeff *= (other_dice - i) / (i + 1.0);
+        }
+        likelihood += binom_coeff * std::pow(prior, k) * std::pow(1 - prior, other_dice - k);
     }
     
-    PatternMatch detect_play_patterns(const AIDecisionContext& context) {
-        PatternMatch best_match;
-        
-        // Analyze recent actions using C++23 ranges
-        auto recent_bids = opponent_model_.recent_actions 
-            | std::views::filter([](const auto& action) {
-                return std::holds_alternative<Bid>(action);
-              })
-            | std::views::transform([](const auto& action) {
-                return std::get<Bid>(action);
-              });
-        
-        // Check for conservative pattern
-        auto conservative_score = std::ranges::count_if(recent_bids,
-            [](const Bid& bid) {
-                return bid.quantity <= 3 && bid.face_value <= 4;
-            });
-            
-        if (conservative_score > recent_bids.size() * 0.7) {
-            best_match.type = PatternMatch::Conservative;
-            best_match.confidence = 0.8;
-        }
-        
-        // Check for aggressive pattern
-        auto aggressive_score = std::ranges::count_if(recent_bids,
-            [this](const Bid& bid) {
-                return is_aggressive_bid(bid, 2.0);
-            });
-            
-        if (aggressive_score > recent_bids.size() * 0.6) {
-            best_match.type = PatternMatch::Aggressive;
-            best_match.confidence = 0.75;
-        }
-        
-        return best_match;
+    return likelihood;
+}
+
+double MediumAIStrategy::detect_bluff_probability(const core::Guess& guess) const {
+    if (!opponent_models_.count(guess.player_id)) {
+        return config_.bluff_frequency; // Default assumption
     }
     
-    AIGuessAction make_strategic_bid(const AIDecisionContext& context,
-                                    const DeepAnalysis& analysis) {
-        AIGuessAction action;
-        
-        // Consider detected patterns
-        switch (analysis.detected_pattern.type) {
-            case PatternMatch::Conservative:
-                // Exploit conservative players with calculated risks
-                action = make_exploitative_bid(context, analysis);
+    const auto& model = opponent_models_.at(guess.player_id);
+    
+    // Base bluff probability from history
+    double bluff_prob = model.bluff_rate;
+    
+    // Adjust based on pattern analysis
+    if (model.recent_guesses.size() >= 3) {
+        // Check for escalation patterns
+        bool escalating = true;
+        for (size_t i = 1; i < model.recent_guesses.size(); ++i) {
+            if (model.recent_guesses[i].dice_count <= model.recent_guesses[i-1].dice_count) {
+                escalating = false;
                 break;
-                
-            case PatternMatch::Aggressive:
-                // Play more conservatively against aggressive players
-                action = make_defensive_bid(context, analysis);
-                break;
-                
-            case PatternMatch::Bluffer:
-                // Set traps for bluffers
-                action = make_trap_bid(context, analysis);
-                break;
-                
-            default:
-                // Balanced approach
-                action = make_balanced_bid(context, analysis);
+            }
         }
-        
-        // Adjust confidence based on analysis
-        action.confidence = calculate_strategic_confidence(
-            action, context, analysis);
-            
-        return action;
+        if (escalating) {
+            bluff_prob += 0.2; // Rapid escalation suggests bluffing
+        }
     }
     
-    std::vector<std::pair<Bid, double>> 
-    calculate_probable_bids(const AIDecisionContext& context) {
-        std::vector<std::pair<Bid, double>> probable_bids;
+    // Check if guess deviates from player's face preferences
+    double total_face_guesses = 0.0;
+    for (const auto& [face, count] : model.face_frequency) {
+        total_face_guesses += count;
+    }
+    
+    if (total_face_guesses > 0 && model.face_frequency.count(guess.face_value)) {
+        double face_preference = model.face_frequency.at(guess.face_value) / total_face_guesses;
+        if (face_preference < 0.1) {
+            bluff_prob += 0.15; // Unusual face choice
+        }
+    }
+    
+    return std::min(1.0, bluff_prob);
+}
+```
+
+### Application Integration
+
+#### Command-Line Options
+
+```cpp
+po::options_description Application::setup_program_options() {
+    po::options_description desc("Liar's Dice CLI Options");
+    desc.add_options()
+        ("help,h", "Show help message")
+        ("verbose,v", "Enable verbose output")
+        ("medium-ai", "Use Medium AI strategy instead of Easy AI")
+        // ... other options
+    ;
+    return desc;
+}
+```
+
+#### AI Creation in Application
+
+```cpp
+void Application::setup_game(int total_players, int ai_players) {
+    // ... game setup code ...
+    
+    // Create AI players
+    for (int i = 0; i < ai_players; ++i) {
+        unsigned int player_id = next_player_id_++;
         
-        if (context.is_first_bid()) {
-            // Opening bid probabilities
-            probable_bids = {
-                {{2, 3}, 0.3},  // Conservative opening
-                {{3, 3}, 0.25}, // Moderate opening
-                {{2, 5}, 0.2},  // Slightly aggressive
-                {{4, 2}, 0.15}, // Quantity-focused
-                {{3, 6}, 0.1}   // Aggressive opening
-            };
+        if (config_.use_medium_ai) {
+            // Create Medium AI with statistical analysis
+            ai::MediumAIStrategy::MediumConfig config;
+            config.risk_tolerance = 0.5;
+            config.bluff_frequency = 0.25;
+            config.call_threshold = 0.65;
+            config.pattern_weight = 0.3;
+            config.history_size = 20;
+            config.use_bayesian = true;
+            config.track_opponents = true;
+            config.think_time_ms = 1000;
+            
+            auto ai = std::make_shared<ai::MediumAIStrategy>(player_id, config);
+            
+            // Connect to game history and state
+            ai->set_game_history(&game_->get_history());
+            ai->set_game_state(&game_->get_state_storage());
+            
+            players_.push_back(ai);
+            game_->add_player(ai);
         } else {
-            // Calculate based on current bid and game state
-            auto next_bids = generate_valid_next_bids(context.current_bid);
+            // Create Easy AI (default)
+            ai::EasyAIStrategy::EasyConfig config;
+            config.risk_tolerance = 0.2;
+            config.bluff_frequency = 0.1;
+            config.call_threshold = 0.8;
+            config.use_statistical_analysis = false;
+            config.think_time_ms = 500;
             
-            for (const auto& bid : next_bids) {
-                double probability = calculate_bid_likelihood(
-                    bid, context, opponent_model_);
-                probable_bids.emplace_back(bid, probability);
-            }
-            
-            // Sort by probability
-            std::ranges::sort(probable_bids, std::greater{},
-                &std::pair<Bid, double>::second);
-                
-            // Keep top 5
-            if (probable_bids.size() > 5) {
-                probable_bids.resize(5);
-            }
-        }
-        
-        return probable_bids;
-    }
-};
-```
-
-{% endraw %}
-
-### AI Testing Framework
-
-#### Statistical Validation
-
-```cpp
-class AIStrategyTester {
-private:
-    struct TestResults {
-        uint32_t games_played = 0;
-        uint32_t wins = 0;
-        uint32_t invalid_moves = 0;
-        double average_decision_time_ms = 0.0;
-        std::map<std::string, uint32_t> decision_distribution;
-        
-        double get_win_rate() const {
-            return games_played > 0 ? 
-                static_cast<double>(wins) / games_played : 0.0;
-        }
-    };
-    
-public:
-    TestResults test_strategy(std::unique_ptr<IAIStrategy> strategy,
-                            uint32_t num_games,
-                            const TestConfig& config) {
-        TestResults results;
-        
-        for (uint32_t i = 0; i < num_games; ++i) {
-            auto game_result = play_test_game(strategy.get(), config);
-            update_results(results, game_result);
-        }
-        
-        return results;
-    }
-    
-    void run_strategy_comparison(const std::vector<Difficulty>& difficulties,
-                                uint32_t games_per_matchup) {
-        std::cout << "AI Strategy Comparison\n";
-        std::cout << "======================\n\n";
-        
-        for (size_t i = 0; i < difficulties.size(); ++i) {
-            for (size_t j = i + 1; j < difficulties.size(); ++j) {
-                auto results = compare_strategies(
-                    difficulties[i], 
-                    difficulties[j], 
-                    games_per_matchup
-                );
-                
-                print_comparison_results(
-                    difficulties[i], 
-                    difficulties[j], 
-                    results
-                );
-            }
+            auto ai = std::make_shared<ai::EasyAIStrategy>(player_id, config);
+            players_.push_back(ai);
+            game_->add_player(ai);
         }
     }
-    
-private:
-    struct GameResult {
-        PlayerID winner;
-        uint32_t total_rounds;
-        std::vector<DecisionRecord> ai_decisions;
-        std::chrono::milliseconds total_decision_time;
-    };
-    
-    struct DecisionRecord {
-        AIDecision decision;
-        AIDecisionContext context;
-        std::chrono::microseconds decision_time;
-    };
-    
-    GameResult play_test_game(IAIStrategy* strategy,
-                            const TestConfig& config) {
-        // Create game with AI player
-        auto game = create_test_game_with_ai(strategy, config);
-        
-        GameResult result;
-        auto start_time = std::chrono::steady_clock::now();
-        
-        // Play game to completion
-        while (!game->is_finished()) {
-            if (game->is_ai_turn()) {
-                auto decision_start = std::chrono::steady_clock::now();
-                
-                auto context = game->get_ai_context();
-                auto decision = strategy->make_decision(context);
-                
-                auto decision_end = std::chrono::steady_clock::now();
-                
-                result.ai_decisions.push_back({
-                    decision,
-                    context,
-                    std::chrono::duration_cast<std::chrono::microseconds>(
-                        decision_end - decision_start)
-                });
-                
-                game->apply_ai_decision(decision);
-            } else {
-                // Simulate other players
-                game->simulate_human_turn();
-            }
-            
-            result.total_rounds++;
-        }
-        
-        auto end_time = std::chrono::steady_clock::now();
-        result.total_decision_time = 
-            std::chrono::duration_cast<std::chrono::milliseconds>(
-                end_time - start_time);
-        result.winner = game->get_winner();
-        
-        return result;
-    }
-};
-```
-
-#### Performance Benchmarks
-
-```cpp
-TEST_CASE("AI Strategy Performance", "[ai][benchmark]") {
-    auto factory = AIStrategyFactory::instance();
-    
-    BENCHMARK("Easy AI Decision Time") {
-        auto strategy = factory.create(Difficulty::Easy, {}).value();
-        auto context = create_typical_decision_context();
-        return strategy->make_decision(context);
-    };
-    
-    BENCHMARK("Medium AI Decision Time") {
-        auto strategy = factory.create(Difficulty::Medium, {}).value();
-        auto context = create_typical_decision_context();
-        return strategy->make_decision(context);
-    };
-    
-    BENCHMARK("Complex Game State Analysis") {
-        auto strategy = factory.create(Difficulty::Medium, {}).value();
-        auto context = create_complex_decision_context(
-            6,  // players
-            15, // rounds played
-            30  // total dice
-        );
-        return strategy->make_decision(context);
-    };
 }
 ```
 
 ---
 
-## Configuration Integration
+## Testing Strategy
 
-### AI Configuration Schema
+### Unit Tests
+
+The AI strategies are tested through the existing test infrastructure:
+
+1. **test_ai.cpp** - Basic AI functionality tests
+2. **test_ai_advanced.cpp** - Advanced AI strategy tests
+3. **Robot Framework tests** - End-to-end AI behavior validation
+
+### Example Test
 
 ```cpp
-struct AIConfig {
-    // Common parameters
-    Difficulty difficulty = Difficulty::Easy;
-    uint32_t random_seed = 0; // 0 = use random device
+TEST_CASE("AI Strategy Comparison", "[ai]") {
+    // Create game with different AI strategies
+    auto easy_ai = std::make_shared<ai::EasyAIStrategy>(1);
+    auto medium_ai = std::make_shared<ai::MediumAIStrategy>(2);
     
-    // Strategy-specific parameters
-    std::unordered_map<std::string, ConfigValue> parameters;
+    // Set up Medium AI with game state
+    medium_ai->set_game_history(&game.get_history());
+    medium_ai->set_game_state(&game.get_state_storage());
     
-    // Helper methods
-    template<typename T>
-    T get_value(std::string_view key, T default_value) const {
-        auto it = parameters.find(std::string(key));
-        if (it != parameters.end()) {
-            return std::get<T>(it->second);
-        }
-        return default_value;
-    }
-};
-
-// Configuration file example (config.json)
-{
-    "ai": {
-        "easy": {
-            "risk_tolerance": 0.3,
-            "bluff_frequency": 0.2,
-            "call_threshold": 0.7,
-            "use_statistics": true
-        },
-        "medium": {
-            "risk_tolerance": 0.5,
-            "bluff_frequency": 0.3,
-            "call_threshold": 0.6,
-            "use_opponent_modeling": true,
-            "pattern_history_size": 10,
-            "pattern_weight": 0.3
-        }
-    }
+    // Test decision making
+    auto last_guess = core::Guess{3, 4, 1};
+    
+    auto easy_decision = easy_ai->make_guess(last_guess);
+    auto medium_decision = medium_ai->make_guess(last_guess);
+    
+    // Verify decisions are valid
+    REQUIRE(game.is_valid_guess(easy_decision));
+    REQUIRE(game.is_valid_guess(medium_decision));
 }
-```
-
-### Logging Integration
-
-```cpp
-class LoggingAIStrategy : public IAIStrategy {
-private:
-    std::unique_ptr<IAIStrategy> wrapped_strategy_;
-    std::shared_ptr<ILogger> logger_;
-    
-public:
-    AIDecision make_decision(const AIDecisionContext& context) override {
-        auto start = std::chrono::steady_clock::now();
-        
-        AI_LOG_DEBUG("Making decision for player {}", context.ai_player_id);
-        AI_LOG_TRACE("Context: {} dice, current bid: {}x{}", 
-                    context.ai_dice_count,
-                    context.current_bid.quantity,
-                    context.current_bid.face_value);
-        
-        auto decision = wrapped_strategy_->make_decision(context);
-        
-        auto end = std::chrono::steady_clock::now();
-        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(
-            end - start);
-        
-        std::visit([this, &duration](const auto& d) {
-            using T = std::decay_t<decltype(d)>;
-            if constexpr (std::is_same_v<T, AIGuessAction>) {
-                AI_LOG_INFO("AI decided to bid {}x{} (confidence: {:.2f}) in {}ms",
-                           d.quantity, d.face_value, d.confidence, 
-                           duration.count());
-            } else if constexpr (std::is_same_v<T, AICallLiarAction>) {
-                AI_LOG_INFO("AI decided to call liar (certainty: {:.2f}) in {}ms",
-                           d.certainty, duration.count());
-            }
-        }, decision);
-        
-        return decision;
-    }
-    
-    // Delegate other methods...
-};
 ```
 
 ---
@@ -961,142 +548,80 @@ public:
 
 ### Decision-Making Performance
 
-| AI Type                   | Average Decision Time | Memory Usage | CPU Usage |
-|---------------------------|-----------------------|--------------|-----------|
-| Easy AI                   | 2.3ms                 | 1.2MB        | 5%        |
-| Medium AI                 | 8.7ms                 | 4.5MB        | 12%       |
-| Complex State (6 players) | 15.2ms                | 8.3MB        | 18%       |
+| AI Type   | Average Decision Time | Memory Usage | CPU Usage |
+|-----------|-----------------------|--------------|-----------| 
+| Easy AI   | ~2-5ms                | < 1MB        | < 5%      |
+| Medium AI | ~10-20ms              | < 2MB        | < 10%     |
 
-### Win Rate Analysis
+### Key Features Comparison
 
-| Matchup          | Games Played | Win Rate |
-|------------------|--------------|----------|
-| Easy vs Random   | 1000         | 72.3%    |
-| Medium vs Easy   | 1000         | 68.5%    |
-| Medium vs Random | 1000         | 84.7%    |
-
-### Memory Characteristics
-
-- **Base AI Memory**: ~500KB per strategy instance
-- **Opponent Modeling**: ~100KB per tracked opponent
-- **History Storage**: ~50KB per 100 rounds
-- **Decision Cache**: ~200KB when enabled
+| Feature                 | Easy AI | Medium AI |
+|-------------------------|---------|-----------|
+| Basic Probability       | ✓       | ✓         |
+| Configurable Parameters | ✓       | ✓         |
+| Bluff Detection         | Basic   | Advanced  |
+| Opponent Modeling       | ✗       | ✓         |
+| Pattern Recognition     | ✗       | ✓         |
+| Game History Analysis   | ✗       | ✓         |
+| Bayesian Probability    | ✗       | ✓         |
 
 ---
 
-## Security Considerations
+## Usage Examples
 
-### Input Validation
+### Command Line Usage
 
-1. **Context Validation**: Ensure game state consistency
-2. **Bounds Checking**: Validate all numeric inputs
-3. **Memory Limits**: Cap history storage
-4. **Timeout Protection**: Limit decision time
+```bash
+# Play with Easy AI (default)
+./build/standalone/liarsdice
 
-### Anti-Cheating Measures
+# Play with Medium AI
+./build/standalone/liarsdice --medium-ai
 
-```cpp
-class SecureAIStrategy {
-private:
-    void validate_context(const AIDecisionContext& context) {
-        // Ensure dice count matches
-        if (context.ai_dice.size() != context.ai_dice_count) {
-            throw InvalidContextError("Dice count mismatch");
-        }
-        
-        // Validate dice values
-        for (const auto& die : context.ai_dice) {
-            if (die.get_value() < 1 || die.get_value() > 6) {
-                throw InvalidContextError("Invalid die value");
-            }
-        }
-        
-        // Ensure player is in game
-        auto player_it = std::ranges::find_if(context.all_players,
-            [&](const auto& p) { return p.id == context.ai_player_id; });
-            
-        if (player_it == context.all_players.end()) {
-            throw InvalidContextError("AI player not in game");
-        }
-    }
-};
+# Play with Medium AI and verbose logging
+./build/standalone/liarsdice --medium-ai --verbose
 ```
 
----
+### Example Game Output
 
-## Future Enhancements
+```
+Welcome to Liar's Dice
+Enter the number of players (2-8): 2
+How many AI players (0-1): 1
+Game starting
 
-### Planned Features
-
-1. **Hard AI Strategy**: Advanced game theory implementation
-2. **Neural Network AI**: Machine learning-based decisions
-3. **Adaptive Difficulty**: Dynamic adjustment based on player skill
-4. **Tournament Mode**: AI vs AI competitions
-5. **Strategy Analysis Tools**: Decision replay and visualization
-
-### Research Areas
-
-1. **Monte Carlo Tree Search**: For optimal decision making
-2. **Reinforcement Learning**: Self-improving AI
-3. **Opponent Modeling**: Advanced behavioral analysis
-4. **Psychological Modeling**: Bluff and tell detection
-
-### Hard AI Preview (Future Implementation)
-
-```cpp
-class HardAIStrategy : public IAIStrategy {
-private:
-    // Game theory components
-    class GameTreeNode {
-        GameState state;
-        std::vector<std::unique_ptr<GameTreeNode>> children;
-        double value;
-        uint32_t visits;
-    };
-    
-    // Monte Carlo Tree Search
-    AIDecision mcts_decision(const AIDecisionContext& context) {
-        auto root = std::make_unique<GameTreeNode>();
-        root->state = context.game_state;
-        
-        for (int i = 0; i < 1000; ++i) {
-            auto leaf = select_leaf(root.get());
-            auto value = simulate_game(leaf);
-            backpropagate(leaf, value);
-        }
-        
-        return best_decision_from_tree(root.get());
-    }
-    
-    // Minimax with alpha-beta pruning
-    AIDecision minimax_decision(const AIDecisionContext& context,
-                               int depth = 5) {
-        double alpha = -std::numeric_limits<double>::infinity();
-        double beta = std::numeric_limits<double>::infinity();
-        
-        return minimax_helper(context, depth, alpha, beta, true).decision;
-    }
-};
+--- Round 1 ---
+Easy AI 2 guesses: 2 dice showing 3
+Your turn - Player 1
+1. Make a guess
+2. Call liar
+Previous guess: 2 dice showing 3
 ```
 
 ---
 
 ## Conclusion
 
-The implementation of the AI Strategy System in Commit 6 provides a robust, extensible foundation for intelligent
-computer opponents in the LiarsDice game. The system leverages modern C++23 features, design patterns, and game theory
-principles to create engaging AI players with configurable difficulty levels.
+The AI Strategy System successfully implements two distinct AI difficulty levels for the LiarsDice game:
 
 ### Key Achievements
 
-1. **Flexible Architecture**: Strategy pattern enables easy addition of new AI types
-2. **Configurable Behavior**: Runtime parameters for AI customization
-3. **Statistical Intelligence**: Probability-based decision making
-4. **Opponent Modeling**: Adaptive strategies based on player behavior
-5. **Performance**: Efficient algorithms with <20ms decision times
+1. **Simple Integration**: Uses inheritance from AIPlayer base class for straightforward implementation
+2. **Configurable Strategies**: Both AI levels support runtime configuration of behavior parameters
+3. **Statistical Intelligence**: Medium AI uses Bayesian probability and pattern recognition
+4. **Game State Integration**: Medium AI leverages GameHistory for informed decisions
+5. **User-Friendly**: Simple --medium-ai flag for strategy selection
 
-The AI system integrates seamlessly with the existing game architecture, configuration system, and logging
-infrastructure, providing a complete solution for single-player gameplay.
+### Implementation Highlights
+
+- Easy AI provides a good baseline opponent with simple heuristics
+- Medium AI offers a challenging opponent with statistical analysis
+- Both strategies integrate seamlessly with the existing game system
+- Configuration structures allow fine-tuning of AI behavior
+- Command-line integration keeps the user interface simple
+
+The system provides a solid foundation for single-player gameplay while maintaining simplicity and extensibility for
+future enhancements.
 
 ---
 

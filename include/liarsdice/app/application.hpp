@@ -22,6 +22,7 @@ struct AppConfig {
     std::string ui_config_path = "assets/ui/default.info";
     bool verbose = false;
     bool demo_mode = false;
+    bool use_medium_ai = false;
     unsigned int min_players = 2;
     unsigned int max_players = 8;
     unsigned int starting_dice = 5;

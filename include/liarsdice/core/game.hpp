@@ -1,6 +1,7 @@
 #pragma once
 
 #include <liarsdice/core/player.hpp>
+#include <liarsdice/core/game_state_storage.hpp>
 #include <boost/signals2.hpp>
 #include <boost/log/trivial.hpp>
 #include <memory>
@@ -71,6 +72,10 @@ public:
     GameEvents& events() { return events_; }
     const GameEvents& events() const { return events_; }
     
+    // State storage access (for analysis/AI)
+    [[nodiscard]] const GameStateStorage& get_state_storage() const { return state_storage_; }
+    [[nodiscard]] const GameHistory& get_history() const { return history_; }
+    
 private:
     GameConfig config_;
     State state_ = State::NOT_STARTED;
@@ -81,6 +86,10 @@ private:
     std::optional<Guess> last_guess_;
     GameEvents events_;
     
+    // Optimized state storage
+    GameStateStorage state_storage_;
+    GameHistory history_;
+    
     void advance_to_next_player();
     void eliminate_player(std::shared_ptr<Player> player);
 public:
@@ -89,6 +98,7 @@ public:
     
 private:
     void log_game_state() const;
+    void capture_game_state();  // Capture current state to history
 };
 
 // Stream operator for Game::State (needed for Boost.Test)

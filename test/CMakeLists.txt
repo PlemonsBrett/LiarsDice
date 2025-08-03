@@ -77,6 +77,15 @@ target_link_libraries(test_game
 )
 set_target_properties(test_game PROPERTIES CXX_STANDARD 20)
 
+# Game state storage tests
+add_executable(test_game_state_storage source/test_game_state_storage.cpp)
+target_link_libraries(test_game_state_storage
+        PRIVATE
+        LiarsDice::LiarsDice
+        Boost::unit_test_framework
+)
+set_target_properties(test_game_state_storage PROPERTIES CXX_STANDARD 20)
+
 # Add tests to CTest
 add_test(NAME DiceTests COMMAND test_dice)
 add_test(NAME PlayerTests COMMAND test_player)
@@ -84,6 +93,7 @@ add_test(NAME AITests COMMAND test_ai)
 add_test(NAME GameTests COMMAND test_game)
 # add_test(NAME BoostDITests COMMAND test_boost_di)
 add_test(NAME ServiceContainerTests COMMAND test_service_container)
+add_test(NAME GameStateStorageTests COMMAND test_game_state_storage)
 
 # ---- code coverage ----
 

@@ -18,7 +18,7 @@ Liar's Dice is a multiplayer dice game where players make increasingly bold clai
 - Each guess must be higher than the previous (more dice or same dice with higher face value)
 - Players can call "liar" instead of making a guess
 - When "liar" is called, all dice are revealed to determine the winner
-- The loser of a challenge loses one die
+- The loser of a challenge loses points
 - Last player with dice wins!
 
 ## 🚀 Quick Start
@@ -151,7 +151,7 @@ Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for de
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
 
 ## 🙏 Acknowledgments
 
