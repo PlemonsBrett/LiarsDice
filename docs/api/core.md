@@ -2,7 +2,9 @@
 
 ## Overview
 
-The core game API provides the fundamental classes and interfaces for implementing the Liar's Dice game logic. This includes dice management, player representation, game state control, and turn management.
+The core game API provides the fundamental classes for implementing the Liar's Dice game logic using Boost libraries.
+This includes dice management, player representation, game state control with signal/slot event handling, and turn
+management.
 
 ## Key Components
 
@@ -10,201 +12,157 @@ The core game API provides the fundamental classes and interfaces for implementi
 
 **Location**: `include/liarsdice/core/dice.hpp`
 
-The `Dice` class represents a single die in the game.
+The `Dice` class represents a single die in the game using Boost's random number generation.
 
 ```cpp
 namespace liarsdice::core {
     class Dice {
     public:
-        using value_type = uint8_t;
-        
         Dice();
-        void Roll();
-        [[nodiscard]] value_type GetFaceValue() const noexcept;
-        void SetFaceValue(value_type value);
-        [[nodiscard]] bool IsRolled() const noexcept;
+        
+        void roll();
+        [[nodiscard]] unsigned int get_value() const { return value_; }
+        void set_value(unsigned int value) { value_ = value; }
         
     private:
-        value_type face_value_{0};
-        bool is_rolled_{false};
-        static std::mt19937& GetRNG();
+        unsigned int value_ = 0;
+        static boost::random::mt19937& get_rng();
     };
 }
 ```
 
 **Key Methods**:
-- `Roll()`: Generates a random value between 1 and 6
-- `GetFaceValue()`: Returns the current face value (0 if not rolled)
-- `SetFaceValue()`: Manually sets the face value (for testing)
-- `IsRolled()`: Checks if the die has been rolled
 
-### Player Interface
+- `roll()`: Generates a random value between 1 and 6 using Boost.Random
+- `get_value()`: Returns the current face value
+- `set_value()`: Manually sets the face value (for testing)
 
-**Location**: `include/liarsdice/interfaces/i_player.hpp`
-
-The `IPlayer` interface defines the contract for all player types.
-
-```cpp
-namespace liarsdice::interfaces {
-    class IPlayer {
-    public:
-        virtual ~IPlayer() = default;
-        
-        [[nodiscard]] virtual PlayerID GetId() const noexcept = 0;
-        [[nodiscard]] virtual std::string_view GetName() const noexcept = 0;
-        [[nodiscard]] virtual bool IsActive() const noexcept = 0;
-        [[nodiscard]] virtual size_t GetDiceCount() const noexcept = 0;
-        [[nodiscard]] virtual std::span<const core::Dice> GetDice() const = 0;
-        
-        virtual void SetName(std::string name) = 0;
-        virtual void RollDice() = 0;
-        virtual void RemoveDie() = 0;
-        virtual void Reset(size_t dice_count = 5) = 0;
-    };
-}
-```
-
-### Player Implementation
+### Player Class
 
 **Location**: `include/liarsdice/core/player.hpp`
 
-The concrete `Player` class implements the `IPlayer` interface.
+The `Player` class represents a player in the game.
 
 ```cpp
 namespace liarsdice::core {
-    class Player : public interfaces::IPlayer {
+    struct Guess {
+        unsigned int face = 0;
+        unsigned int count = 0;
+        
+        bool operator<(const Guess& other) const;
+        [[nodiscard]] std::string to_string() const;
+    };
+    
+    class Player : public std::enable_shared_from_this<Player> {
     public:
-        explicit Player(PlayerID id, std::string name = "");
+        Player(unsigned int id, const std::string& name);
+        virtual ~Player() = default;
         
-        // IPlayer interface implementation
-        [[nodiscard]] PlayerID GetId() const noexcept override;
-        [[nodiscard]] std::string_view GetName() const noexcept override;
-        [[nodiscard]] bool IsActive() const noexcept override;
-        [[nodiscard]] size_t GetDiceCount() const noexcept override;
-        [[nodiscard]] std::span<const Dice> GetDice() const override;
+        // Core functionality
+        void roll_dice();
+        void lose_die();
+        void reset();
         
-        void SetName(std::string name) override;
-        void RollDice() override;
-        void RemoveDie() override;
-        void Reset(size_t dice_count = 5) override;
+        // Virtual methods for AI override
+        virtual Guess make_guess(const std::optional<Guess>& last_guess);
+        virtual bool decide_call_liar(const Guess& last_guess);
         
-    private:
-        class Impl;
-        std::unique_ptr<Impl> pImpl;
+        // Getters
+        [[nodiscard]] unsigned int get_id() const { return id_; }
+        [[nodiscard]] const std::string& get_name() const { return name_; }
+        [[nodiscard]] bool is_human() const { return is_human_; }
+        [[nodiscard]] size_t get_dice_count() const { return dice_.size(); }
+        [[nodiscard]] const std::vector<Dice>& get_dice() const { return dice_; }
+        [[nodiscard]] bool is_eliminated() const { return dice_.empty(); }
+        
+    protected:
+        unsigned int id_;
+        std::string name_;
+        std::vector<Dice> dice_;
+        bool is_human_ = true;
     };
 }
 ```
 
-### Game Interface
-
-**Location**: `include/liarsdice/interfaces/i_game.hpp`
-
-The `IGame` interface defines the contract for game management.
-
-```cpp
-namespace liarsdice::interfaces {
-    class IGame {
-    public:
-        virtual ~IGame() = default;
-        
-        // Game state
-        [[nodiscard]] virtual GameState GetState() const noexcept = 0;
-        [[nodiscard]] virtual size_t GetPlayerCount() const noexcept = 0;
-        [[nodiscard]] virtual PlayerID GetCurrentPlayerId() const noexcept = 0;
-        [[nodiscard]] virtual std::optional<PlayerID> GetWinnerId() const noexcept = 0;
-        
-        // Player management
-        virtual void AddPlayer(std::unique_ptr<IPlayer> player) = 0;
-        [[nodiscard]] virtual const IPlayer* GetPlayer(PlayerID id) const = 0;
-        [[nodiscard]] virtual std::vector<const IPlayer*> GetPlayers() const = 0;
-        
-        // Game flow
-        virtual void StartNewGame() = 0;
-        virtual void StartRound() = 0;
-        virtual BidResult MakeBid(const Bid& bid) = 0;
-        virtual CallLiarResult CallLiar() = 0;
-        
-        // Game information
-        [[nodiscard]] virtual std::optional<Bid> GetCurrentBid() const noexcept = 0;
-        [[nodiscard]] virtual std::vector<Bid> GetBidHistory() const = 0;
-        [[nodiscard]] virtual size_t GetTotalDiceCount() const noexcept = 0;
-    };
-}
-```
-
-### Game Implementation
+### Game Class
 
 **Location**: `include/liarsdice/core/game.hpp`
 
-The concrete `Game` class implements the `IGame` interface.
+The `Game` class manages the overall game state and flow using Boost.Signals2 for event handling.
 
 ```cpp
 namespace liarsdice::core {
-    class Game : public interfaces::IGame {
+    // Game events for signal/slot system
+    struct GameEvents {
+        boost::signals2::signal<void(unsigned int round)> on_round_start;
+        boost::signals2::signal<void(unsigned int round)> on_round_end;
+        boost::signals2::signal<void(const Player&)> on_player_turn;
+        boost::signals2::signal<void(const Player&, const Guess&)> on_guess_made;
+        boost::signals2::signal<void(const Player&)> on_liar_called;
+        boost::signals2::signal<void(const Player&, const Player&)> on_round_result;
+        boost::signals2::signal<void(const Player&)> on_player_eliminated;
+        boost::signals2::signal<void(const Player&)> on_game_winner;
+    };
+    
+    // Game configuration
+    struct GameConfig {
+        unsigned int min_players = 2;
+        unsigned int max_players = 8;
+        unsigned int starting_dice = 5;
+        bool allow_ones_wild = true;
+        unsigned int ai_think_time_ms = 1000;
+    };
+    
+    class Game {
     public:
-        Game();
-        ~Game();
+        enum class State {
+            NOT_STARTED,
+            WAITING_FOR_PLAYERS,
+            IN_PROGRESS,
+            ROUND_ENDED,
+            GAME_OVER
+        };
         
-        // Move semantics
-        Game(Game&&) noexcept;
-        Game& operator=(Game&&) noexcept;
+        explicit Game(const GameConfig& config = {});
         
-        // Deleted copy semantics
-        Game(const Game&) = delete;
-        Game& operator=(const Game&) = delete;
+        // Player management
+        void add_player(std::shared_ptr<Player> player);
+        void remove_player(unsigned int player_id);
+        [[nodiscard]] size_t get_player_count() const;
+        [[nodiscard]] const std::vector<std::shared_ptr<Player>>& get_players() const;
+        [[nodiscard]] std::shared_ptr<Player> get_player(unsigned int id) const;
         
-        // IGame interface implementation
-        // ... (all virtual methods from IGame)
+        // Game flow
+        void start_game();
+        void start_round();
+        void make_guess(const Guess& guess);
+        void call_liar();
+        
+        // Game state
+        [[nodiscard]] State get_state() const { return state_; }
+        [[nodiscard]] const std::optional<Guess>& get_current_guess() const;
+        [[nodiscard]] std::shared_ptr<Player> get_current_player() const;
+        [[nodiscard]] unsigned int get_total_dice() const;
+        [[nodiscard]] unsigned int get_round_number() const { return round_number_; }
+        
+        // Event access
+        GameEvents& events() { return events_; }
         
     private:
-        class Impl;
-        std::unique_ptr<Impl> pImpl;
-    };
-}
-```
-
-## Common Types
-
-**Location**: `include/liarsdice/common/types.hpp`
-
-```cpp
-namespace liarsdice {
-    // Player identification
-    using PlayerID = uint32_t;
-    
-    // Game state enumeration
-    enum class GameState : uint8_t {
-        NOT_STARTED,
-        IN_PROGRESS,
-        ROUND_OVER,
-        GAME_OVER
-    };
-    
-    // Bid structure
-    struct Bid {
-        uint32_t quantity;
-        uint8_t face_value;
-        PlayerID player_id;
+        void next_turn();
+        void end_round(std::shared_ptr<Player> loser);
+        void check_game_over();
+        [[nodiscard]] unsigned int count_dice_with_face(unsigned int face) const;
         
-        auto operator<=>(const Bid&) const = default;
-    };
-    
-    // Result types
-    enum class BidResult : uint8_t {
-        SUCCESS,
-        INVALID_TURN,
-        INVALID_BID_TOO_LOW,
-        INVALID_QUANTITY,
-        INVALID_FACE_VALUE,
-        GAME_NOT_IN_PROGRESS
-    };
-    
-    enum class CallLiarResult : uint8_t {
-        CALLER_WINS,
-        BIDDER_WINS,
-        INVALID_TURN,
-        NO_CURRENT_BID,
-        GAME_NOT_IN_PROGRESS
+    private:
+        GameConfig config_;
+        State state_ = State::NOT_STARTED;
+        std::vector<std::shared_ptr<Player>> players_;
+        std::vector<std::shared_ptr<Player>> active_players_;
+        size_t current_player_index_ = 0;
+        std::optional<Guess> current_guess_;
+        unsigned int round_number_ = 0;
+        GameEvents events_;
     };
 }
 ```
@@ -214,72 +172,88 @@ namespace liarsdice {
 ### Creating a Game
 
 ```cpp
-#include "liarsdice/core/game.hpp"
-#include "liarsdice/core/player.hpp"
+#include <liarsdice/core/game.hpp>
+#include <liarsdice/core/player.hpp>
+#include <liarsdice/ai/ai_player.hpp>
 
-// Create a new game
-liarsdice::core::Game game;
+// Create a new game with custom config
+liarsdice::core::GameConfig config;
+config.starting_dice = 5;
+config.allow_ones_wild = true;
 
-// Add players
-auto player1 = std::make_unique<liarsdice::core::Player>(1, "Alice");
-auto player2 = std::make_unique<liarsdice::core::Player>(2, "Bob");
+liarsdice::core::Game game(config);
 
-game.AddPlayer(std::move(player1));
-game.AddPlayer(std::move(player2));
+// Add human and AI players
+auto human = std::make_shared<liarsdice::core::Player>(1, "Alice");
+auto ai = std::make_shared<liarsdice::ai::EasyAI>(2);
+
+game.add_player(human);
+game.add_player(ai);
+
+// Connect to game events
+game.events().on_round_start.connect([](unsigned int round) {
+    std::cout << "Round " << round << " started!\n";
+});
+
+game.events().on_guess_made.connect([](const auto& player, const auto& guess) {
+    std::cout << player.get_name() << " guessed " << guess.to_string() << "\n";
+});
 
 // Start the game
-game.StartNewGame();
-game.StartRound();
+game.start_game();
 ```
 
-### Making Bids
+### Making Guesses
 
 ```cpp
-// Make a bid
-liarsdice::Bid bid{
-    .quantity = 3,
-    .face_value = 5,
-    .player_id = 1
-};
+// Get current player's guess
+auto current_player = game.get_current_player();
+auto last_guess = game.get_current_guess();
 
-auto result = game.MakeBid(bid);
-if (result == liarsdice::BidResult::SUCCESS) {
-    // Bid was successful
+// Human player makes a guess
+if (current_player->is_human()) {
+    liarsdice::core::Guess guess;
+    guess.count = 3;
+    guess.face = 5;
+    game.make_guess(guess);
+} else {
+    // AI player automatically makes decision
+    auto ai_guess = current_player->make_guess(last_guess);
+    game.make_guess(ai_guess);
 }
 ```
 
 ### Calling Liar
 
 ```cpp
-auto result = game.CallLiar();
-switch (result) {
-    case liarsdice::CallLiarResult::CALLER_WINS:
-        // The caller was correct
-        break;
-    case liarsdice::CallLiarResult::BIDDER_WINS:
-        // The bidder was truthful
-        break;
-    default:
-        // Handle error
-        break;
+// Current player can call liar on the previous guess
+if (game.get_current_guess().has_value()) {
+    game.call_liar();
 }
+
+// Handle round result via signals
+game.events().on_round_result.connect([](const auto& winner, const auto& loser) {
+    std::cout << winner.get_name() << " won the round!\n";
+    std::cout << loser.get_name() << " loses a die.\n";
+});
 ```
+
+## Boost Dependencies
+
+This implementation uses several Boost libraries:
+
+- **Boost.Signals2**: Event-driven architecture with signal/slot connections
+- **Boost.Random**: Random number generation for dice rolls
+- **Boost.Log**: Logging support (via boost::log::trivial)
 
 ## Thread Safety
 
-- The `Dice` class uses thread-local RNG for thread safety
-- `Player` and `Game` classes are not thread-safe by default
-- External synchronization is required for multi-threaded access
-
-## Performance Considerations
-
-- Uses PIMPL idiom for ABI stability and compilation speed
-- `std::span` for efficient dice access without copying
-- Move semantics supported for `Game` objects
-- `noexcept` specifications for performance-critical methods
+- The `Dice` class uses thread-safe random number generation
+- The `Game` class is not thread-safe; external synchronization required for multi-threaded access
+- Boost.Signals2 provides thread-safe signal handling when configured appropriately
 
 ## See Also
 
 - [AI System API](ai.md) - For AI player implementations
 - [Logging System API](logging.md) - For game event logging
-- [Configuration System API](configuration.md) - For game configuration options
+- [UI System](../architecture/ui-system.md) - For the menu system and user interface

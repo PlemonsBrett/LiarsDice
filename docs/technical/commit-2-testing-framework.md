@@ -709,6 +709,7 @@ public:
 
 ### GitHub Actions Configuration
 
+{% raw %}
 ```yaml
 name: Tests
 
@@ -766,6 +767,8 @@ jobs:
           name: coverage-${{ matrix.os }}
           path: build/coverage.html
 ```
+
+{% endraw %}
 
 ---
 

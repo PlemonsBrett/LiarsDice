@@ -467,6 +467,7 @@ private:
 
 #### Enhanced Strategy Class
 
+{% raw %}
 ```cpp
 class MediumAIStrategy final : public IAIStrategy {
 private:
@@ -716,6 +717,8 @@ private:
     }
 };
 ```
+
+{% endraw %}
 
 ### AI Testing Framework
 

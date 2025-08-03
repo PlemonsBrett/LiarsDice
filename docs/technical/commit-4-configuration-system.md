@@ -785,6 +785,7 @@ TEST_CASE("ConfigManager functionality", "[config]") {
 
 ### Integration Tests
 
+{% raw %}
 ```cpp
 TEST_CASE("Configuration hot reload", "[config][integration]") {
     auto temp_file = create_temp_config_file();
@@ -806,6 +807,8 @@ TEST_CASE("Configuration hot reload", "[config][integration]") {
     REQUIRE(updated.value() == 100);
 }
 ```
+
+{% endraw %}
 
 ---
 

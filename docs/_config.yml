@@ -1,0 +1,67 @@
+# Jekyll configuration for LiarsDice documentation
+
+title: LiarsDice Documentation
+description: A modern C++ implementation of the classic Liar's Dice game using Boost libraries
+baseurl: "/LiarsDice" # the subpath of your site, e.g. /blog
+url: "https://plemonsbrett.github.io" # the base hostname & protocol for your site
+
+# Build settings
+theme: jekyll-theme-primer
+plugins:
+  - jekyll-seo-tag
+  - jekyll-github-metadata
+  - jekyll-relative-links
+
+# Markdown settings
+markdown: kramdown
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
+  syntax_highlighter_opts:
+    css_class: 'highlight'
+
+# Collections
+collections:
+  api:
+    output: true
+    permalink: /api/:name
+  architecture:
+    output: true
+    permalink: /architecture/:name
+  technical:
+    output: true
+    permalink: /technical/:name
+
+# Defaults
+defaults:
+  - scope:
+      path: ""
+      type: "pages"
+    values:
+      layout: "default"
+  - scope:
+      path: "api"
+      type: "pages"
+    values:
+      layout: "api"
+      category: "API Reference"
+  - scope:
+      path: "architecture"
+      type: "pages"
+    values:
+      layout: "default"
+      category: "Architecture"
+  - scope:
+      path: "technical"
+      type: "pages"
+    values:
+      layout: "default"
+      category: "Technical Design"
+
+# Exclude from processing
+exclude:
+  - notes/
+  - "*.docx"
+  - "*.rtf"
+  - "*.html"
+  - requirements.txt

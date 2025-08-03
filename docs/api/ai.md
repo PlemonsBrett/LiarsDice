@@ -2,399 +2,255 @@
 
 ## Overview
 
-The AI system provides a flexible framework for implementing computer-controlled players with varying difficulty levels
-and strategies. The system uses the Strategy pattern with a factory for runtime registration and creation of AI players.
+The AI system provides computer-controlled players with configurable strategies for the Liar's Dice game. The system
+uses inheritance from the base Player class with strategy configuration and Boost libraries for random decision making.
 
 ## Key Components
 
-### AI Strategy Interface
+### AI Player Class
 
-**Location**: `include/liarsdice/ai/i_ai_strategy.hpp`
+**Location**: `include/liarsdice/ai/ai_player.hpp`
 
-The base interface for all AI strategies.
+The `AIPlayer` class extends the core `Player` class to provide automated decision-making.
 
+{% raw %}
 ```cpp
 namespace liarsdice::ai {
-    class IAIStrategy {
+    // Base AI player with configurable strategy
+    class AIPlayer : public core::Player {
     public:
-        virtual ~IAIStrategy() = default;
+        struct Strategy {
+            double risk_tolerance = 0.5;      // 0.0 = conservative, 1.0 = aggressive
+            double bluff_frequency = 0.2;     // How often to bluff
+            double call_threshold = 0.7;      // Probability threshold to call liar
+            unsigned int think_time_ms = 1000; // Simulated thinking time
+        };
         
-        [[nodiscard]] virtual AIDecision make_decision(
-            const AIDecisionContext& context) = 0;
+        AIPlayer(unsigned int id, const std::string& name, const Strategy& strategy);
         
-        [[nodiscard]] virtual std::string_view get_name() const noexcept = 0;
-        [[nodiscard]] virtual std::unique_ptr<IAIStrategy> clone() const = 0;
+        core::Guess make_guess(const std::optional<core::Guess>& last_guess) override;
+        bool decide_call_liar(const core::Guess& last_guess) override;
+        
+    protected:
+        [[nodiscard]] double calculate_probability(const core::Guess& guess, size_t total_dice) const;
+        [[nodiscard]] core::Guess generate_safe_guess(const std::optional<core::Guess>& last_guess) const;
+        [[nodiscard]] core::Guess generate_bluff_guess(const std::optional<core::Guess>& last_guess) const;
+        
+        void simulate_thinking() const;
+        
+    protected:
+        Strategy strategy_;
+        mutable boost::random::mt19937 rng_;
+        mutable boost::random::uniform_real_distribution<> probability_dist_{0.0, 1.0};
+        mutable boost::random::uniform_int_distribution<> face_dist_{1, 6};
     };
 }
 ```
 
-### AI Decision Types
+{% endraw %}
 
-**Location**: `include/liarsdice/ai/ai_types.hpp`
+### Predefined AI Personalities
 
+The system includes predefined AI personalities with different difficulty levels:
+
+{% raw %}
 ```cpp
 namespace liarsdice::ai {
-    // AI actions
-    struct AIGuessAction {
-        uint32_t quantity;
-        uint8_t face_value;
+    // Easy AI - Conservative play style
+    class EasyAI : public AIPlayer {
+    public:
+        explicit EasyAI(unsigned int id);
     };
     
-    struct AICallLiarAction {};
-    
-    // Type-safe decision variant
-    using AIDecision = std::variant<AIGuessAction, AICallLiarAction>;
-    
-    // Decision context
-    struct AIDecisionContext {
-        // Current game state
-        std::optional<Bid> current_bid;
-        size_t total_dice_count;
-        std::vector<Bid> bid_history;
-        
-        // AI player information
-        PlayerID ai_player_id;
-        std::vector<Dice> ai_dice;
-        size_t ai_dice_count;
-        
-        // Opponent information
-        std::vector<OpponentInfo> opponents;
-        
-        // Additional context
-        size_t round_number;
-        std::chrono::milliseconds time_limit;
+    // Medium AI - Balanced play style
+    class MediumAI : public AIPlayer {
+    public:
+        explicit MediumAI(unsigned int id);
     };
     
-    struct OpponentInfo {
-        PlayerID player_id;
-        std::string name;
-        size_t dice_count;
-        std::vector<Bid> previous_bids;
-        bool is_active;
+    // Hard AI - Aggressive and sophisticated play
+    class HardAI : public AIPlayer {
+    public:
+        explicit HardAI(unsigned int id);
     };
 }
 ```
 
-### AI Strategy Factory
+{% endraw %}
 
-**Location**: `include/liarsdice/ai/ai_strategy_factory.hpp`
+## AI Strategy Configuration
 
-Singleton factory for registering and creating AI strategies.
+### Strategy Parameters
+
+The `Strategy` struct allows fine-tuning of AI behavior:
+
+- **risk_tolerance** (0.0-1.0): Controls how aggressive the AI is
+    - 0.0: Very conservative, rarely bluffs
+    - 0.5: Balanced approach
+    - 1.0: Very aggressive, frequently bluffs
+
+- **bluff_frequency** (0.0–1.0): How often the AI attempts to bluff
+    - 0.0: Never bluffs
+    - 0.2: Occasional bluffs (default)
+    - 0.5: Frequent bluffing
+
+- **call_threshold** (0.0–1.0): Probability threshold for calling liar
+    - Lower values: Calls liar more often
+    - Higher values: More cautious about calling
+
+- **think_time_ms**: Simulated thinking delay in milliseconds
+    - Makes AI feel more human-like
+    - Can be set to 0 for instant responses
+
+### Predefined Strategies
 
 ```cpp
-namespace liarsdice::ai {
-    class AIStrategyFactory {
-    public:
-        static AIStrategyFactory& instance();
-        
-        // Registration
-        template<typename TStrategy>
-            requires std::derived_from<TStrategy, IAIStrategy>
-        void register_strategy(std::string_view name, 
-                             std::string_view description);
-        
-        // Creation
-        [[nodiscard]] std::unique_ptr<IAIStrategy> create(
-            std::string_view name) const;
-        
-        // Query available strategies
-        [[nodiscard]] std::vector<std::string> get_strategy_names() const;
-        [[nodiscard]] std::optional<std::string> get_description(
-            std::string_view name) const;
-        
-        // Check if strategy exists
-        [[nodiscard]] bool has_strategy(std::string_view name) const;
-        
-    private:
-        AIStrategyFactory() = default;
-        class Impl;
-        std::unique_ptr<Impl> pImpl;
-    };
-}
+// Easy AI configuration
+EasyAI::EasyAI(unsigned int id) 
+    : AIPlayer(id, "Easy AI", {
+        .risk_tolerance = 0.2,
+        .bluff_frequency = 0.1,
+        .call_threshold = 0.8,
+        .think_time_ms = 500
+    }) {}
+
+// Medium AI configuration
+MediumAI::MediumAI(unsigned int id)
+    : AIPlayer(id, "Medium AI", {
+        .risk_tolerance = 0.5,
+        .bluff_frequency = 0.2,
+        .call_threshold = 0.7,
+        .think_time_ms = 1000
+    }) {}
+
+// Hard AI configuration
+HardAI::HardAI(unsigned int id)
+    : AIPlayer(id, "Hard AI", {
+        .risk_tolerance = 0.8,
+        .bluff_frequency = 0.3,
+        .call_threshold = 0.6,
+        .think_time_ms = 1500
+    }) {}
 ```
 
-### Easy AI Strategy
+## Decision Making Algorithm
 
-**Location**: `include/liarsdice/ai/easy_ai_strategy.hpp`
+### Making Guesses
 
-Simple AI implementation with configurable parameters.
+The AI uses a two-phase approach:
+
+1. **Probability Calculation**: Estimates the likelihood of dice combinations
+2. **Strategy Application**: Decides between safe play and bluffing based on strategy
 
 ```cpp
-namespace liarsdice::ai {
-    struct EasyAIConfig {
-        double risk_tolerance = 0.3;      // 0.0 (conservative) to 1.0 (aggressive)
-        double bluff_frequency = 0.2;     // Probability of bluffing
-        double call_threshold = 0.7;      // Probability threshold for calling liar
-        bool use_statistical_analysis = true;
-        std::chrono::milliseconds decision_delay{500};
-    };
+core::Guess AIPlayer::make_guess(const std::optional<core::Guess>& last_guess) {
+    simulate_thinking();
     
-    class EasyAIStrategy : public IAIStrategy {
-    public:
-        explicit EasyAIStrategy(EasyAIConfig config = {});
-        
-        [[nodiscard]] AIDecision make_decision(
-            const AIDecisionContext& context) override;
-        
-        [[nodiscard]] std::string_view get_name() const noexcept override;
-        [[nodiscard]] std::unique_ptr<IAIStrategy> clone() const override;
-        
-        // Configuration
-        void set_config(const EasyAIConfig& config);
-        [[nodiscard]] const EasyAIConfig& get_config() const noexcept;
-        
-    private:
-        class Impl;
-        std::unique_ptr<Impl> pImpl;
-    };
+    // Decide whether to bluff based on strategy
+    double random = probability_dist_(rng_);
+    if (random < strategy_.bluff_frequency) {
+        return generate_bluff_guess(last_guess);
+    } else {
+        return generate_safe_guess(last_guess);
+    }
 }
 ```
 
-### Medium AI Strategy
+### Calling Liar
 
-**Location**: `include/liarsdice/ai/medium_ai_strategy.hpp`
-
-Advanced AI with statistical analysis and opponent modeling.
+The AI calculates the probability of the current guess being true:
 
 ```cpp
-namespace liarsdice::ai {
-    struct MediumAIConfig {
-        // Basic parameters
-        double risk_tolerance = 0.5;
-        double bluff_frequency = 0.3;
-        double call_threshold = 0.6;
-        
-        // Advanced features
-        bool use_opponent_modeling = true;
-        bool use_pattern_recognition = true;
-        bool use_bayesian_inference = true;
-        
-        // Pattern detection
-        size_t pattern_history_size = 10;
-        double pattern_weight = 0.4;
-        
-        // Performance tuning
-        std::chrono::milliseconds decision_delay{1000};
-        size_t max_simulations = 1000;
-    };
+bool AIPlayer::decide_call_liar(const core::Guess& last_guess) {
+    simulate_thinking();
     
-    class MediumAIStrategy : public IAIStrategy {
-    public:
-        explicit MediumAIStrategy(MediumAIConfig config = {});
-        
-        [[nodiscard]] AIDecision make_decision(
-            const AIDecisionContext& context) override;
-        
-        [[nodiscard]] std::string_view get_name() const noexcept override;
-        [[nodiscard]] std::unique_ptr<IAIStrategy> clone() const override;
-        
-        // Configuration
-        void set_config(const MediumAIConfig& config);
-        [[nodiscard]] const MediumAIConfig& get_config() const noexcept;
-        
-        // Analysis methods (for testing/debugging)
-        [[nodiscard]] double calculate_bid_probability(
-            const Bid& bid, const AIDecisionContext& context) const;
-        
-        [[nodiscard]] std::vector<OpponentModel> get_opponent_models() const;
-        
-    private:
-        class Impl;
-        std::unique_ptr<Impl> pImpl;
-    };
-}
-```
-
-### AI Player
-
-**Location**: `include/liarsdice/core/ai_player.hpp`
-
-Player implementation that uses AI strategies for decision making.
-
-```cpp
-namespace liarsdice::core {
-    class AIPlayer : public Player {
-    public:
-        AIPlayer(PlayerID id, std::unique_ptr<ai::IAIStrategy> strategy,
-                std::string name = "");
-        
-        // AI-specific methods
-        [[nodiscard]] ai::AIDecision make_decision(
-            const ai::AIDecisionContext& context) const;
-        
-        [[nodiscard]] const ai::IAIStrategy& get_strategy() const noexcept;
-        void set_strategy(std::unique_ptr<ai::IAIStrategy> strategy);
-        
-        // AI player identification
-        [[nodiscard]] bool is_ai() const noexcept override { return true; }
-        
-    private:
-        std::unique_ptr<ai::IAIStrategy> strategy_;
-    };
+    // Calculate probability of the guess being true
+    double probability = calculate_probability(last_guess, total_dice_in_game);
+    
+    // Call liar if probability is below threshold
+    return probability < (1.0 - strategy_.call_threshold);
 }
 ```
 
 ## Usage Examples
 
-### Registering AI Strategies
-
-```cpp
-#include "liarsdice/ai/ai_strategy_factory.hpp"
-#include "liarsdice/ai/easy_ai_strategy.hpp"
-#include "liarsdice/ai/medium_ai_strategy.hpp"
-
-// Register strategies at startup
-auto& factory = liarsdice::ai::AIStrategyFactory::instance();
-
-factory.register_strategy<liarsdice::ai::EasyAIStrategy>(
-    "easy", "Easy difficulty AI with simple heuristics");
-
-factory.register_strategy<liarsdice::ai::MediumAIStrategy>(
-    "medium", "Medium difficulty AI with statistical analysis");
-```
-
 ### Creating AI Players
 
 ```cpp
-#include "liarsdice/core/ai_player.hpp"
+#include <liarsdice/ai/ai_player.hpp>
 
-// Create AI player with factory
-auto ai_strategy = factory.create("easy");
-auto ai_player = std::make_unique<liarsdice::core::AIPlayer>(
-    1, std::move(ai_strategy), "EasyBot");
+// Create predefined AI players
+auto easy_ai = std::make_shared<liarsdice::ai::EasyAI>(2);
+auto medium_ai = std::make_shared<liarsdice::ai::MediumAI>(3);
+auto hard_ai = std::make_shared<liarsdice::ai::HardAI>(4);
 
-// Create AI player with custom configuration
-liarsdice::ai::EasyAIConfig config;
-config.risk_tolerance = 0.5;
-config.bluff_frequency = 0.1;
-
-auto custom_ai = std::make_unique<liarsdice::ai::EasyAIStrategy>(config);
-auto custom_player = std::make_unique<liarsdice::core::AIPlayer>(
-    2, std::move(custom_ai), "CustomBot");
-```
-
-### Using AI in Game
-
-```cpp
-// In game loop
-liarsdice::ai::AIDecisionContext context{
-    .current_bid = game.GetCurrentBid(),
-    .total_dice_count = game.GetTotalDiceCount(),
-    .bid_history = game.GetBidHistory(),
-    .ai_player_id = ai_player->GetId(),
-    .ai_dice = std::vector<liarsdice::core::Dice>(
-        ai_player->GetDice().begin(), 
-        ai_player->GetDice().end()),
-    .ai_dice_count = ai_player->GetDiceCount(),
-    .opponents = gather_opponent_info(game),
-    .round_number = current_round,
-    .time_limit = std::chrono::seconds(30)
+// Create custom AI with specific strategy
+liarsdice::ai::AIPlayer::Strategy custom_strategy{
+    .risk_tolerance = 0.6,
+    .bluff_frequency = 0.25,
+    .call_threshold = 0.65,
+    .think_time_ms = 800
 };
-
-auto decision = ai_player->make_decision(context);
-
-// Process decision
-std::visit(overloaded{
-    [&](const liarsdice::ai::AIGuessAction& guess) {
-        liarsdice::Bid bid{
-            .quantity = guess.quantity,
-            .face_value = guess.face_value,
-            .player_id = ai_player->GetId()
-        };
-        game.MakeBid(bid);
-    },
-    [&](const liarsdice::ai::AICallLiarAction&) {
-        game.CallLiar();
-    }
-}, decision);
+auto custom_ai = std::make_shared<liarsdice::ai::AIPlayer>(5, "Custom AI", custom_strategy);
 ```
 
-### Implementing Custom AI Strategy
+### Integrating with Game
 
 ```cpp
-class HardAIStrategy : public liarsdice::ai::IAIStrategy {
-public:
-    [[nodiscard]] liarsdice::ai::AIDecision make_decision(
-        const liarsdice::ai::AIDecisionContext& context) override {
-        
-        // Implement sophisticated decision logic
-        if (should_call_liar(context)) {
-            return liarsdice::ai::AICallLiarAction{};
-        }
-        
-        auto [quantity, face_value] = calculate_optimal_bid(context);
-        return liarsdice::ai::AIGuessAction{quantity, face_value};
-    }
-    
-    [[nodiscard]] std::string_view get_name() const noexcept override {
-        return "hard";
-    }
-    
-    [[nodiscard]] std::unique_ptr<IAIStrategy> clone() const override {
-        return std::make_unique<HardAIStrategy>(*this);
-    }
-    
-private:
-    bool should_call_liar(const liarsdice::ai::AIDecisionContext& context);
-    std::pair<uint32_t, uint8_t> calculate_optimal_bid(
-        const liarsdice::ai::AIDecisionContext& context);
-};
+#include <liarsdice/core/game.hpp>
+#include <liarsdice/ai/ai_player.hpp>
+
+// Create game
+liarsdice::core::Game game;
+
+// Add human player
+auto human = std::make_shared<liarsdice::core::Player>(1, "Human");
+game.add_player(human);
+
+// Add various AI opponents
+game.add_player(std::make_shared<liarsdice::ai::EasyAI>(2));
+game.add_player(std::make_shared<liarsdice::ai::MediumAI>(3));
+game.add_player(std::make_shared<liarsdice::ai::HardAI>(4));
+
+// Start game - AI players will automatically make decisions
+game.start_game();
 ```
 
-## AI Strategy Guidelines
+### AI Decision Flow
 
-### Decision Making
+During gameplay, AI players automatically:
 
-1. **Risk Assessment**: Evaluate the probability of success for each action
-2. **Opponent Modeling**: Track opponent behavior patterns
-3. **Bluff Detection**: Analyze bid patterns for inconsistencies
-4. **Strategic Timing**: Consider when to call liar vs continue bidding
+1. Make guesses when it's their turn
+2. Decide whether to call liar on opponents' guesses
+3. Simulate thinking time for realism
+4. Adapt strategy based on game state
 
-### Performance Considerations
+## Boost Dependencies
 
-- AI decisions should complete within the time limit
-- Use caching for expensive calculations
-- Consider using async computation for complex strategies
-- Profile AI performance in release builds
+The AI system uses:
 
-### Testing AI Strategies
+- **Boost.Random**: For probabilistic decision-making
+    - `boost::random::mt19937`: Mersenne Twister RNG
+    - `boost::random::uniform_real_distribution`: For probability checks
+    - `boost::random::uniform_int_distribution`: For dice face selection
 
-```cpp
-// Unit test example
-TEST_CASE("AI makes valid decisions") {
-    liarsdice::ai::EasyAIStrategy ai;
-    liarsdice::ai::AIDecisionContext context{
-        .current_bid = liarsdice::Bid{2, 4, 1},
-        .total_dice_count = 10,
-        .ai_dice = {/* dice values */},
-        // ... other context
-    };
-    
-    auto decision = ai.make_decision(context);
-    
-    std::visit(overloaded{
-        [&](const liarsdice::ai::AIGuessAction& guess) {
-            // Verify bid is valid and higher than current
-            REQUIRE(guess.quantity > context.current_bid->quantity || 
-                   (guess.quantity == context.current_bid->quantity && 
-                    guess.face_value > context.current_bid->face_value));
-        },
-        [&](const liarsdice::ai::AICallLiarAction&) {
-            // Verify call liar is reasonable
-            REQUIRE(context.current_bid.has_value());
-        }
-    }, decision);
-}
-```
+## Performance Considerations
 
-## Thread Safety
+- AI calculations are lightweight and suitable for real-time gameplay
+- Thinking time simulation uses `std::this_thread::sleep_for`
+- Random number generators are mutable for const-correctness
+- No heavy computation or machine learning overhead
 
-- AI strategies should be stateless or use thread-safe internal state
-- The factory is thread-safe for strategy creation
-- AI players are not thread-safe by default
+## Future Enhancements
+
+Potential improvements could include:
+
+- Learning from game history
+- Pattern recognition for opponent behavior
+- Tournament-style AI competitions
+- Configurable personality traits (cautious, aggressive, unpredictable)
 
 ## See Also
 
-- [Core Game API](core.md) - For game mechanics and player interfaces
-- [Technical Design: AI Strategy System](../technical/commit-6-ai-strategy.md) - Architecture details
-- [Configuration System API](configuration.md) - For AI configuration management
+- [Core Game API](core.md) — For base Player class and game mechanics
+- [Application](../architecture/application.md) — For game loop integration
