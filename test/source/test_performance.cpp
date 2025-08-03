@@ -159,7 +159,7 @@ BOOST_AUTO_TEST_CASE(PoolAllocatorVsStandard) {
     
     // Pool allocator
     auto pool_time = measure_time([&]() {
-        std::vector<int*, FastPoolAllocator<int>> ptrs;
+        std::vector<int*> ptrs;
         FastPoolAllocator<int> alloc;
         ptrs.reserve(100);
         
@@ -453,7 +453,7 @@ BOOST_AUTO_TEST_CASE(PoolAllocatorStatistics) {
     FastPoolAllocator<int>::release_memory();
     
     {
-        std::vector<int*, FastPoolAllocator<int>> vec;
+        std::vector<int*> vec;
         FastPoolAllocator<int> alloc;
         
         // Allocate many objects

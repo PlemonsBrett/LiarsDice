@@ -83,7 +83,9 @@ public:
     
     // Get pool statistics
     static std::size_t get_allocated_count() {
-        return pool_type::get_requested_size() / sizeof(T);
+        // Note: boost::singleton_pool doesn't provide direct allocated count
+        // This is a placeholder for the interface
+        return 0;
     }
     
     static void release_memory() {
@@ -303,7 +305,12 @@ public:
     const Stats& get_stats() const { return stats_; }
     
     void reset() {
-        stats_ = Stats{};
+        stats_.allocations.store(0);
+        stats_.deallocations.store(0);
+        stats_.bytes_allocated.store(0);
+        stats_.bytes_deallocated.store(0);
+        stats_.peak_usage.store(0);
+        stats_.current_usage.store(0);
     }
     
     void print_report() const {
