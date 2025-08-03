@@ -104,6 +104,16 @@ target_link_libraries(test_statistics
 )
 set_target_properties(test_statistics PROPERTIES CXX_STANDARD 20)
 
+# Performance tests
+add_executable(test_performance source/test_performance.cpp)
+target_link_libraries(test_performance
+        PRIVATE
+        LiarsDice::LiarsDice
+        Boost::unit_test_framework
+        Boost::timer
+)
+set_target_properties(test_performance PROPERTIES CXX_STANDARD 20)
+
 # Add tests to CTest
 add_test(NAME DiceTests COMMAND test_dice)
 add_test(NAME PlayerTests COMMAND test_player)
@@ -112,6 +122,7 @@ add_test(NAME GameTests COMMAND test_game)
 add_test(NAME GameStateStorageTests COMMAND test_game_state_storage)
 add_test(NAME DataStructuresTests COMMAND test_data_structures)
 add_test(NAME StatisticsTests COMMAND test_statistics)
+add_test(NAME PerformanceTests COMMAND test_performance)
 # add_test(NAME BoostDITests COMMAND test_boost_di)
 add_test(NAME ServiceContainerTests COMMAND test_service_container)
 

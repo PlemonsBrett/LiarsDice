@@ -46,6 +46,14 @@ CPMAddPackage(
   DOWNLOAD_ONLY YES
 )
 
+# Add Boost.SIMD (header-only SIMD library)
+CPMAddPackage(
+        NAME boost-simd
+        GITHUB_REPOSITORY agenium-scale/boost.simd
+        GIT_TAG develop
+        DOWNLOAD_ONLY YES
+)
+
 CPMAddPackage(
   NAME fmt
   GIT_TAG 10.2.1
@@ -90,6 +98,11 @@ target_link_libraries(${PROJECT_NAME}
 if(boost-di_ADDED)
   target_include_directories(${PROJECT_NAME} PRIVATE ${boost-di_SOURCE_DIR}/include)
 endif()
+
+# Add Boost.SIMD include directory if available
+if (boost-simd_ADDED)
+  target_include_directories(${PROJECT_NAME} PUBLIC ${boost-simd_SOURCE_DIR}/include)
+endif ()
 
 target_include_directories(
   ${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
