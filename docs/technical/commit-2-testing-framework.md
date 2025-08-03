@@ -1,6 +1,6 @@
 # Technical Design Document
 
-## Comprehensive Testing Framework with Catch2
+## Comprehensive Testing Framework with Boost.Test and Robot Framework
 
 ### Document Information
 
@@ -373,97 +373,67 @@ private:
 };
 ```
 
-### Property-Based Testing Framework
+### Robot Framework Test Implementation
 
-#### Generator Implementation
+#### Custom Python Library
 
-```cpp
-namespace generators {
+{% raw %}
 
-template<std::integral T>
-class IntegerGenerator {
-    std::mt19937 gen_{std::random_device{}()};
-    std::uniform_int_distribution<T> dist_;
+```python
+import pexpect
+import time
+from robot.api import logger
+
+class LiarsDiceLibrary:
+    def __init__(self):
+        self.process = None
+        self.timeout = 5
     
-public:
-    IntegerGenerator(T min, T max) : dist_{min, max} {}
+    def start_game(self):
+        """Start the Liar's Dice game"""
+        self.process = pexpect.spawn('./build/bin/liarsdice-cli')
+        self.process.expect('Welcome to Liar\'s Dice!', timeout=self.timeout)
     
-    std::generator<T> generate() {
-        while (true) {
-            co_yield dist_(gen_);
-        }
-    }
-};
-
-template<typename T>
-class VectorGenerator {
-    std::function<T()> element_gen_;
-    std::uniform_int_distribution<size_t> size_dist_;
-    std::mt19937 gen_{std::random_device{}()};
+    def enter_number_of_players(self, count):
+        """Enter the number of players"""
+        self.process.expect('How many players.*:', timeout=self.timeout)
+        self.process.sendline(str(count))
     
-public:
-    VectorGenerator(std::function<T()> elem_gen, 
-                   size_t min_size = 0, 
-                   size_t max_size = 100)
-        : element_gen_{elem_gen}
-        , size_dist_{min_size, max_size} {}
+    def enter_player_name(self, player_num, name):
+        """Enter a player's name"""
+        pattern = f'Enter name for player {player_num}:'
+        self.process.expect(pattern, timeout=self.timeout)
+        self.process.sendline(name)
     
-    std::generator<std::vector<T>> generate() {
-        while (true) {
-            size_t size = size_dist_(gen_);
-            std::vector<T> vec;
-            vec.reserve(size);
-            
-            for (size_t i = 0; i < size; ++i) {
-                vec.push_back(element_gen_());
-            }
-            
-            co_yield vec;
-        }
-    }
-};
-
-} // namespace generators
+    def get_game_output(self):
+        """Get the current game output"""
+        return self.process.before.decode('utf-8')
 ```
 
-#### Property Test Example
+{% endraw %}
 
-```cpp
-PROPERTY_TEST("Dice values are always valid", 
-              "[dice][properties]", 
-              1000) {
-    auto dice_gen = generators::IntegerGenerator<uint8_t>{1, 6};
-    
-    for (auto value : dice_gen.generate() | std::views::take(1000)) {
-        Dice dice{value};
-        
-        REQUIRE(dice.get_value() >= 1);
-        REQUIRE(dice.get_value() <= 6);
-        REQUIRE((dice.is_wild() == (dice.get_value() == 1)));
-    }
-}
+#### Robot Test Suite
 
-PROPERTY_TEST("Game state transitions are valid", 
-              "[game][properties]", 
-              100) {
-    auto player_count_gen = generators::IntegerGenerator<size_t>{2, 8};
-    
-    for (auto player_count : player_count_gen.generate() 
-                            | std::views::take(100)) {
-        auto game = create_game_with_players(player_count);
-        
-        // Property: Game always starts in WAITING state
-        REQUIRE(game->get_state() == GameState::WAITING);
-        
-        // Property: Can't start with < 2 players
-        if (player_count < 2) {
-            REQUIRE(!game->start().has_value());
-        } else {
-            REQUIRE(game->start().has_value());
-            REQUIRE(game->get_state() == GameState::IN_PROGRESS);
-        }
-    }
-}
+```robot
+*** Settings ***
+Library    LiarsDiceLibrary.py
+Test Setup    Start Game
+Test Teardown    Terminate Game
+
+*** Test Cases ***
+Test Valid Player Setup
+    [Documentation]    Test setting up a game with valid players
+    Enter Number Of Players    2
+    Enter Player Name    1    Alice
+    Enter Player Name    2    Bob
+    ${output}=    Get Game Output
+    Should Contain    ${output}    Rolling dice
+
+Test Invalid Player Count
+    [Documentation]    Test handling of invalid player counts
+    Enter Number Of Players    1
+    ${output}=    Get Game Output
+    Should Contain    ${output}    must be between 2 and
 ```
 
 ### Test Data Builders

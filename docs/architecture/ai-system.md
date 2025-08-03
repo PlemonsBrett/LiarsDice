@@ -16,19 +16,27 @@ and play styles.
 
 ## Core Design Patterns
 
-### Strategy Pattern
+### Inheritance-Based AI
 
-The AI system's foundation is the Strategy pattern, which encapsulates different AI algorithms behind a common
-interface.
+The AI system uses inheritance from the base `Player` class to implement computer-controlled players.
 
+{% raw %}
 ```cpp
-class IAIStrategy {
+class AIPlayer : public core::Player {
 public:
-    virtual AIDecision make_decision(const AIDecisionContext& context) = 0;
-    virtual std::string_view get_name() const noexcept = 0;
-    virtual std::unique_ptr<IAIStrategy> clone() const = 0;
+    struct Strategy {
+        double risk_tolerance = 0.5;
+        double bluff_frequency = 0.2;
+        double call_threshold = 0.7;
+        unsigned int think_time_ms = 1000;
+    };
+    
+    core::Guess make_guess(const std::optional<core::Guess>& last_guess) override;
+    bool decide_call_liar(const core::Guess& last_guess) override;
 };
 ```
+
+{% endraw %}
 
 **Benefits**:
 
@@ -37,167 +45,187 @@ public:
 - Each strategy can be tested independently
 - Strategies can be swapped during gameplay
 
-### Factory Pattern with Type Erasure
+### Predefined AI Classes
 
-The `AIStrategyFactory` uses type erasure to store heterogeneous strategy types while maintaining type safety.
+The system provides predefined AI difficulty levels through specialized classes:
 
+{% raw %}
 ```cpp
-class AIStrategyFactory {
-    struct IStrategyHolder {
-        virtual ~IStrategyHolder() = default;
-        virtual std::unique_ptr<IAIStrategy> create() const = 0;
-        virtual std::string_view get_description() const noexcept = 0;
-    };
-    
-    template<typename TStrategy>
-    struct StrategyHolder : IStrategyHolder {
-        std::string description;
-        
-        std::unique_ptr<IAIStrategy> create() const override {
-            return std::make_unique<TStrategy>();
-        }
-    };
-    
-    std::unordered_map<std::string, std::unique_ptr<IStrategyHolder>> strategies_;
+class EasyAI : public AIPlayer {
+public:
+    explicit EasyAI(unsigned int id)
+        : AIPlayer(id, "Easy AI", {
+            .risk_tolerance = 0.2,
+            .bluff_frequency = 0.1,
+            .call_threshold = 0.8,
+            .think_time_ms = 500
+        }) {}
+};
+
+class MediumAI : public AIPlayer {
+public:
+    explicit MediumAI(unsigned int id)
+        : AIPlayer(id, "Medium AI", {
+            .risk_tolerance = 0.5,
+            .bluff_frequency = 0.2,
+            .call_threshold = 0.7,
+            .think_time_ms = 1000
+        }) {}
 };
 ```
 
+{% endraw %}
+
 **Benefits**:
 
-- Runtime registration of strategies
-- No compile-time dependencies between factory and concrete strategies
-- Type-safe creation without switch statements
-- Supports plugin-style architecture
+- Simple inheritance model
+- Clear difficulty progression
+- Easy to instantiate and use
+- Integrates seamlessly with game loop
 
-### Variant Pattern for Type-Safe Decisions
+### Virtual Method Override Pattern
 
-AI decisions use `std::variant` to ensure type safety and enable pattern matching.
+AI behavior is implemented by overriding virtual methods from the base Player class:
 
+{% raw %}
 ```cpp
-using AIDecision = std::variant<AIGuessAction, AICallLiarAction>;
+// In AIPlayer class
+core::Guess make_guess(const std::optional<core::Guess>& last_guess) override {
+    simulate_thinking();
+    
+    double random = probability_dist_(rng_);
+    if (random < strategy_.bluff_frequency) {
+        return generate_bluff_guess(last_guess);
+    } else {
+        return generate_safe_guess(last_guess);
+    }
+}
 
-// Usage with std::visit
-std::visit(overloaded{
-    [&](const AIGuessAction& guess) { /* handle guess */ },
-    [&](const AICallLiarAction&) { /* handle call */ }
-}, decision);
+bool decide_call_liar(const core::Guess& last_guess) override {
+    simulate_thinking();
+    double probability = calculate_probability(last_guess, total_dice_in_game);
+    return probability < (1.0 - strategy_.call_threshold);
+}
 ```
 
+{% endraw %}
+
 **Benefits**:
 
-- Compile-time exhaustiveness checking
-- No runtime type identification needed
-- Clear API contract for decision types
-- Efficient implementation (no virtual dispatch)
+- Natural integration with game flow
+- AI players work exactly like human players
+- No special handling required in game logic
+- Simple and straightforward implementation
 
 ## Component Architecture
 
-### Decision Context
+### AI Decision Information
 
-The `AIDecisionContext` provides all information needed for decision-making:
-
-```
-AIDecisionContext
-├── Game State
-│   ├── current_bid
-│   ├── total_dice_count
-│   └── bid_history
-├── AI Player State
-│   ├── ai_player_id
-│   ├── ai_dice
-│   └── ai_dice_count
-├── Opponent Information
-│   └── opponents[]
-│       ├── player_id
-│       ├── dice_count
-│       └── previous_bids
-└── Meta Information
-    ├── round_number
-    └── time_limit
-```
-
-### Strategy Hierarchy
+The AI has access to game state through the Player class interface:
 
 ```
-IAIStrategy (interface)
-├── EasyAIStrategy
-│   ├── Simple heuristics
-│   ├── Basic probability
-│   └── Configurable risk
-├── MediumAIStrategy
-│   ├── Statistical analysis
-│   ├── Opponent modeling
-│   ├── Pattern recognition
-│   └── Bayesian inference
-└── (Future) HardAIStrategy
-    ├── Monte Carlo simulation
-    ├── Game tree search
-    └── Machine learning
+AI Information Access
+├── Own State
+│   ├── dice_ (vector of own dice)
+│   ├── get_dice_count()
+│   └── is_eliminated()
+├── Game Information
+│   ├── last_guess (previous player's guess)
+│   ├── total_dice_in_game (calculated)
+│   └── number_of_players (from game)
+└── Random Number Generation
+    ├── boost::random::mt19937 (RNG)
+    ├── uniform_real_distribution (0.0-1.0)
+    └── uniform_int_distribution (1-6)
+```
+
+### AI Class Hierarchy
+
+```
+core::Player (base class)
+└── ai::AIPlayer
+    ├── ai::EasyAI
+    │   ├── Low risk tolerance (0.2)
+    │   ├── Minimal bluffing (0.1)
+    │   └── Conservative play
+    ├── ai::MediumAI
+    │   ├── Balanced risk (0.5)
+    │   ├── Moderate bluffing (0.2)
+    │   └── Strategic play
+    └── ai::HardAI
+        ├── High risk tolerance (0.8)
+        ├── Frequent bluffing (0.3)
+        └── Aggressive play
 ```
 
 ## Implementation Details
 
-### Easy AI Strategy
+### Easy AI Implementation
 
 The Easy AI uses simple heuristics and basic probability calculations:
 
-1. **Bid Generation**:
-    - Count own dice matching potential bid
+1. **Guess Generation**:
+   - Count own dice matching potential guess
     - Estimate opponent dice using uniform distribution
     - Apply risk tolerance to adjust estimates
-    - Consider bluff frequency for occasional aggressive bids
+   - Consider bluff frequency for occasional aggressive guesses
 
 2. **Call Decision**:
-    - Calculate probability of current bid being true
+   - Calculate probability of current guess being true
     - Compare against call threshold
     - Factor in game state (remaining dice, players)
 
-### Medium AI Strategy
+### Medium AI Implementation
 
-The Medium AI employs advanced statistical techniques:
+The Medium AI uses balanced statistical techniques:
 
-1. **Opponent Modeling**:
+1. **Enhanced Probability Calculation**:
+   {% raw %}
    ```cpp
-   struct OpponentModel {
-       PlayerID player_id;
-       double aggression_level;      // 0.0 to 1.0
-       double bluff_frequency;       // Observed bluff rate
-       std::vector<BidPattern> patterns;  // Detected patterns
-       BayesianEstimator estimator;  // Probability updates
-   };
+   double calculate_probability(const core::Guess& guess, size_t total_dice) const {
+       // Count our matching dice
+       auto my_matches = count_matching_dice(guess.face);
+       
+       // Calculate expected matches in unknown dice
+       size_t unknown_dice = total_dice - get_dice_count();
+       double expected_matches = unknown_dice / 6.0;
+       
+       // Apply strategy adjustments
+       return (my_matches + expected_matches) / guess.count;
+   }
    ```
+   {% endraw %}
 
-2. **Pattern Recognition**:
-    - Tracks bid sequences for each opponent
-    - Identifies common patterns (e.g., always increasing by 1)
-    - Weights patterns by recency and frequency
+2. **Strategic Guessing**:
+   - Balances between safe and aggressive plays
+   - Considers game state when making decisions
+   - Moderate bluffing based on configuration
 
-3. **Bayesian Inference**:
-    - Updates beliefs about opponent dice based on bids
-    - Incorporates prior knowledge from opponent models
-    - Adjusts probabilities based on game events
+3. **Adaptive Calling**:
+   - Adjusts call threshold based on game progress
+   - More likely to call when fewer dice remain
+   - Considers risk vs reward
 
 ### Decision Flow
 
 ```
-make_decision()
-├── Analyze Context
-│   ├── Parse current game state
-│   ├── Update opponent models
-│   └── Calculate time constraints
-├── Generate Candidates
-│   ├── Possible bids
-│   ├── Call liar option
-│   └── Apply strategy filters
-├── Evaluate Options
-│   ├── Calculate probabilities
-│   ├── Apply risk tolerance
-│   └── Consider bluff value
-├── Select Best Action
-│   ├── Rank by expected value
-│   ├── Add randomization
-│   └── Apply time delay
-└── Return Decision
+make_guess() / decide_call_liar()
+├── Simulate Thinking
+│   ├── Apply configured delay
+│   └── Make AI feel human-like
+├── Analyze Situation
+│   ├── Count own dice
+│   ├── Calculate total dice
+│   └── Check last guess
+├── Apply Strategy
+│   ├── Use risk tolerance
+│   ├── Consider bluff frequency
+│   └── Apply call threshold
+├── Generate Decision
+│   ├── For guesses: safe vs bluff
+│   ├── For calls: probability check
+│   └── Apply randomization
+└── Return Result
 ```
 
 ## Performance Considerations
@@ -228,30 +256,32 @@ make_decision()
     - Skip complex calculations for obvious decisions
     - Use heuristics before full analysis
 
-3. **Incremental Updates**:
-    - Update opponent models incrementally
-    - Reuse calculations from previous turns
+3. **Boost.Random Efficiency**:
+   - Thread-safe random number generation
+   - Reuse RNG instance across calls
 
 ## Configuration System
 
-AI strategies support runtime configuration through structured config objects:
+AI behavior is configured through the Strategy struct:
 
+{% raw %}
 ```cpp
-struct EasyAIConfig {
-    double risk_tolerance = 0.3;
-    double bluff_frequency = 0.2;
-    double call_threshold = 0.7;
-    bool use_statistical_analysis = true;
-    std::chrono::milliseconds decision_delay{500};
+struct Strategy {
+    double risk_tolerance = 0.5;      // 0.0 = conservative, 1.0 = aggressive
+    double bluff_frequency = 0.2;     // How often to bluff
+    double call_threshold = 0.7;      // Probability threshold to call liar
+    unsigned int think_time_ms = 1000; // Simulated thinking time
 };
 ```
 
-Configuration can be loaded from:
+{% endraw %}
 
-- JSON files
-- Environment variables
-- Runtime API calls
-- Game difficulty settings
+Configuration is set through:
+
+- Constructor parameters for predefined AI
+- Custom Strategy struct for custom AI
+- Direct instantiation with specific values
+- UI configuration (via UIConfig class)
 
 ## Testing Strategy
 
@@ -330,13 +360,13 @@ Configuration can be loaded from:
 
 ## Best Practices
 
-### For Strategy Implementers
+### For AI Implementers
 
-1. **Stateless Design**: Strategies should not store game state
-2. **Deterministic Testing**: Support seed-based randomization
-3. **Time Awareness**: Respect time limits in context
-4. **Clear Naming**: Use descriptive names for strategies
-5. **Configuration**: Expose tunable parameters
+1. **Inherit from AIPlayer**: Extend the base AI class
+2. **Override Virtual Methods**: Implement make_guess and decide_call_liar
+3. **Use Boost.Random**: For all randomization needs
+4. **Respect Think Time**: Add appropriate delays
+5. **Configuration**: Use the Strategy struct for parameters
 
 ### For System Integrators
 
@@ -348,7 +378,8 @@ Configuration can be loaded from:
 
 ## Conclusion
 
-The AI system architecture provides a solid foundation for implementing intelligent computer opponents. The combination
-of design patterns creates a system that is both powerful and maintainable, supporting everything from simple rule-based
-AI to sophisticated statistical analysis. The architecture's extensibility ensures that new AI strategies can be added
-as the game evolves, while maintaining backward compatibility and performance standards.
+The AI system architecture provides a straightforward and effective implementation of computer opponents using
+inheritance
+and virtual methods. The use of Boost libraries ensures reliable random number generation and consistent behavior. The
+simple Strategy configuration struct makes it easy to tune AI behavior, while the predefined difficulty classes provide
+ready-to-use opponents for players of all skill levels.

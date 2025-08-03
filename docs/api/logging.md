@@ -1,246 +1,333 @@
-# Logging System API Reference
+# Logging System API
 
 ## Overview
 
-The LiarsDice logging system provides structured, type-safe logging with correlation tracking and performance monitoring. Built on spdlog with modern C++23 features.
+The LiarsDice logging system uses Boost.Log to provide comprehensive logging with severity levels, file rotation, and
+component-specific loggers. The system supports both console and file output with configurable formatting.
 
 ## Core Components
 
-### LoggerManager
+### Logger Interface
 
-Thread-safe singleton managing all logger instances.
+**Location**: `include/liarsdice/logging/logger.hpp`
 
+The `ILogger` interface provides the core logging functionality:
+
+{% raw %}
+```cpp
+namespace liarsdice::logging {
+    
+    // Severity levels from Boost.Log
+    using Severity = boost::log::trivial::severity_level;
+    
+    class ILogger {
+    public:
+        virtual ~ILogger() = default;
+        
+        virtual void trace(const std::string& message) = 0;
+        virtual void debug(const std::string& message) = 0;
+        virtual void info(const std::string& message) = 0;
+        virtual void warning(const std::string& message) = 0;
+        virtual void error(const std::string& message) = 0;
+        virtual void fatal(const std::string& message) = 0;
+        
+        // Formatted logging
+        template<typename... Args>
+        void debug_fmt(const std::string& format, Args&&... args);
+        
+        template<typename... Args>
+        void info_fmt(const std::string& format, Args&&... args);
+        
+        template<typename... Args>
+        void error_fmt(const std::string& format, Args&&... args);
+    };
+}
+```
+
+{% endraw %}
+
+### Logger Configuration
+
+{% raw %}
+```cpp
+struct LoggerConfig {
+    Severity console_level = Severity::info;
+    Severity file_level = Severity::debug;
+    std::string log_directory = "logs";
+    std::string log_filename = "liarsdice_%Y%m%d_%H%M%S.log";
+    size_t max_file_size = 10 * 1024 * 1024; // 10MB
+    size_t max_files = 5;
+    bool enable_console = true;
+    bool enable_file = true;
+    bool auto_flush = true;
+};
+```
+
+{% endraw %}
+
+### Logger Manager
+
+The `LoggerManager` class provides centralized logger management:
+
+{% raw %}
 ```cpp
 class LoggerManager {
 public:
     static LoggerManager& instance();
-    void initialize(const LoggerConfig& config);
-    std::shared_ptr<ILogger> get_logger();
-    std::shared_ptr<ILogger> get_component_logger(const std::string& component);
+    
+    void initialize(const LoggerConfig& config = {});
     void shutdown();
-};
-```
-
-#### Methods
-
-- **`instance()`**: Get singleton instance
-- **`initialize(config)`**: Initialize with configuration
-- **`get_logger()`**: Get default logger
-- **`get_component_logger(component)`**: Get component-specific logger
-- **`shutdown()`**: Clean shutdown
-
-### ILogger Interface
-
-Core logging interface with structured logging support.
-
-```cpp
-class ILogger {
-public:
-    virtual void log_structured(spdlog::level::level_enum level,
-                               const LogContext& context,
-                               const std::string& event_type,
-                               const std::string& message) const = 0;
     
-    template<typename... Args>
-    void info(const std::string& format, Args&&... args) const;
+    std::shared_ptr<ILogger> get_logger(const std::string& name = "default");
+    void set_global_level(Severity level);
+    void set_console_level(Severity level);
+    void set_file_level(Severity level);
     
-    template<typename... Args>
-    void debug(const std::string& format, Args&&... args) const;
-    
-    template<typename... Args>
-    void warn(const std::string& format, Args&&... args) const;
-    
-    template<typename... Args>
-    void error(const std::string& format, Args&&... args) const;
+private:
+    LoggerManager() = default;
+    void setup_console_sink(const LoggerConfig& config);
+    void setup_file_sink(const LoggerConfig& config);
+    void setup_formatter();
 };
 ```
 
-### LogContext
-
-Structured logging context for correlation and metadata.
-
-```cpp
-struct LogContext {
-    std::string component;
-    uint64_t correlation_id{0};
-    std::optional<std::string> user_id;
-    std::optional<std::string> session_id;
-    std::optional<std::string> request_id;
-    std::chrono::system_clock::time_point timestamp{std::chrono::system_clock::now()};
-    std::source_location location{std::source_location::current()};
-};
-```
-
-### LoggerConfig
-
-Configuration structure for logger initialization.
-
-```cpp
-struct LoggerConfig {
-    std::string environment{"development"};
-    spdlog::level::level_enum log_level{spdlog::level::info};
-    bool async_logging{true};
-    bool json_format{false};
-    bool console_output{true};
-    std::optional<std::string> file_path;
-    std::size_t async_queue_size{8192};
-    std::size_t worker_threads{1};
-    std::chrono::milliseconds flush_interval{std::chrono::milliseconds(100)};
-};
-```
-
-## Logging Macros
-
-### Component-Specific Macros
-
-```cpp
-// Game logging
-GAME_LOG_INFO(message, ...);
-GAME_LOG_DEBUG(message, ...);
-GAME_LOG_WARN(message, ...);
-GAME_LOG_ERROR(message, ...);
-
-// Dice logging
-DICE_LOG_INFO(message, ...);
-DICE_LOG_DEBUG(message, ...);
-DICE_LOG_WARN(message, ...);
-DICE_LOG_ERROR(message, ...);
-
-// Player logging
-PLAYER_LOG_INFO(message, ...);
-PLAYER_LOG_DEBUG(message, ...);
-PLAYER_LOG_WARN(message, ...);
-PLAYER_LOG_ERROR(message, ...);
-
-// Performance logging
-PERF_LOG_INFO(message, ...);
-PERF_LOG_DEBUG(message, ...);
-PERF_TIMER(operation_name);
-```
-
-### Correlation Tracking
-
-```cpp
-// Generate new correlation ID
-auto id = NEW_CORRELATION_ID();
-
-// Set correlation scope (RAII)
-WITH_CORRELATION_ID(logger, correlation_id);
-```
-
-## Convenience Functions
-
-```cpp
-// Get pre-configured loggers
-std::shared_ptr<ILogger> get_default_logger();
-std::shared_ptr<ILogger> get_game_logger();
-std::shared_ptr<ILogger> get_dice_logger();
-std::shared_ptr<ILogger> get_player_logger();
-std::shared_ptr<ILogger> get_performance_logger();
-```
-
-## RAII System Management
-
-```cpp
-class LoggingSystem {
-public:
-    explicit LoggingSystem(const std::string& environment);
-    ~LoggingSystem(); // Automatic cleanup
-};
-```
+{% endraw %}
 
 ## Usage Examples
 
 ### Basic Logging
 
+{% raw %}
 ```cpp
-#include "liarsdice/logging/logging.hpp"
+#include <liarsdice/logging/logger.hpp>
 
-// Initialize logging system
-LoggingSystem logging("production");
+// Get logger instance
+auto logger = liarsdice::logging::LoggerManager::instance().get_logger("game");
 
-// Simple logging
-GAME_LOG_INFO("Game started with {} players", player_count);
-DICE_LOG_DEBUG("Rolling dice: result = {}", result);
+// Log messages at different severity levels
+logger->trace("Detailed trace information");
+logger->debug("Debug information");
+logger->info("Game started");
+logger->warning("Low dice count");
+logger->error("Invalid move attempted");
+logger->fatal("Critical game error");
 ```
 
-### Structured Logging
+{% endraw %}
 
+### Formatted Logging
+
+{% raw %}
 ```cpp
-auto logger = get_game_logger();
-LogContext context;
-context.component = "game_engine";
-context.user_id = "player123";
-context.session_id = "session456";
+// Use formatted logging methods
+logger->info_fmt("Player {} joined the game", player_name);
+logger->debug_fmt("Dice roll: {}, {}, {}, {}, {}", d1, d2, d3, d4, d5);
+logger->error_fmt("Invalid bid: {} x {}", quantity, face_value);
 
-logger->log_structured(spdlog::level::info, context, 
-                      "game_event", "Player joined game");
+// With boost::format
+logger->info(boost::str(boost::format("Round %1% started with %2% players") 
+    % round_number % player_count));
 ```
 
-### Performance Monitoring
+{% endraw %}
 
+### Component-Specific Loggers
+
+{% raw %}
 ```cpp
-PERF_TIMER("dice_roll_operation");
-// ... perform dice roll ...
-// Timer automatically logs duration when scope ends
+// Create loggers for different components
+auto game_logger = LoggerManager::instance().get_logger("game");
+auto ai_logger = LoggerManager::instance().get_logger("ai");
+auto ui_logger = LoggerManager::instance().get_logger("ui");
+
+// Each logger can be used independently
+game_logger->info("Game initialized");
+ai_logger->debug("AI strategy selected: Medium");
+ui_logger->trace("Menu displayed");
 ```
 
-### Correlation Tracking
-
-```cpp
-auto correlation_id = NEW_CORRELATION_ID();
-{
-    WITH_CORRELATION_ID(*get_game_logger(), correlation_id);
-    GAME_LOG_INFO("Starting game operation");
-    // All logs in this scope will include correlation_id
-}
-```
+{% endraw %}
 
 ### Configuration
 
+{% raw %}
 ```cpp
-LoggerConfig config;
-config.environment = "production";
-config.log_level = spdlog::level::warn;
-config.async_logging = true;
-config.json_format = true;
-config.file_path = "/var/log/liarsdice.log";
+// Custom configuration
+liarsdice::logging::LoggerConfig config;
+config.console_level = liarsdice::logging::Severity::debug;
+config.file_level = liarsdice::logging::Severity::trace;
+config.log_directory = "./game_logs";
+config.log_filename = "game_%Y%m%d.log";
+config.max_file_size = 50 * 1024 * 1024; // 50MB
+config.enable_file = true;
 
-LoggerManager::instance().initialize(config);
+// Initialize logging system
+liarsdice::logging::LoggerManager::instance().initialize(config);
 ```
 
-## Conditional Compilation
+{% endraw %}
 
-Logging can be disabled at compile-time:
+### Scoped Attributes
 
-```cmake
-# Disable logging
-set(LIARSDICE_ENABLE_LOGGING OFF)
+{% raw %}
+```cpp
+// Add context to log messages using scoped attributes
+{
+    BOOST_LOG_SCOPED_THREAD_TAG("GameID", game_id);
+    BOOST_LOG_SCOPED_THREAD_TAG("PlayerID", player_id);
+    
+    logger->info("Player made a move");
+    // Log output includes GameID and PlayerID
+}
 ```
 
-When disabled:
-- All macros become no-ops
-- `NEW_CORRELATION_ID()` returns 0
-- No runtime overhead
+{% endraw %}
 
-## Thread Safety
+## Logging Macros
 
-- All logger instances are thread-safe
-- LoggerManager is thread-safe singleton
-- Async logging uses lock-free queues
-- Correlation IDs are thread-local
+For convenience, the system provides logging macros:
 
-## Error Handling
+{% raw %}
+```cpp
+// Direct logging macros
+LOG_TRACE(message)
+LOG_DEBUG(message)
+LOG_INFO(message)
+LOG_WARNING(message)
+LOG_ERROR(message)
+LOG_FATAL(message)
 
-- Invalid configurations log warnings and use defaults
-- Failed file operations fall back to console output
-- Exceptions in user code don't affect the logging system
-- Graceful degradation when spdlog unavailable
+// Component-specific macros
+GAME_LOG_INFO(message)
+GAME_LOG_DEBUG(message)
+GAME_LOG_ERROR(message)
+
+AI_LOG_INFO(message)
+AI_LOG_DEBUG(message)
+
+UI_LOG_INFO(message)
+UI_LOG_TRACE(message)
+```
+
+{% endraw %}
+
+## Log Format
+
+The default log format includes:
+
+{% raw %}
+```
+[Timestamp] [Severity] [Thread] [Component] Message
+
+Example:
+[2025-01-15 14:32:15.123] [INFO] [0x7fff8b3a5380] [game] New game started with 4 players
+[2025-01-15 14:32:15.456] [DEBUG] [0x7fff8b3a5380] [ai] AI player analyzing game state
+[2025-01-15 14:32:15.789] [ERROR] [0x7fff8b3a5380] [game] Invalid bid: quantity exceeds total dice
+```
+
+{% endraw %}
+
+## File Rotation
+
+The logging system supports automatic file rotation:
+
+- **Size-based rotation**: Files rotate when reaching `max_file_size`
+- **Count-based cleanup**: Keeps only the most recent `max_files` log files
+- **Time-based naming**: Log files include timestamp in filename
 
 ## Performance Considerations
 
-- Async logging minimizes blocking
-- Format strings evaluated only when needed
-- Correlation IDs use atomic counters
-- RAII objects have minimal overhead
-- Compile-time log level optimization available
+- **Asynchronous logging**: Available through Boost.Log async frontend
+- **Severity filtering**: Messages below threshold are not processed
+- **Auto-flush**: Configurable for debugging vs. performance
+- **Thread-safe**: All logging operations are thread-safe
+
+## Integration with Game Components
+
+### Game Class Integration
+
+{% raw %}
+```cpp
+class Game {
+private:
+    std::shared_ptr<ILogger> logger_;
+    
+public:
+    Game() : logger_(LoggerManager::instance().get_logger("game")) {
+        logger_->info("Game instance created");
+    }
+    
+    void start_round() {
+        logger_->info_fmt("Starting round {}", current_round_);
+        // Game logic...
+    }
+};
+```
+
+{% endraw %}
+
+### AI Integration
+
+{% raw %}
+```cpp
+class AIPlayer : public Player {
+private:
+    std::shared_ptr<ILogger> logger_;
+    
+public:
+    AIPlayer(unsigned int id) 
+        : Player(id, "AI"), 
+          logger_(LoggerManager::instance().get_logger("ai")) {
+        logger_->debug_fmt("AI player {} created", id);
+    }
+    
+    Guess make_guess(const std::optional<Guess>& last_guess) override {
+        logger_->debug("AI analyzing game state");
+        // AI logic...
+        logger_->info_fmt("AI decided to bid {} x {}", 
+                         guess.count, guess.face);
+        return guess;
+    }
+};
+```
+
+{% endraw %}
+
+## Error Handling
+
+{% raw %}
+
+```cpp
+try {
+    // Game operation
+} catch (const std::exception& e) {
+    logger->error_fmt("Game error: {}", e.what());
+    // Additional error handling
+}
+```
+
+{% endraw %}
+
+## Best Practices
+
+1. **Use appropriate severity levels**:
+    - `TRACE`: Very detailed information, typically disabled
+    - `DEBUG`: Detailed information for debugging
+    - `INFO`: General informational messages
+    - `WARNING`: Warning messages for recoverable issues
+    - `ERROR`: Error messages for serious problems
+    - `FATAL`: Critical errors requiring immediate attention
+
+2. **Component-specific loggers**: Use separate loggers for different subsystems
+
+3. **Structured logging**: Include relevant context in log messages
+
+4. **Performance**: Disable verbose logging in production builds
+
+5. **Security**: Never log sensitive information (passwords, personal data)
+
+## See Also
+
+- [Boost.Log Documentation](https://www.boost.org/doc/libs/release/libs/log/doc/html/index.html)
+- [Core Game API](core.md) - Game component integration
+- [AI System](ai.md) - AI logging integration

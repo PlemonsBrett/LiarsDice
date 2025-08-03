@@ -2,7 +2,9 @@
 
 ## Overview
 
-This document describes the architectural design and rationale behind the LiarsDice logging and configuration systems, implemented as part of Commits 3 and 4. Both systems follow modern C++23 design principles and provide enterprise-grade functionality.
+This document describes the architectural design and rationale behind the LiarsDice logging and configuration systems.
+The logging system uses Boost.Log for structured logging with severity levels, while the configuration system uses
+Boost.PropertyTree for hierarchical configuration management.
 
 ## Design Principles
 
@@ -190,25 +192,29 @@ using ConfigVariant = std::variant<
 - Command-line override capability
 - Sensible defaults always available
 
-#### 4. C++23 Concepts for Type Constraints
+#### 4. Boost.Log Severity Levels
 
-**Rationale**: Compile-time validation of configuration value types.
+**Rationale**: Structured logging with configurable severity filtering.
 
 **Benefits**:
-- Clear error messages for unsupported types
-- Documentation through code
-- Prevention of runtime type errors
-- Better IDE support and tooling
+
+- Standard severity levels (trace, debug, info, warning, error, fatal)
+- Runtime filtering by severity
+- Per-component severity configuration
+- File rotation and size limits
 
 **Example**:
+{% raw %}
 ```cpp
-template<typename T>
-concept ConfigValueType = requires {
-    std::default_initializable<std::remove_cvref_t<T>>;
-    std::copyable<std::remove_cvref_t<T>>;
-    std::equality_comparable<std::remove_cvref_t<T>>;
-};
+namespace logging = boost::log;
+namespace sinks = boost::log::sinks;
+namespace keywords = boost::log::keywords;
+
+BOOST_LOG_TRIVIAL(info) << "Game started";
+BOOST_LOG_TRIVIAL(error) << "Failed to load configuration";
 ```
+
+{% endraw %}
 
 ## Cross-System Integration
 
