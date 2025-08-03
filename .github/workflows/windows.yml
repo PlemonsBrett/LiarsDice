@@ -2,37 +2,64 @@ name: Windows
 
 on:
   push:
-    branches:
-      - master
-      - main
+    branches: [ main ]
   pull_request:
-    branches:
-      - master
-      - main
-
-env:
-  CTEST_OUTPUT_ON_FAILURE: 1
-  CPM_SOURCE_CACHE: ${{ github.workspace }}/cpm_modules
+    branches: [ main ]
 
 jobs:
-  build:
+  build-and-test:
     runs-on: windows-latest
-
+    strategy:
+      matrix:
+        build_type: [Debug, Release]
+        
     steps:
-      - uses: actions/checkout@v3
-
-      - uses: actions/cache@v3
-        with:
-          path: "**/cpm_modules"
-          key: ${{ github.workflow }}-cpm-modules-${{ hashFiles('**/CMakeLists.txt', '**/*.cmake') }}
-
-      - name: configure
-        run: cmake -Stest -Bbuild
-
-      - name: build
-        run: cmake --build build --config Debug -j4
-
-      - name: test
-        run: |
-          cd build
-          ctest --build-config Debug
+    - uses: actions/checkout@v4
+    
+    - name: Install Boost
+      uses: MarkusJx/install-boost@v2.4.5
+      id: install-boost
+      with:
+        boost_version: 1.83.0
+        platform_version: 2022
+        toolset: msvc
+        
+    - name: Configure CMake
+      run: |
+        cmake -B build -S . `
+          -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} `
+          -DBoost_ROOT=${{ steps.install-boost.outputs.BOOST_ROOT }}
+      
+    - name: Build
+      run: cmake --build build --config ${{ matrix.build_type }} -j
+      
+    - name: Run unit tests
+      working-directory: build/test
+      shell: cmd
+      run: |
+        for %%f in (test_*.exe) do (
+          echo Running %%f...
+          %%f
+        )
+        
+    - name: Setup Python for Robot tests
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        
+    - name: Install Robot Framework
+      run: |
+        pip install robotframework==7.0 pexpect==4.9.0 psutil==5.9.8
+        
+    - name: Run Robot Framework tests  
+      run: |
+        robot --variable CLI_PATH:${{ github.workspace }}\build\standalone\liarsdice.exe `
+              --outputdir test\robot\results `
+              test\robot\liarsdice_tests.robot
+              
+    - name: Upload test results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: robot-results-windows-${{ matrix.build_type }}
+        path: test/robot/results/
