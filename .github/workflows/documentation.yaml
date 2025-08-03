@@ -2,8 +2,11 @@ name: Documentation
 
 on:
   push:
+    branches: [ main ]
     tags:
       - "*"
+  pull_request:
+    branches: [ main ]
 
 env:
   CPM_SOURCE_CACHE: ${{ github.workspace }}/cpm_modules
@@ -11,35 +14,37 @@ env:
 permissions:
   contents: write
 
-
 jobs:
-  build:
+  build-docs:
     name: Build and publish documentation
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - uses: actions/cache@v3
         with:
           path: "**/cpm_modules"
           key: ${{ github.workflow }}-cpm-modules-${{ hashFiles('**/CMakeLists.txt', '**/*.cmake') }}
 
-      - name: Install python dependencies
+      - name: Install dependencies
         run: |
-          pip3 install jinja2==3.1.6 Pygments==2.19.1
+          sudo apt-get update
+          sudo apt-get install -y libboost-all-dev
+          pip3 install jinja2 Pygments sphinx sphinx-rtd-theme breathe
 
       - name: Install Doxygen
         uses: ssciwr/doxygen-install@v1
         with:
-          version: "1.13.2"
+          version: "1.10.0"
 
-      - name: Build
+      - name: Configure and build docs
         run: |
-          cmake -Sdocumentation -Bbuild
+          cmake -S. -Bbuild -DLIARSDICE_BUILD_DOCS=ON -DLIARSDICE_BUILD_TESTS=OFF
           cmake --build build --target GenerateDocs
 
-      - name: Publish
+      - name: Publish to GitHub Pages
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/'))
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./build/doxygen/html
+          publish_dir: ./build/documentation/doxygen/html

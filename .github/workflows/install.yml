@@ -1,42 +1,45 @@
-name: Install
+name: Install Test
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
   pull_request:
-    branches:
-      - main
+    branches: [ main ]
 
 env:
   CTEST_OUTPUT_ON_FAILURE: 1
   CPM_SOURCE_CACHE: ${{ github.workspace }}/cpm_modules
 
 jobs:
-  build:
+  install-test:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - uses: actions/cache@v3
         with:
           path: "**/cpm_modules"
           key: ${{ github.workflow }}-cpm-modules-${{ hashFiles('**/CMakeLists.txt', '**/*.cmake') }}
 
-      - name: build and install library
+      - name: Install Boost
         run: |
-          cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release
+          sudo apt-get update
+          sudo apt-get install -y libboost-all-dev
+
+      - name: Build and install library
+        run: |
+          cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release -DLIARSDICE_BUILD_TESTS=OFF -DLIARSDICE_BUILD_EXAMPLES=OFF
           sudo cmake --build build --target install
           rm -rf build
 
-      - name: configure
+      - name: Configure test with installed version
         run: cmake -Stest -Bbuild -DTEST_INSTALLED_VERSION=1
 
-      - name: build
+      - name: Build tests
         run: cmake --build build --config Debug -j4
 
-      - name: test
+      - name: Run tests
         run: |
           cd build
-          ctest --build-config Debug
+          ctest --build-config Debug --output-on-failure

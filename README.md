@@ -2,6 +2,8 @@
 
 A modern C++20 implementation of the classic Liar's Dice game using Boost libraries, featuring AI players, comprehensive testing with Robot Framework, and clean architecture.
 
+[![Tests](https://github.com/bplemons/LiarsDice/actions/workflows/test.yml/badge.svg)](https://github.com/bplemons/LiarsDice/actions/workflows/test.yml)
+[![codecov](https://codecov.io/gh/bplemons/LiarsDice/branch/main/graph/badge.svg)](https://codecov.io/gh/bplemons/LiarsDice)
 [![C++20](https://img.shields.io/badge/C%2B%2B-20-blue.svg)](https://en.cppreference.com/w/cpp/20)
 [![CMake](https://img.shields.io/badge/CMake-3.14+-green.svg)](https://cmake.org/)
 [![Boost](https://img.shields.io/badge/Boost-1.70+-orange.svg)](https://www.boost.org/)

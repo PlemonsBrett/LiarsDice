@@ -1,0 +1,180 @@
+/** @page game_rules Game Rules
+
+@section rules_overview Liar's Dice Rules
+
+Liar's Dice is a game of deception, probability, and psychology where players make increasingly bold
+claims about the dice hidden under their cups. The last player with dice remaining wins.
+
+@section basic_rules Basic Rules
+
+@subsection setup Game Setup
+- Each player starts with **5 dice** and **5 points**
+- All players roll their dice secretly at the start of each round
+- Dice values range from 1 to 6
+- **Wild Rule**: 1s are wild and count as any face value
+
+@subsection gameplay Gameplay Flow
+
+1. **Starting a Round**
+   - All players roll their dice secretly
+   - Players can only see their own dice
+   - The first player makes an initial guess
+
+2. **Making a Guess**
+   - A guess consists of: quantity + face value
+   - Example: "three 4s" means at least 3 dice showing 4
+   - Each guess must be higher than the previous:
+     - Higher quantity (any face value), OR
+     - Same quantity with higher face value
+
+3. **Calling Liar**
+   - Instead of guessing, a player can call "liar"
+   - All dice are revealed
+   - The actual count is determined (including wild 1s)
+   - Loser loses points based on the outcome
+
+@subsection winning Winning Conditions
+- Players lose points when they lose a challenge
+- When a player reaches 0 points, they are eliminated
+- The last player with points remaining wins
+
+@section detailed_rules Detailed Rules
+
+@subsection point_system Point System
+
+The point-based elimination system works as follows:
+
+- **Starting Points**: Each player begins with 5 points
+- **Lying Penalty**: Lose 1 point if caught lying
+- **False Accusation**: Lose 2 points for incorrectly calling liar
+- **Elimination**: Players with 0 points are removed from the game
+
+@subsection wild_dice Wild Dice (1s)
+
+The wild dice rule adds strategic depth:
+
+- 1s count as the face value being guessed
+- Example: With dice [1,1,4,4,5], the count for 4s is 4 (two 4s + two 1s)
+- This increases probabilities and enables bolder guesses
+
+@subsection guess_validation Valid Guesses
+
+A guess is valid if it meets these criteria:
+
+1. **Quantity**: Must not exceed total dice in play
+2. **Progression**: Must be higher than previous guess:
+   - More dice (e.g., "four 3s" after "three 6s")
+   - Same quantity, higher face (e.g., "three 5s" after "three 4s")
+3. **Face Value**: Must be between 2 and 6 (1s are wild)
+
+@code{.cpp}
+// Validation logic
+bool is_valid_guess(const Guess& new_guess, const Guess& previous) {
+    if (new_guess.face_value < 1 || new_guess.face_value > 6) 
+        return false;
+    
+    if (new_guess.dice_count > total_dice_in_play) 
+        return false;
+    
+    // Must increase quantity or keep same with higher face
+    return new_guess.dice_count > previous.dice_count ||
+           (new_guess.dice_count == previous.dice_count && 
+            new_guess.face_value > previous.face_value);
+}
+@endcode
+
+@section probability Probability Guide
+
+Understanding probabilities is key to success:
+
+@subsection basic_prob Basic Probabilities
+
+For standard dice (no wilds):
+- Probability of specific face: 1/6 ≈ 16.67%
+- Expected count: (total dice × 1/6)
+
+With wild dice rule:
+- Probability of specific face: 1/3 ≈ 33.33%
+- Expected count: (total dice × 1/3)
+
+@subsection probability_table Probability Table
+
+| Total Dice | Face Count | Probability (with wilds) |
+|------------|------------|-------------------------|
+| 5          | 2+         | 86.8%                   |
+| 5          | 3+         | 53.9%                   |
+| 5          | 4+         | 20.9%                   |
+| 10         | 4+         | 78.5%                   |
+| 10         | 5+         | 55.1%                   |
+| 10         | 6+         | 32.3%                   |
+
+@section strategy Strategy Tips
+
+@subsection basic_strategy Basic Strategy
+
+1. **Conservative Opening**: Start with probable guesses
+2. **Track Information**: Remember what others claim to have
+3. **Bluff Sparingly**: Occasional bluffs keep opponents guessing
+4. **Know the Odds**: Understand when guesses become improbable
+
+@subsection advanced_strategy Advanced Strategy
+
+1. **Pattern Recognition**: 
+   - Watch for player tendencies
+   - Some bluff early, others late
+   - Identify conservative vs aggressive players
+
+2. **Information Management**:
+   - Your guesses reveal information
+   - Sometimes guess what you don't have
+   - Force opponents to reveal their hands
+
+3. **Psychological Warfare**:
+   - Quick calls suggest confidence
+   - Hesitation can induce doubt
+   - Vary your timing and demeanor
+
+4. **End Game**:
+   - With few dice left, exact counts matter
+   - Bluffing becomes riskier
+   - Conservative play often wins
+
+@section variations Game Variations
+
+@subsection common_variants Common Variants
+
+1. **Spot On**: Exact guess earns bonus (everyone else loses a die)
+2. **Passing**: Can pass instead of guessing (limited uses)
+3. **Blind Bidding**: Can increase bid without looking at dice
+4. **Progressive Dice Loss**: Lose dice instead of points
+
+@subsection house_rules Popular House Rules
+
+- **No Wilds**: 1s are not wild (harder game)
+- **Ace High**: 1s are highest value instead of wild
+- **Minimum Bid**: Must start with at least 2 dice
+- **Death Roll**: Eliminated players get one final round
+
+@section examples Example Round
+
+**Setup**: 3 players, each with 5 dice
+
+**Dice Rolls** (hidden):
+- Player 1: [1, 2, 4, 4, 6]
+- Player 2: [1, 1, 3, 5, 5]
+- Player 3: [2, 3, 3, 6, 6]
+
+**Actual Counts** (including wilds):
+- 2s: 2, 3s: 5, 4s: 4, 5s: 4, 6s: 5
+
+**Bidding**:
+1. Player 1: "Three 4s" (safe - has two 4s + one wild)
+2. Player 2: "Four 5s" (aggressive - has two 5s + two wilds)
+3. Player 3: "Five 6s" (bluff - only has two 6s)
+4. Player 1: "Liar!"
+
+**Resolution**: 
+- Actual 6s = 5 (two 6s + three wilds)
+- Player 3's guess was exactly right!
+- Player 1 loses 2 points for false accusation
+*/

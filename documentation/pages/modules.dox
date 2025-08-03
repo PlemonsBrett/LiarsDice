@@ -1,0 +1,85 @@
+/**
+@file modules.dox
+@brief Module organization for Liar's Dice documentation
+*/
+
+/**
+@defgroup core Core Game Components
+@brief Essential game logic and entities
+
+The core module contains the fundamental building blocks of the Liar's Dice game,
+including the game controller, player management, dice handling, and game rules.
+*/
+
+/**
+@defgroup ai Artificial Intelligence
+@brief AI strategies and decision-making systems
+
+The AI module provides various artificial intelligence implementations for computer
+players, from simple heuristics to advanced statistical analysis and pattern recognition.
+*/
+
+/**
+@defgroup config Configuration System  
+@brief Hierarchical configuration management
+
+The configuration module handles loading, parsing, and accessing game configuration
+from various sources including JSON files and environment variables.
+*/
+
+/**
+@defgroup logging Logging Infrastructure
+@brief Structured logging with spdlog
+
+The logging module provides high-performance structured logging with multiple
+output targets, configurable levels, and compile-time filtering.
+*/
+
+/**
+@defgroup data_structures High-Performance Data Structures
+@brief Optimized containers using Boost libraries
+
+Custom data structures optimized for game-specific use cases, including
+trie maps for pattern storage, circular buffers for history, and sparse
+matrices for statistics.
+*/
+
+/**
+@defgroup statistics Statistical Analysis
+@brief Statistical computation and analysis tools
+
+Comprehensive statistical tools including accumulators, histograms, time series
+analysis, and probability distributions for game analytics and AI decision making.
+*/
+
+/**
+@defgroup performance Performance Optimization
+@brief SIMD operations and custom allocators
+
+Performance-critical components including SIMD-accelerated operations,
+custom memory allocators, and profiling utilities.
+*/
+
+/**
+@defgroup di Dependency Injection
+@brief Lightweight dependency injection framework
+
+A simple but effective dependency injection container for managing
+service lifetimes and enabling testability.
+*/
+
+/**
+@defgroup exceptions Exception Handling
+@brief Custom exception hierarchy
+
+Game-specific exceptions for error handling and flow control,
+organized in a hierarchical structure for precise error catching.
+*/
+
+/**
+@defgroup testing Testing Infrastructure
+@brief Unit and integration testing support
+
+Testing utilities and helpers for comprehensive test coverage,
+including mocks, fixtures, and test data generators.
+*/

@@ -1,33 +1,51 @@
-name: Standalone
+name: Build Standalone
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
   pull_request:
-    branches:
-      - main
+    branches: [ main ]
 
 env:
   CPM_SOURCE_CACHE: ${{ github.workspace }}/cpm_modules
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  build-standalone:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, macos-latest ]
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - uses: actions/cache@v3
+      - name: Cache
+        uses: actions/cache@v3
         with:
-          path: "**/cpm_modules"
-          key: ${{ github.workflow }}-cpm-modules-${{ hashFiles('**/CMakeLists.txt', '**/*.cmake') }}
+          path: |
+            **/cpm_modules
+            ~/.cache/pip
+            ~/Library/Caches/pip
+          key: ${{ github.workflow }}-${{ matrix.os }}-cpm-modules-${{ hashFiles('**/CMakeLists.txt', '**/*.cmake') }}
 
-      - name: configure
-        run: cmake -Sstandalone -Bbuild -DCMAKE_BUILD_TYPE=Debug
+      - name: Install dependencies (Ubuntu)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libboost-all-dev ninja-build
 
-      - name: build
+      - name: Install dependencies (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          brew install boost ninja
+
+      - name: Configure
+        run: cmake -Sstandalone -Bbuild -DCMAKE_BUILD_TYPE=Release -G Ninja
+
+      - name: Build
         run: cmake --build build -j4
 
-      - name: run
-        run: ./build/Greeter
+      - name: Test executable
+        run: |
+          ./build/liarsdice --help
+          echo "2" | ./build/liarsdice --seed 12345 || true

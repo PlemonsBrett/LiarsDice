@@ -130,5 +130,18 @@ packageProject(
 
 # ---- Add subdirectories ----
 
+# ---- Options ----
+option(LIARSDICE_BUILD_TESTS "Build tests" ON)
+option(LIARSDICE_BUILD_DOCS "Build documentation" OFF)
+option(LIARSDICE_BUILD_EXAMPLES "Build examples" ON)
+
+if (LIARSDICE_BUILD_TESTS)
+  add_subdirectory(test)
+endif ()
+
 add_subdirectory(standalone)
-add_subdirectory(test)
+
+# ---- Documentation ----
+if (LIARSDICE_BUILD_DOCS)
+  add_subdirectory(documentation)
+endif ()

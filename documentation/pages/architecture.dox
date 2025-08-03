@@ -1,0 +1,151 @@
+/** @page architecture System Architecture
+
+@section arch_overview Architecture Overview
+
+The Liar's Dice project follows clean architecture principles with clear separation of concerns
+and dependency inversion. The architecture is designed to be testable, maintainable, and extensible.
+
+@section layers Architectural Layers
+
+@subsection core_layer Core Layer
+The innermost layer containing business logic and domain entities:
+
+- **Game**: Central game controller managing game flow and rules
+- **Player**: Base class for human and AI players
+- **Dice**: Dice rolling and management
+- **Guess**: Game guess validation and comparison
+- **GameEvents**: Event system for decoupled communication
+
+@subsection ai_layer AI Layer
+Strategy pattern implementation for AI players:
+
+- **IAIStrategy**: Pure virtual interface for AI strategies
+- **AIStrategyFactory**: Factory with type erasure for strategy creation
+- **EasyAIStrategy**: Simple heuristics-based AI
+- **MediumAIStrategy**: Statistical analysis with pattern recognition
+- **HardAIStrategy**: Advanced opponent modeling (future)
+
+@subsection infrastructure Infrastructure Layer
+Supporting services and utilities:
+
+- **Logging**: Structured logging with spdlog
+- **Configuration**: Hierarchical configuration system
+- **Exceptions**: Custom exception hierarchy
+- **Data Structures**: High-performance containers
+- **Statistics**: Statistical analysis tools
+
+@subsection application Application Layer
+User interface and application logic:
+
+- **CLI Application**: Command-line interface
+- **Game Setup**: Player configuration and initialization
+- **UI Rendering**: Console-based game visualization
+
+@section patterns Design Patterns
+
+@subsection dependency_injection Dependency Injection
+Custom lightweight DI container for managing dependencies:
+
+@code{.cpp}
+// Service registration
+ServiceContainer container;
+container.register_service<ILogger>(std::make_shared<ConsoleLogger>());
+container.register_service<IConfig>(std::make_shared<JsonConfig>());
+
+// Service resolution
+auto logger = container.get_service<ILogger>();
+@endcode
+
+@subsection factory_pattern Factory Pattern
+AI strategy creation with type erasure:
+
+@code{.cpp}
+AIStrategyFactory& factory = AIStrategyFactory::instance();
+factory.register_strategy("easy", []() { 
+    return std::make_unique<EasyAIStrategy>(); 
+});
+
+auto strategy = factory.create("easy");
+@endcode
+
+@subsection observer_pattern Observer Pattern
+Event-driven communication using Boost.Signals2:
+
+@code{.cpp}
+// Event subscription
+game_events.on_round_start.connect([](const auto& state) {
+    render_game_state(state);
+});
+
+// Event emission
+game_events.on_round_start(current_state);
+@endcode
+
+@section data_flow Data Flow
+
+@subsection game_flow Game Flow Architecture
+1. **Initialization**: DI container setup, configuration loading
+2. **Game Setup**: Player creation, AI strategy selection
+3. **Game Loop**: Round management, turn processing
+4. **Event Processing**: UI updates, logging, state tracking
+5. **Game End**: Winner determination, cleanup
+
+@subsection ai_decision AI Decision Flow
+1. **Context Gathering**: Current game state, history analysis
+2. **Strategy Execution**: Pattern matching, probability calculation
+3. **Decision Making**: Action selection (guess/call liar)
+4. **Learning**: Pattern storage, opponent modeling
+
+@section memory Memory Architecture
+
+@subsection state_storage Game State Storage
+Optimized memory layout for game states:
+
+- **CompactGameState**: 8-byte bit-packed representation
+- **GameStateStorage**: Cache-efficient flat containers
+- **GameHistory**: Ring buffer with pool allocation
+
+@subsection allocators Custom Allocators
+Performance-optimized memory management:
+
+- **FastPoolAllocator**: Small object allocation
+- **SimdAllocator**: Aligned memory for SIMD
+- **MemoryArena**: Bulk temporary allocations
+
+@section threading Threading Model
+
+The game currently uses a single-threaded model with provisions for future parallelization:
+
+- Event handling is thread-safe
+- Logging system is thread-safe
+- AI calculations can be parallelized
+- SIMD operations use parallel algorithms
+
+@section extensibility Extensibility Points
+
+@subsection new_ai Adding New AI Strategies
+1. Inherit from IAIStrategy interface
+2. Implement decision-making logic
+3. Register with AIStrategyFactory
+4. Add configuration support
+
+@subsection new_ui Adding New UI Types
+1. Create new rendering module
+2. Subscribe to game events
+3. Implement display logic
+4. Configure via DI container
+
+@subsection new_rules Adding Game Variations
+1. Extend Game class or create variant
+2. Modify validation rules
+3. Update AI strategies
+4. Add configuration options
+
+@section best_practices Architectural Best Practices
+
+- **Dependency Inversion**: Depend on abstractions, not concretions
+- **Single Responsibility**: Each class has one reason to change
+- **Open/Closed**: Open for extension, closed for modification
+- **Interface Segregation**: Small, focused interfaces
+- **Separation of Concerns**: Clear boundaries between layers
+*/

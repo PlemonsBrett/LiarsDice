@@ -1,22 +1,20 @@
-name: Style
+name: Code Style Check
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
   pull_request:
-    branches:
-      - main
+    branches: [ main ]
 
 env:
   CPM_SOURCE_CACHE: ${{ github.workspace }}/cpm_modules
 
 jobs:
-  build:
+  format-check:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - uses: actions/cache@v3
         with:
@@ -24,10 +22,13 @@ jobs:
           key: ${{ github.workflow }}-cpm-modules-${{ hashFiles('**/CMakeLists.txt', '**/*.cmake') }}
 
       - name: Install format dependencies
-        run: pip3 install clang-format==14.0.6 cmake_format==0.6.11 pyyaml
+        run: |
+          pip3 install clang-format==14.0.6 cmake_format==0.6.11 pyyaml
+          sudo apt-get update
+          sudo apt-get install -y libboost-all-dev
 
-      - name: configure
+      - name: Configure
         run: cmake -Stest -Bbuild
 
-      - name: check style
+      - name: Check code style
         run: cmake --build build --target check-format
