@@ -1,0 +1,5 @@
+# Robot Framework test dependencies
+robotframework==7.0
+robotframework-pythonlibcore==4.4.1
+pexpect==4.9.0
+psutil==5.9.8  # For process monitoring

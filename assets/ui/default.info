@@ -1,0 +1,179 @@
+; Liar's Dice UI Configuration
+; Using Boost.PropertyTree INFO format
+
+menus {
+    main {
+        title "=== LIAR'S DICE ==="
+        prompt "Select an option:"
+        
+        items {
+            new_game {
+                label "New Game"
+                shortcut "1"
+                description "Start a new game of Liar's Dice"
+            }
+            tutorial {
+                label "Tutorial"
+                shortcut "2"
+                description "Learn how to play"
+            }
+            settings {
+                label "Settings"
+                shortcut "3"
+                description "Configure game options"
+            }
+            quit {
+                label "Quit"
+                shortcut "Q"
+                description "Exit the game"
+            }
+        }
+    }
+    
+    game_setup {
+        title "Game Setup"
+        prompt "Configure your game:"
+        back_option "Back to Main Menu"
+        
+        items {
+            player_count {
+                label "Number of Players"
+                shortcut "1"
+                description "Set how many players (2-8)"
+            }
+            ai_difficulty {
+                label "AI Difficulty"
+                shortcut "2"
+                description "Easy, Medium, or Hard"
+            }
+            start_game {
+                label "Start Game"
+                shortcut "S"
+                description "Begin with current settings"
+            }
+        }
+    }
+    
+    in_game {
+        title "Your Turn"
+        prompt "What would you like to do?"
+        
+        items {
+            make_guess {
+                label "Make a Guess"
+                shortcut "G"
+                description "Guess the total dice count"
+            }
+            call_liar {
+                label "Call Liar!"
+                shortcut "L"
+                description "Challenge the previous guess"
+            }
+            view_dice {
+                label "View Your Dice"
+                shortcut "D"
+                description "See your current dice"
+            }
+            game_help {
+                label "Help"
+                shortcut "H"
+                description "Show game rules"
+            }
+        }
+    }
+}
+
+prompts {
+    player_name {
+        text "Enter your name:"
+        default_value "Player"
+        validation_pattern "^[A-Za-z0-9 ]{1,20}$"
+        error_message "Name must be 1-20 alphanumeric characters"
+    }
+    
+    player_count {
+        text "How many players? (2-8):"
+        default_value "4"
+        validation_pattern "^[2-8]$"
+        error_message "Please enter a number between 2 and 8"
+    }
+    
+    guess_quantity {
+        text "How many dice?"
+        validation_pattern "^[1-9][0-9]*$"
+        error_message "Please enter a positive number"
+    }
+    
+    guess_face_value {
+        text "What face value? (1-6):"
+        validation_pattern "^[1-6]$"
+        error_message "Please enter a number between 1 and 6"
+    }
+    
+    confirm_call_liar {
+        text "Are you sure you want to call liar? (Y/N):"
+        default_value "N"
+        validation_pattern "^[YyNn]$"
+        error_message "Please enter Y or N"
+    }
+}
+
+messages {
+    welcome "Welcome to Liar's Dice, {player_name}!"
+    round_start "=== Round {round} ===\nTotal dice in play: {total_dice}"
+    player_turn "{player_name}'s turn..."
+    player_guess "{player_name} guesses: {quantity} × {face_value}"
+    player_calls_liar "{player_name} calls LIAR!"
+    reveal_dice "Actual count of {face_value}'s: {actual_count}"
+    round_winner "{winner_name} wins the round! {loser_name} loses a die."
+    game_winner "🎉 {winner_name} wins the game! 🎉"
+    your_dice "Your dice: {dice_display}"
+    ai_thinking "{player_name} is thinking..."
+    invalid_guess "Invalid guess! Must be higher than {prev_quantity} × {prev_face}"
+}
+
+texts {
+    rules_title "=== LIAR'S DICE RULES ==="
+    rules_content "Each player starts with 5 dice.\nPlayers take turns guessing the total number of a specific face value.\nEach guess must be higher than the previous.\nCall 'Liar!' if you think the guess is wrong.\nLose a die if you're wrong. Last player with dice wins!"
+    press_enter "Press Enter to continue..."
+    invalid_input "Invalid input. Please try again."
+    goodbye "Thanks for playing Liar's Dice!"
+}
+
+theme {
+    colors {
+        primary cyan
+        secondary yellow
+        success green
+        error red
+        warning yellow
+        info blue
+        text white
+        dim gray
+    }
+    
+    styles {
+        title bold
+        menu_item normal
+        prompt bold
+        error "bold,red"
+        success "bold,green"
+        dice_display "bold,cyan"
+    }
+    
+    dice_faces {
+        1 "⚀"
+        2 "⚁"
+        3 "⚂"
+        4 "⚃"
+        5 "⚄"
+        6 "⚅"
+    }
+    
+    ascii_logo {
+        line1 "╔═══════════════════════════════╗"
+        line2 "║      LIAR'S DICE v1.0        ║"
+        line3 "║   Roll the dice, call bluffs! ║"
+        line4 "╚═══════════════════════════════╝"
+    }
+}

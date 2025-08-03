@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build-and-test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        build_type: [Debug, Release]
+        
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Install dependencies (Ubuntu)
+      if: runner.os == 'Linux'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libboost-all-dev python3-pip
+        
+    - name: Install dependencies (macOS)
+      if: runner.os == 'macOS'
+      run: |
+        brew install boost python@3.11
+        
+    - name: Configure CMake
+      run: cmake -B build -S . -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+      
+    - name: Build
+      run: cmake --build build -j
+      
+    - name: Run unit tests
+      working-directory: build/test
+      run: |
+        for test in test_*; do
+          if [ -f "$test" ] && [ -x "$test" ]; then
+            echo "Running $test..."
+            ./$test
+          fi
+        done
+        
+    - name: Setup Python for Robot tests
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        
+    - name: Install Robot Framework
+      run: |
+        pip install robotframework==7.0 pexpect==4.9.0 psutil==5.9.8
+        
+    - name: Run Robot Framework tests
+      run: |
+        robot --variable CLI_PATH:${{ github.workspace }}/build/standalone/liarsdice \
+              --outputdir test/robot/results \
+              test/robot/liarsdice_tests.robot
+              
+    - name: Upload test results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: robot-results-${{ matrix.os }}-${{ matrix.build_type }}
+        path: test/robot/results/

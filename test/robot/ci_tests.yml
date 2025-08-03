@@ -1,0 +1,78 @@
+# GitHub Actions workflow for Robot Framework tests
+
+name: Robot Framework Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  robot-tests:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+    
+    - name: Install build dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y cmake ninja-build
+    
+    - name: Configure project
+      run: |
+        cmake -B build -S . \
+          -DCMAKE_BUILD_TYPE=Release \
+          -DLIARSDICE_BUILD_TESTS=ON \
+          -DLIARSDICE_ENABLE_LOGGING=OFF
+    
+    - name: Build project
+      run: cmake --build build --parallel
+    
+    - name: Install Robot Framework
+      run: |
+        cd tests/robot
+        python -m venv venv
+        source venv/bin/activate
+        pip install -r requirements.txt
+    
+    - name: Run smoke tests
+      run: |
+        cd tests/robot
+        source venv/bin/activate
+        export PYTHONPATH=$PWD:$PYTHONPATH
+        robot --include smoke \
+              --outputdir results \
+              --variable CLI_PATH:$PWD/../../build/bin/liarsdice-cli \
+              liarsdice_tests.robot
+    
+    - name: Run input validation tests
+      run: |
+        cd tests/robot
+        source venv/bin/activate
+        export PYTHONPATH=$PWD:$PYTHONPATH
+        robot --include input-validation \
+              --outputdir results \
+              --variable CLI_PATH:$PWD/../../build/bin/liarsdice-cli \
+              *.robot
+      continue-on-error: true
+    
+    - name: Upload test results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: robot-test-results
+        path: tests/robot/results/
+    
+    - name: Publish test results
+      uses: EnricoMi/publish-unit-test-result-action@v2
+      if: always()
+      with:
+        files: tests/robot/results/xunit.xml
+        check_name: Robot Framework Test Results
