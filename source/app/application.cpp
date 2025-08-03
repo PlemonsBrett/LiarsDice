@@ -361,7 +361,11 @@ core::Guess Application::get_player_guess(const std::optional<core::Guess>& last
     int dice_count, face_value;
     
     while (!should_exit.load()) {
-        dice_count = get_validated_input(DICE_COUNT_PROMPT, 1, 50); // Reasonable upper limit
+        // Get total dice for validation
+        unsigned int total_dice = game_->get_total_dice_count();
+        
+        // Get dice count with upper limit of total dice in game
+        dice_count = get_validated_input(DICE_COUNT_PROMPT, 1, total_dice);
         if (should_exit.load()) break;
         
         face_value = get_validated_input(FACE_VALUE_PROMPT, 1, 6);
@@ -372,7 +376,7 @@ core::Guess Application::get_player_guess(const std::optional<core::Guess>& last
                          static_cast<unsigned int>(face_value), 
                          current_player ? current_player->get_id() : 0};
         
-        // Use game's validation
+        // Use game's validation for previous guess comparison
         if (!game_->is_valid_guess(guess)) {
             print_with_flush(INVALID_MSG);
             if (last_guess.has_value()) {

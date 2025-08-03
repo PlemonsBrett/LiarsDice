@@ -33,7 +33,7 @@ Test Maximum Dice Scenario
     # Try to guess more dice than possible
     Send Input    1
     Expect Prompt    dice count
-    Send Input    10    # More than max possible (2 players * 5 dice)
+    Send Input    11    # More than max possible (2 players * 5 dice = 10)
     Expect Prompt    Invalid
 
 Test Single Die Remaining

@@ -173,8 +173,8 @@ BOOST_AUTO_TEST_CASE(PlayerElimination) {
         auto current_player = game.get_current_player();
         
         if (round % 2 == 0) {
-            // Make an obviously false guess (more dice than exist)
-            Guess bad_guess{15, 6, current_player->get_id()};
+            // Make an obviously false guess (all dice showing 6s)
+            Guess bad_guess{10, 6, current_player->get_id()};
             game.process_guess(bad_guess);
             // Next player will correctly call liar (guesser loses 1 point)
             game.process_call_liar();

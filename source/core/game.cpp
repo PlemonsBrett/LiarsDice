@@ -341,6 +341,14 @@ bool Game::is_valid_guess(const Guess& guess) const {
         return false;
     }
     
+    // Cannot guess more dice than exist in the game
+    unsigned int total_dice = get_total_dice_count();
+    if (guess.dice_count > total_dice) {
+        BOOST_LOG_TRIVIAL(debug) << "Invalid guess: " << guess.dice_count 
+                                 << " dice exceeds total in play: " << total_dice;
+        return false;
+    }
+    
     // Must be higher than previous guess
     if (last_guess_.has_value()) {
         const auto& prev = *last_guess_;
