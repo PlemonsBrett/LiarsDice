@@ -4,454 +4,319 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a modern C++23 implementation of the Liar's Dice game following industry best practices. The project is organized as a library (`liarsdice_core`) with a CLI application, AI players, and comprehensive testing infrastructure including automated Robot Framework tests.
+This is a modern C++20 implementation of the Liar's Dice game with Boost libraries. The project is based on the ModernCppStarter template and features:
 
-## Build System
+- Point-based elimination system (5 starting points, differential point loss)
+- AI players with configurable strategies
+- Optimized game state storage with bit-packing
+- Comprehensive testing with Boost.Test and Robot Framework
 
-This project uses **Conan 2.0+** as the primary dependency manager. Conan is required for building the project.
-
-### Prerequisites
-
-```bash
-# Install Conan (if not already installed)
-pip install conan
-
-# Verify Conan version (must be 2.0+)
-conan --version
-```
-
-## Essential Commands
-
-### Quick Build and Run
+## Essential Build Commands
 
 ```bash
-# Build everything (Release by default)
-./scripts/build.sh
-
-# Build Debug version
-./scripts/build.sh Debug
-
-# Build with specific Conan profile
-./scripts/build.sh Release debug  # Uses profiles/debug
+# Quick build (Release by default)
+./build.sh
+./build.sh Debug    # Debug build
 
 # Run the game
-./build/bin/liarsdice-cli
+./build/standalone/liarsdice
+./build/standalone/liarsdice --seed 12345    # Deterministic mode
 
-# Run tests
-./scripts/test.sh
+# Run all tests
+./test.sh
 
-# Run example
-./build/bin/basic_game
+# Run specific unit test
+./build/test/test_dice
+./build/test/test_player
+./build/test/test_game
+./build/test/test_ai
+./build/test/test_service_container
+./build/test/test_game_state_storage
+./build/test/test_data_structures
+./build/test/test_statistics
+./build/test/test_performance    # Performance benchmarks
 
 # Run Robot Framework tests
-./tests/robot/run_tests.sh
+./test/robot/run_tests.sh
+./test/robot/run_tests.sh --suite edge    # Run specific suite
+./test/robot/run_tests.sh --tag smoke     # Run by tag
 
-# Build documentation (requires Doxygen and Sphinx)
-cmake -B build -S . -DLIARSDICE_BUILD_DOCS=ON
-cmake --build build --target docs
+# Clean build
+./clean.sh
 ```
 
-### Manual Build with Conan
+## High-Level Architecture
 
-```bash
-# Install dependencies with Conan
-conan install . --build=missing -s build_type=Release
+### Core Game Flow
 
-# Configure with CMake using Conan toolchain
-cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE=build/Release/generators/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
-
-# Build
-cmake --build build -j
-
-# Run tests
-ctest --test-dir build --output-on-failure
-
-# Install (optional)
-cmake --install build --prefix /usr/local
-```
-
-### Development Tools
-
-```bash
-# Format code
-./scripts/format.sh
-
-# Check formatting (without changes)
-./scripts/format.sh --check
-
-# Lint code
-./scripts/lint.sh
-
-# Lint with automatic fixes
-./scripts/lint.sh --fix
-
-# Lint with verbose output
-./scripts/lint.sh --verbose
-```
-
-### Documentation
-
-```bash
-# Install documentation dependencies
-pip install -r docs/requirements.txt
-
-# Build all documentation
-cmake --build build --target docs
-
-# Build API docs only (Doxygen)
-cmake --build build --target doxygen
-
-# Build user docs only (Sphinx)
-cmake --build build --target sphinx-html
-
-# Serve documentation locally
-python -m http.server 8000 -d build/docs/html
-```
-
-### GitHub Pages Deployment
-
-The project includes automated documentation deployment via GitHub Actions:
-
-- **Workflow**: `.github/workflows/docs.yml` (full CMake build)
-- **Simple Workflow**: `.github/workflows/docs-simple.yml` (Sphinx-only)
-- **Triggers**: Push to `main` or `Enhancements-SoftwareEngineeringAndDesign` branches
-- **Output**: Deployed to `https://[username].github.io/[repository]/`
-
-Manual deployment:
-
-```bash
-# Build documentation
-cmake -B build -S . -DLIARSDICE_BUILD_DOCS=ON
-cmake --build build --target docs
-
-# Deploy to gh-pages branch (requires gh CLI)
-gh-pages -d build/docs/html
-```
-
-## Project Structure
-
-### Modern C++23 Architecture
-
-```sh
-LiarsDice/
-├── src/                          # Library implementation
-│   └── liarsdice/
-│       ├── core/                 # Core game logic
-│       │   ├── dice.cpp         # Dice implementation
-│       │   ├── player.cpp       # Player management
-│       │   └── game.cpp         # Game controller
-│       ├── ai/                   # AI strategies
-│       │   ├── ai_strategy_factory.cpp  # Strategy factory
-│       │   └── easy_ai_strategy.cpp     # Easy AI implementation
-│       ├── config/               # Configuration system
-│       ├── logging/              # Logging infrastructure
-│       └── ...
-├── include/                      # Public API headers
-│   └── liarsdice/
-│       ├── core/                 # Core interfaces
-│       ├── ai/                   # AI interfaces
-│       │   ├── i_ai_strategy.hpp        # AI strategy interface
-│       │   ├── ai_strategy_factory.hpp  # Factory pattern
-│       │   └── easy_ai_strategy.hpp     # Easy AI header
-│       ├── config/               # Configuration headers
-│       ├── exceptions/           # Exception hierarchy
-│       └── ...
-├── apps/                         # Executable applications
-│   └── liarsdice-cli/           # Command-line interface
-├── tests/                        # Test suites
-│   ├── unit/                    # Unit tests (Catch2)
-│   │   ├── core/               # Core component tests
-│   │   └── ai/                 # AI tests
-│   └── robot/                   # Robot Framework tests
-│       ├── liarsdice_tests.robot    # Main test suite
-│       ├── edge_cases.robot         # Edge case tests
-│       ├── performance.robot        # Performance tests
-│       └── LiarsDiceLibrary.py      # Custom library
-├── examples/                     # Usage examples
-├── cmake/                        # CMake modules
-└── scripts/                      # Build scripts
-```
-
-### Library Organization
-
-- **Core Library**: `liarsdice::core` - Game logic and data models
-- **AI System**: `liarsdice::ai` - AI strategies with factory pattern
-- **Configuration**: `liarsdice::config` - Hierarchical configuration system
-- **Logging**: `liarsdice::logging` - Structured logging with spdlog
-- **Exception Hierarchy**: `liarsdice::exceptions` - Custom exception types
-- **CLI Application**: Independent executable using the library
+1. **Game** class orchestrates gameplay, manages players, validates guesses
+2. **Player** hierarchy: HumanPlayer and AIPlayer (EasyAI, MediumAI, HardAI)
+3. **Point System**: Players start with 5 points, lose 1 for lying, 2 for false accusation
+4. **Validation**: Single source in Game::is_valid_guess() - must increase dice count OR keep same count with higher
+   face value
 
 ### Key Design Patterns
 
-- **Separation of Concerns**: Library vs application code
-- **Modern CMake**: Target-based configuration with proper visibility
-- **RAII**: Resource management with smart pointers
-- **Exception Safety**: Custom exception hierarchy for error handling
-- **Factory Pattern**: AI strategy creation with type erasure
-- **Variant Pattern**: Type-safe AI decisions using std::variant
+**Event System (Boost.Signals2)**
 
-## CMake Build Options
+- Game emits events through GameEvents struct
+- Application layer subscribes to render UI updates
+- Loose coupling between game logic and presentation
 
-```bash
-# Available options (default values shown)
--DLIARSDICE_BUILD_TESTS=ON         # Build test suite
--DLIARSDICE_BUILD_EXAMPLES=ON      # Build example programs  
--DLIARSDICE_BUILD_BENCHMARKS=OFF   # Build performance benchmarks
--DLIARSDICE_BUILD_DOCS=OFF         # Build documentation
--DLIARSDICE_INSTALL=ON             # Generate install targets
--DLIARSDICE_USE_SANITIZERS=ON      # Enable sanitizers in debug builds
--DLIARSDICE_ENABLE_LOGGING=ON      # Enable spdlog logging
--DLIARSDICE_ENABLE_CONFIG=ON       # Enable configuration system
-```
+**Dependency Injection**
 
-## Testing
+- Custom lightweight DI container in di/service_container.hpp
+- Used primarily for configuration and logging services
 
-### Unit Tests (Catch2)
+**State Storage Optimization**
 
-```bash
-# All tests (recommended)
-./scripts/test.sh
+- GameStateStorage: Cache-efficient with boost::container::flat_map
+- CompactGameState: 8-byte bit-packed representation
+- GameHistory: Ring buffer with pool allocator for AI analysis
 
-# Specific test by tag
-./scripts/test.sh --filter "[dice]"
+### Testing Architecture
 
-# Specific test by pattern
-./scripts/test.sh --filter "*constructor*"
+**Unit Tests (Boost.Test)**
 
-# List all available tests
-./scripts/test.sh --list
+- Located in test/source/
+- Each component has a dedicated test file
+- Run with ./test.sh or individual executables
 
-# Verbose output
-./scripts/test.sh --verbose
+**Robot Framework Tests**
 
-# Get help with test options
-./scripts/test.sh --help
+- Located in test/robot/
+- LiarsDiceLibrary.py provides Python interface
+- Tests CLI interaction, input validation, game flow
+- Some tests skipped due to timeout issues (marked with Skip)
 
-# Manual test execution
-ctest --test-dir build --output-on-failure
-./build/bin/unit_tests "[dice]"
-```
+### AI System
 
-### Robot Framework Tests (Automated CLI Testing)
+**Strategy Pattern**
 
-```bash
-# Run all automated tests
-./tests/robot/run_tests.sh
+- IAIStrategy interface for all AI implementations
+- AIStrategyFactory with type erasure
+- Configurable parameters (risk tolerance, bluff frequency)
 
-# Run specific test suite
-./tests/robot/run_tests.sh --suite main
-./tests/robot/run_tests.sh --suite edge
-./tests/robot/run_tests.sh --suite performance
-
-# Run tests with specific tags
-./tests/robot/run_tests.sh --tag smoke
-./tests/robot/run_tests.sh --tag input-validation
-./tests/robot/run_tests.sh --exclude long-running
-
-# Enable verbose/debug output
-./tests/robot/run_tests.sh --verbose --debug
-```
-
-### Test Structure
-
-- **Unit Tests**: `tests/unit/` - Component-level testing with Catch2
-- **Robot Framework Tests**: `tests/robot/` - End-to-end CLI testing with Pexpect
-- **Test Coverage**: Core components, AI strategies, input validation, performance, signal handling
-
-## AI System
-
-### AI Strategy Architecture
-
-The AI system uses a flexible strategy pattern with:
-
-- **IAIStrategy Interface**: Pure virtual base for all AI strategies
-- **AIStrategyFactory**: Singleton factory with type erasure for strategy creation
-- **AIDecision Variant**: Type-safe decisions (AIGuessAction, AICallLiarAction)
-- **AIDecisionContext**: Structured game state and history for decision making
-
-### Implemented AI Strategies
-
+**Current Implementations**
 - **EasyAIStrategy**: Simple heuristics with configurable parameters
-  - Risk tolerance (0.0-1.0)
+  - Risk tolerance (0.0–1.0)
   - Bluff frequency
   - Call threshold
-  - Statistical analysis toggle
+  - Statistical analysis toggles
   
 - **MediumAIStrategy**: Statistical AI with advanced probability calculations
   - Bayesian probability calculations
   - Opponent behavior modeling with pattern tracking
   - Bluff detection using statistical analysis
   - Pattern recognition algorithms
-  - Uses C++23 ranges for efficient game history analysis
+  - Utilizes `GameHistory` for current game context analysis
   - Configurable pattern weight and history size
 
-### Adding New AI Strategies
+- **HardAI**: Advanced opponent modeling with pattern tracking
 
-1. Create new strategy class inheriting from `IAIStrategy`
-2. Implement `make_decision()`, `get_name()`, and `clone()` methods
-3. Register with factory in main or CLI initialization
-4. Add configuration in AI strategy config
+## Optimized Game State Representation
+
+The project includes an optimized game state storage system designed for efficient memory usage and cache performance:
+
+### GameStateStorage
+
+- Uses `boost::container::flat_map` and `flat_set` for cache-efficient data access
+- Provides O(log n) lookup with better cache locality than node-based containers
+- Tracks active players separately for quick iteration
+
+### CompactGameState
+
+- Bit-packed representation using only 8 bytes per state
+- Stores up to 5 dice values in 15 bits (3 bits per die)
+- Player state packed into single byte (points, dice count, active flag)
+- Last action information compressed into 2 bytes
+- Supports serialization/deserialization for network or storage
+
+### GameHistory
+
+- Ring buffer implementation using `boost::circular_buffer`
+- Automatically discards old entries when capacity is reached
+- Uses pool allocator for efficient memory management
+- Provides analysis methods (dice frequency, average dice count)
+
+### Memory Pool Allocator
+
+- Custom `GameStateAllocator` using `boost::pool`
+- Efficient allocation/deallocation for frequently created states
+- Reduces memory fragmentation and improves performance
+
+## High-Performance Data Structures
+
+The project includes advanced data structures for game analytics and AI optimization:
+
+### TrieMap
+
+- Efficient pattern storage using trie structure with `boost::container::flat_map`
+- O(m) operations where m is pattern length
+- Used for player behavior pattern tracking (e.g., "GGCL" sequences)
+- Specialized `PlayerPatternTrie` for behavior statistics
+
+### CircularBuffer
+
+- Enhanced `boost::circular_buffer` wrapper with perfect forwarding
+- Sliding window analysis and statistical calculations
+- Pattern detection within bounded history
+- Used for recent game state tracking and moving averages
+
+### SparseMatrix
+
+- Built on `boost::numeric::ublas::compressed_matrix`
+- Efficient storage for sparse game statistics
+- Row/column operations, matrix multiplication, top-N finding
+- Specialized types: `PlayerInteractionMatrix`, `ProbabilityMatrix`
+
+### LRUCache
+
+- Multi-index container with O(1) operations
+- Automatic eviction of least recently used entries
+- Cache statistics tracking (hit rate, misses, evictions)
+- Used for AI decision caching and expensive computation memoization
+
+## Statistical Data Containers
+
+The project includes comprehensive statistical analysis tools using Boost libraries:
+
+### StatisticalAccumulator
+
+- Powered by `boost::accumulators` for single-pass statistics
+- Calculates mean, variance, min/max, median, skewness, kurtosis
+- Rolling window statistics for recent data analysis
+- Specialized `DiceRollAccumulator` for game-specific metrics
+- Normality testing and coefficient of variation
+
+### Histogram
+
+- Built on `boost::histogram` with automatic axis type selection
+- Statistical analysis: mode, percentiles, entropy
+- Specialized `DiceHistogram` with fairness testing
+- 2D histograms for correlation analysis
+- Efficient binning for large datasets
+
+### TimeSeries
+
+- Uses `boost::circular_buffer` for bounded time-ordered data
+- Moving averages (simple and exponential)
+- Linear trend detection with regression analysis
+- Outlier detection using z-score method
+- Autocorrelation and seasonal decomposition
+- Specialized `GameMetricsTimeSeries` for performance tracking
+
+### ProbabilityDistribution
+
+- Unified interface for `boost::math` distributions
+- Implementations: Normal, Binomial, Poisson, Uniform, Exponential, Beta
+- Random sampling with `boost::random`
+- Hypothesis testing: Kolmogorov-Smirnov and Chi-square tests
+- Bayesian inference utilities for adaptive AI
+
+### Performance Optimization
+
+- **SIMD Operations**: boost.simd for vectorized computations
+  - 2-4x speedup for mathematical operations
+  - Automatic pack size detection
+  - Fallback for non-SIMD data sizes
+
+- **Custom Allocators**: boost::pool based memory management
+  - FastPoolAllocator for small objects (3-5x faster)
+  - SimdAllocator for aligned memory (32-byte alignment)
+  - GameObjectPool for object recycling
+  - MemoryArena for bulk temporary allocations
+
+- **Performance Testing**: Comprehensive benchmarking suite
+  - boost::timer for nanosecond precision
+  - Statistical validation of performance gains
+  - Memory usage profiling and tracking
+
+## Key Design Patterns
+
+- **Separation of Concerns**: Library vs. application code
+- **Modern CMake**: Target-based configuration with proper visibility
+- **RAII**: Resource management with smart pointers
+- **Exception Safety**: Custom exception hierarchy for error handling
+- **Factory Pattern**: AI strategy creation with type erasure
+- **Variant Pattern**: Type-safe AI decisions using std::variant
+
+## Critical Implementation Details
+
+### Guess Validation Rules
+
+```cpp
+// In Game::is_valid_guess()
+1. Cannot guess more dice than exist in game
+2. Must either:
+   - Increase dice count (any face value), OR
+   - Keep same dice count with higher face value
+3. Cannot decrease dice count
+```
+
+### Memory Layout (CompactGameState)
+
+- Dice values: 15 bits (3 bits × 5 dice)
+- Player state: 8 bits (4 points + 3 dice count + 1 active)
+- Last action: 16 bits
+- Total: 8 bytes per state
+
+### Robot Framework Integration
+
+- CLI path: build/standalone/liarsdice
+- Expects specific prompts: "Enter the number of players," "How many AI players"
+- Type conversion: Always use str() in send_input to avoid float/string errors
 
 ## Dependencies
 
-### Required
+- **Boost 1.82.0+**: Core dependency for advanced features
+  - boost::container (flat_map, flat_set)
+  - boost::numeric::ublas (sparse matrices)
+  - boost::circular_buffer (ring buffers)
+  - boost::multi_index (LRU cache)
+  - boost::accumulators (statistics)
+  - boost::histogram (binned data)
+  - boost::math (probability distributions)
+  - boost::random (random sampling)
+  - boost::pool (memory allocation)
+  - boost::signals2 (event system)
+  - boost::test (unit testing)
+  - boost::timer (performance measurement)
+  - boost::align (aligned allocation)
 
-- **CMake 3.28+**: Build system
-- **C++23 Compiler**: GCC 12+, Clang 15+, or MSVC 2022+
+- **boost.simd**: SIMD vectorization (via CPM)
+  - Added as header-only dependency
+  - Provides portable SIMD operations
 
-### Optional
+## GitHub Workflows
 
-- **Python 3.8+**: For Robot Framework tests
-- **Doxygen**: For API documentation
-- **Sphinx**: For user documentation
+The project follows ModernCppStarter patterns with platform-specific CI/CD workflows:
 
-### Logging System
+### Platform-Specific Workflows
+- **ubuntu.yml**: Linux builds with code coverage
+- **macos.yml**: macOS builds and tests
+- **windows.yml**: Windows builds with MSVC
+- **standalone.yml**: Tests standalone executable
+- **install.yml**: Tests library installation
+- **style.yml**: Code formatting checks
+- **documentation.yaml**: Doxygen documentation deployment
 
-- **Enabled by Default**: All profiles now have logging enabled
-- **Log Levels**: 
-  - Debug builds use `DEBUG` level for detailed diagnostics
-  - Release builds use `INFO` level for important events only
-- **Log Format**: Structured logging with spdlog for efficient filtering
-- **Performance**: Logging macros are compiled out when disabled
+### Key Workflow Features
+- **CPM caching**: Uses `$CPM_SOURCE_CACHE` for dependency caching
+- **Codecov integration**: Automatic coverage reporting on Ubuntu
+- **Cross-platform testing**: All platforms test with Boost dependencies
+- **Fixed seed testing**: Tests use deterministic seeds (e.g., 12345) for reproducibility
 
-### Dependencies
+## Known Issues
 
-- **Catch2**: Testing framework
-  - Via Conan: `catch2/3.7.0` (preferred)
-  - Via FetchContent: Automatically fetched if Conan not available
-- **spdlog**: Logging library (optional)
-  - Via Conan: `spdlog/1.14.1`
-- **fmt**: Formatting library (required by spdlog)
-  - Via Conan: `fmt/10.2.1`
-- **nlohmann_json**: JSON parsing (optional)
-  - Via Conan: `nlohmann_json/3.11.3`
+1. Robot Framework tests with multiple AIs may timeout
+2. Logging can impact performance in tight loops
+3. Boost libraries required - ensure full Boost installation
 
 ## Development Workflow
 
-### Adding New Features
-
-1. Implement in `src/liarsdice/` (library code)
-2. Add public interface to `include/liarsdice/`
-3. Write unit tests in `tests/unit/`
-4. Add Robot Framework tests in `tests/robot/`
-5. Update CLI app in `apps/liarsdice-cli/` if needed
-6. Update CLAUDE.md and README.md with changes
-
-### Code Style
-
-- **Formatting**: `.clang-format` (LLVM style with C++23 support)
-- **Linting**: `.clang-tidy` (comprehensive rule set for C++23)
-- **Naming**: CamelCase for classes, snake_case for functions/variables
-- **Standards**: Full C++23 compatibility with clang-tidy integration
-- **Comments**: Minimal inline comments, prefer self-documenting code
-
-## Build System Details
-
-### Target-Based CMake
-
-- `liarsdice::core` - Main library target
-- `liarsdice::warnings` - Compiler warnings interface
-- `liarsdice-cli` - CLI executable
-- `unit_tests` - Unit test executable
-- `basic_game` - Example executable
-
-### Compiler Features
-
-- **C++23 Standard**: Required for all targets
-- **IPO/LTO**: Enabled for Release builds
-- **Warnings**: Comprehensive warning set as errors
-- **Sanitizers**: Address/UB sanitizers in Debug builds
-
-## Git Workflow
-
-- **Feature Branch**: `Enhancements-SoftwareEngineeringAndDesign` (current)
-- **Main Branch**: `main` (target for PRs)
-- **Build Artifacts**: All in `build/` directory (gitignored)
-- **Documentation**: Auto-deployed via GitHub Actions on push to main/feature branches
-
-## Assets
-
-- **Game Rules**: `assets/rules.txt` automatically copied to build directory
-- **Asset Path**: CLI expects assets in `./assets/` relative to executable
-
-## Known Considerations
-
-- Platform-specific code exists (console clearing) - may need abstraction
-- Game uses interactive I/O - consider dependency injection for better testability
-- Mersenne Twister RNG properly seeded for realistic dice behavior
-- Logging can be disabled at compile time to reduce dependencies
-
-## CI/CD Configuration
-
-### Conan Profiles
-
-The project includes Conan profiles for different environments:
-
-- **profiles/default**: macOS/Linux development profile with C++23
-  - Logging disabled by default to avoid dependency issues
-  - Can be enabled by setting `&:enable_logging=True`
-- **profiles/ci**: CI environment profile for GitHub Actions (Linux, Clang 15, C++23)
-
-When running in CI, ensure the profile includes:
-
-```ini
-[settings]
-compiler.cppstd=23  # Required for dependencies like catch2 and spdlog
-
-[options]
-&:enable_logging=False  # Disable if spdlog causes issues
-```
-
-### Common CI Issues
-
-1. **"The compiler.cppstd is not defined" error**: The CI profile must include `compiler.cppstd=23`
-2. **Build tools profile**: Conan uses separate profiles for host and build - ensure both have required settings
-3. **spdlog/fmt compatibility**: If encountering issues, disable logging in Conan profile
-
-## Robot Framework Test Details
-
-### Test Categories
-
-- **Input Validation**: Invalid inputs, edge cases, security tests
-- **Game Logic**: Win/lose conditions, game flow, AI behavior
-- **Performance**: Response times, memory usage, stress testing
-- **Signal Handling**: Ctrl+C, SIGTERM, graceful shutdown
-- **Timeouts**: User inactivity handling
-
-### Key Test Library Features
-
-- **Pexpect Integration**: Simulates real CLI interaction
-- **Performance Monitoring**: Memory and response time tracking
-- **Signal Testing**: Tests interrupt handling
-- **Pattern Matching**: Flexible output validation
-
-## Type Safety
-
-- **Unsigned Integers**: All dice counts, face values, and player IDs use unsigned integers
-- **Size Types**: Use `size_t` for container indices and sizes  
-- **No Negative Values**: Game logic never requires negative numbers for dice or players
-- **Explicit Conversions**: Always use explicit casts when converting between signed/unsigned
-
-## Developer Guidance
-
-- **General Practice**:
-  - Always create scripts to make running common tasks easier
-  - Ensure to always use industry best practices for C++ Standard 23 with Clang, Clang-Tidy, and Clang-Format
-  - When adding a new script, or making changes to build or project configurations, make sure that we update CLAUDE.md and README.md
-  - Prefer LLVM code style for consistency
-  - Write Robot Framework tests for new CLI features
-  - Keep AI strategies modular and configurable
-  - Use the configuration system for runtime parameters
-  - Add appropriate logging for debugging (when enabled)
-
-- **Documentation**:
-  - Update Sphinx documentation when making architectural changes
-  - Technical design documents go in `docs/technical/`
-  - RST versions for Sphinx go in `docs/sphinx/technical/`
-  - Update the Sphinx index.rst when adding new documentation sections
-  - Keep both markdown and RST versions in sync
-
-## Development Memory
-
-- When adding new features, integrate into existing game, and write end-to-end tests with robot framework and pexpect.
-- Ensure that we are regularly updating the sphinx documentation when changes are made.
+1. Make changes to source files
+2. Run ./build.sh to rebuild
+3. Run ./test.sh to verify all tests pass
+4. Update CLAUDE.md when adding new build commands or changing architecture
+5. Update docs/technical/ when implementing major features

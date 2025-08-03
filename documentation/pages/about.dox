@@ -1,0 +1,86 @@
+/** @page about About Liar's Dice
+
+@section overview Project Overview
+
+Liar's Dice is a modern C++20 implementation of the classic dice game, featuring:
+
+- Clean architecture with separation of concerns
+- AI players with configurable strategies
+- Comprehensive testing with Boost.Test and Robot Framework
+- High-performance data structures using Boost libraries
+- Advanced statistical analysis capabilities
+- SIMD-optimized operations for performance
+
+@section features Key Features
+
+@subsection gameplay Gameplay Features
+- Multiple human and AI players
+- Point-based elimination system
+- Configurable game rules
+- Deterministic mode for testing (seed support)
+- Real-time game state tracking
+
+@subsection ai_features AI System
+- Multiple AI difficulty levels (Easy, Medium, Hard)
+- Configurable AI parameters
+- Statistical analysis and pattern recognition
+- Bayesian probability calculations
+- Opponent behavior modeling
+
+@subsection technical Technical Features
+- Modern C++20 with concepts and ranges
+- Dependency injection architecture
+- Comprehensive logging system
+- Hierarchical configuration management
+- Memory-efficient game state storage
+- SIMD-optimized mathematical operations
+
+@section architecture Architecture
+
+The project follows clean architecture principles:
+
+- **Core Layer**: Game logic, rules, and entities
+- **AI Layer**: Strategy pattern for AI implementations
+- **Infrastructure**: Logging, configuration, and I/O
+- **Application**: CLI and UI components
+
+@section performance Performance
+
+The game includes several performance optimizations:
+
+- Bit-packed game state representation (8 bytes per state)
+- Custom memory allocators using boost::pool
+- SIMD operations with boost.simd
+- Cache-efficient data structures
+- Statistical accumulators for single-pass calculations
+
+@section testing Testing
+
+Comprehensive test coverage includes:
+
+- Unit tests with Boost.Test
+- End-to-end tests with Robot Framework
+- Performance benchmarks with boost::timer
+- Code coverage reporting with codecov
+
+@section building Building the Project
+
+@code{.bash}
+# Quick build
+./build.sh
+
+# Build with specific configuration
+./build.sh Debug
+
+# Run tests
+./test.sh
+
+# Build documentation
+cmake -B build -S . -DLIARSDICE_BUILD_DOCS=ON
+cmake --build build --target docs
+@endcode
+
+@section license License
+
+This project is licensed under the MIT License. See the LICENSE file for details.
+*/

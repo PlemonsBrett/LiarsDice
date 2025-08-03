@@ -159,6 +159,9 @@ void Game::start_round() {
         player->roll_dice();
     }
     
+    // Capture initial round state
+    capture_game_state();
+    
     events_.on_round_start(round_number_);
     log_game_state();
     
@@ -190,6 +193,9 @@ void Game::process_guess(const Guess& guess) {
     
     last_guess_ = guess;
     events_.on_guess_made(*current_player, guess);
+    
+    // Capture state after guess
+    capture_game_state();
     
     advance_to_next_player();
     
@@ -388,6 +394,61 @@ void Game::log_game_state() const {
                                 << " dice showing " << last_guess_->face_value;
     }
     BOOST_LOG_TRIVIAL(debug) << "==================";
+}
+
+void Game::capture_game_state() {
+    // Update state storage with current player states
+    state_storage_.clear();
+    
+    for (const auto& player : players_) {
+        CompactGameState state;
+        
+        // Set player state
+        state.player_state.points = static_cast<std::uint8_t>(player->get_points());
+        state.player_state.dice_count = static_cast<std::uint8_t>(player->get_dice_count());
+        state.player_state.is_active = player->is_eliminated() ? 0 : 1;
+        
+        // Set dice values
+        auto dice_values = player->get_dice_values();
+        std::vector<std::uint8_t> dice_bytes;
+        dice_bytes.reserve(dice_values.size());
+        for (auto val : dice_values) {
+            dice_bytes.push_back(static_cast<std::uint8_t>(val));
+        }
+        state.set_all_dice(dice_bytes);
+        
+        // Set last action if this is the player who made the last guess
+        if (last_guess_.has_value() && last_guess_->player_id == player->get_id()) {
+            state.last_action.action_type = 1; // Guess
+            state.last_action.dice_count = static_cast<std::uint8_t>(last_guess_->dice_count);
+            state.last_action.face_value = static_cast<std::uint8_t>(last_guess_->face_value);
+        }
+        
+        // Store in state storage
+        state_storage_.store_player_state(
+            static_cast<GameStateStorage::PlayerId>(player->get_id()), 
+            state
+        );
+        
+        // Update active players set
+        if (!player->is_eliminated()) {
+            state_storage_.add_active_player(
+                static_cast<GameStateStorage::PlayerId>(player->get_id())
+            );
+        }
+    }
+    
+    // Record a snapshot of current player's state in history
+    if (auto current = get_current_player()) {
+        if (auto* state = state_storage_.get_player_state(
+            static_cast<GameStateStorage::PlayerId>(current->get_id()))) {
+            history_.record_state(*state);
+        }
+    }
+    
+    BOOST_LOG_TRIVIAL(trace) << "Game state captured - " 
+                            << state_storage_.size() << " players, "
+                            << history_.size() << " history entries";
 }
 
 } // namespace liarsdice::core

@@ -1,4 +1,6 @@
 #include <liarsdice/app/application.hpp>
+#include <liarsdice/ai/easy_ai_strategy.hpp>
+#include <liarsdice/ai/medium_ai_strategy.hpp>
 #include <boost/log/expressions.hpp>
 #include <boost/program_options.hpp>
 #include <iostream>
@@ -113,7 +115,8 @@ po::options_description Application::setup_program_options() {
         ("ai-think-time", po::value<unsigned int>(&config_.ai_think_time)->default_value(1000), 
          "AI thinking time in milliseconds")
         ("seed", po::value<unsigned int>(), 
-         "Random seed for deterministic gameplay (useful for testing)");
+         "Random seed for deterministic gameplay (useful for testing)")
+        ("medium-ai", "Use Medium AI strategy instead of Easy AI");
     
     return desc;
 }
@@ -132,6 +135,7 @@ bool Application::parse_command_line(int argc, char* argv[], AppConfig& config) 
         
         config.verbose = vm.count("verbose");
         config.demo_mode = vm.count("demo");
+        config.use_medium_ai = vm.count("medium-ai");
         
         // Handle optional seed
         if (vm.count("seed")) {
@@ -175,7 +179,8 @@ int Application::get_ai_player_count(int total_players) {
 
 void Application::setup_game(int total_players, int ai_players) {
     BOOST_LOG_TRIVIAL(info) << "Setting up game: " << total_players 
-                           << " total players, " << ai_players << " AI players";
+                           << " total players, " << ai_players << " AI players"
+                           << " (using " << (config_.use_medium_ai ? "Medium" : "Easy") << " AI)";
     
     // Create game with configuration
     core::GameConfig game_config;
@@ -201,9 +206,41 @@ void Application::setup_game(int total_players, int ai_players) {
     
     // Create AI players
     for (int i = 0; i < ai_players; ++i) {
-        auto ai = std::make_shared<ai::EasyAI>(next_player_id_++);
-        players_.push_back(ai);
-        game_->add_player(ai);
+        unsigned int player_id = next_player_id_++;
+        
+        if (config_.use_medium_ai) {
+            // Create Medium AI with statistical analysis
+            ai::MediumAIStrategy::MediumConfig config;
+            config.risk_tolerance = 0.5;
+            config.bluff_frequency = 0.25;
+            config.call_threshold = 0.65;
+            config.pattern_weight = 0.3;
+            config.history_size = 20;
+            config.use_bayesian = true;
+            config.track_opponents = true;
+            config.think_time_ms = 1000;
+            
+            auto ai = std::make_shared<ai::MediumAIStrategy>(player_id, config);
+            
+            // Connect to game history and state
+            ai->set_game_history(&game_->get_history());
+            ai->set_game_state(&game_->get_state_storage());
+            
+            players_.push_back(ai);
+            game_->add_player(ai);
+        } else {
+            // Create Easy AI (default)
+            ai::EasyAIStrategy::EasyConfig config;
+            config.risk_tolerance = 0.2;
+            config.bluff_frequency = 0.1;
+            config.call_threshold = 0.8;
+            config.use_statistical_analysis = false;
+            config.think_time_ms = 500;
+            
+            auto ai = std::make_shared<ai::EasyAIStrategy>(player_id, config);
+            players_.push_back(ai);
+            game_->add_player(ai);
+        }
     }
     
     // Connect to game events

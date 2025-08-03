@@ -1,0 +1,119 @@
+/** 
+@file namespaces.dox
+@brief Namespace documentation for Liar's Dice
+*/
+
+/** 
+@namespace liarsdice
+@brief Main namespace for the Liar's Dice game
+
+The liarsdice namespace contains all the components of the Liar's Dice game implementation.
+It is organized into several sub-namespaces for better organization and separation of concerns.
+*/
+
+/** 
+@namespace liarsdice::core
+@brief Core game logic and entities
+
+The core namespace contains the fundamental game components:
+- Game controller and rules engine
+- Player base class and implementations
+- Dice management and rolling
+- Guess validation and comparison
+- Game events and state management
+*/
+
+/** 
+@namespace liarsdice::ai
+@brief Artificial Intelligence strategies and decision making
+
+The ai namespace provides the AI system components:
+- IAIStrategy interface for all AI implementations
+- AIStrategyFactory for strategy creation
+- Various AI strategy implementations (Easy, Medium, Hard)
+- AI decision types and context
+- Pattern recognition and opponent modeling
+*/
+
+/** 
+@namespace liarsdice::config
+@brief Configuration management system
+
+The config namespace handles all configuration aspects:
+- Hierarchical configuration with JSON support
+- Environment variable overrides
+- Configuration validation
+- Default configuration values
+- Runtime configuration access
+*/
+
+/** 
+@namespace liarsdice::logging
+@brief Logging infrastructure
+
+The logging namespace provides structured logging:
+- Multiple log levels (DEBUG, INFO, WARN, ERROR)
+- File and console output
+- Structured log formatting
+- Performance-optimized logging
+- Compile-time log level filtering
+*/
+
+/** 
+@namespace liarsdice::exceptions
+@brief Custom exception hierarchy
+
+The exceptions namespace defines game-specific exceptions:
+- Base GameException class
+- Specific exceptions for different error conditions
+- Exception handling utilities
+- Error code definitions
+*/
+
+/** 
+@namespace liarsdice::data_structures
+@brief High-performance data structures
+
+The data_structures namespace provides optimized containers:
+- TrieMap for pattern storage
+- CircularBuffer for bounded history
+- SparseMatrix for game statistics
+- LRUCache for computation caching
+- Memory-efficient implementations using Boost
+*/
+
+/** 
+@namespace liarsdice::statistics
+@brief Statistical analysis tools
+
+The statistics namespace offers statistical computations:
+- StatisticalAccumulator for running statistics
+- Histogram for distribution analysis
+- TimeSeries for temporal data
+- ProbabilityDistribution interfaces
+- Hypothesis testing utilities
+*/
+
+/** 
+@namespace liarsdice::performance
+@brief Performance optimization utilities
+
+The performance namespace contains optimization tools:
+- SIMD operations using boost.simd
+- Custom memory allocators with boost::pool
+- Performance profiling utilities
+- Cache-efficient algorithms
+- Memory usage tracking
+*/
+
+/** 
+@namespace liarsdice::di
+@brief Dependency injection framework
+
+The di namespace provides a lightweight DI container:
+- Service registration and resolution
+- Lifetime management
+- Type-safe service access
+- Configuration injection
+- Testing support with mock services
+*/

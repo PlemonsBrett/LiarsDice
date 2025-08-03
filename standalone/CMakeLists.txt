@@ -8,7 +8,10 @@ include(../cmake/tools.cmake)
 
 # ---- Dependencies ----
 
-# Parent project already provides LiarsDice target
+include(../cmake/CPM.cmake)
+
+# Add the main library as a dependency
+CPMAddPackage(NAME LiarsDice SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/..)
 
 # ---- Create standalone executable ----
 
@@ -21,8 +24,4 @@ set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 20 OUTPUT_NAME "li
 target_link_libraries(${PROJECT_NAME} 
   PRIVATE 
     LiarsDice::LiarsDice
-    Boost::log
-    Boost::log_setup
-    Boost::thread
-    Boost::system
 )

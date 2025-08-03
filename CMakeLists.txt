@@ -35,6 +35,7 @@ find_package(Boost 1.70.0 REQUIRED COMPONENTS
   filesystem
   serialization
   thread
+        container
 )
 
 # Add Boost.DI (header-only library)
@@ -43,6 +44,14 @@ CPMAddPackage(
   GITHUB_REPOSITORY boost-ext/di
   GIT_TAG v1.3.0
   DOWNLOAD_ONLY YES
+)
+
+# Add Boost.SIMD (header-only SIMD library)
+CPMAddPackage(
+        NAME boost-simd
+        GITHUB_REPOSITORY agenium-scale/boost.simd
+        GIT_TAG develop
+        DOWNLOAD_ONLY YES
 )
 
 CPMAddPackage(
@@ -80,6 +89,7 @@ target_link_libraries(${PROJECT_NAME}
     Boost::filesystem
     Boost::serialization
     Boost::thread
+        Boost::container
   PUBLIC
     Boost::boost
 )
@@ -88,6 +98,11 @@ target_link_libraries(${PROJECT_NAME}
 if(boost-di_ADDED)
   target_include_directories(${PROJECT_NAME} PRIVATE ${boost-di_SOURCE_DIR}/include)
 endif()
+
+# Add Boost.SIMD include directory if available
+if (boost-simd_ADDED)
+  target_include_directories(${PROJECT_NAME} PUBLIC ${boost-simd_SOURCE_DIR}/include)
+endif ()
 
 target_include_directories(
   ${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
@@ -115,5 +130,18 @@ packageProject(
 
 # ---- Add subdirectories ----
 
+# ---- Options ----
+option(LIARSDICE_BUILD_TESTS "Build tests" ON)
+option(LIARSDICE_BUILD_DOCS "Build documentation" OFF)
+option(LIARSDICE_BUILD_EXAMPLES "Build examples" ON)
+
+if (LIARSDICE_BUILD_TESTS)
+  add_subdirectory(test)
+endif ()
+
 add_subdirectory(standalone)
-add_subdirectory(test)
+
+# ---- Documentation ----
+if (LIARSDICE_BUILD_DOCS)
+  add_subdirectory(documentation)
+endif ()

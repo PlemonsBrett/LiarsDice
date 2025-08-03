@@ -1,4 +1,4 @@
-name: Windows
+name: macOS
 
 on:
   push:
@@ -8,10 +8,11 @@ on:
 
 env:
   CPM_SOURCE_CACHE: ${{ github.workspace }}/cpm_modules
+  CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: macos-latest
 
     steps:
       - uses: actions/checkout@v4
@@ -24,16 +25,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-          choco install ninja
-          choco install boost-msvc-14.3
-
-      - name: Setup Cpp
-        uses: aminya/setup-cpp@v1
-        with:
-          compiler: msvc
-          vcvarsall: true
-          cmake: true
-          ninja: true
+          brew install boost ninja ccache
+          pip3 install robotframework==7.0 pexpect==4.9.0 psutil==5.9.8
 
       - name: Configure
         run: cmake -Bbuild -H. -DCMAKE_BUILD_TYPE=Release -G Ninja
@@ -43,4 +36,11 @@ jobs:
 
       - name: Test
         working-directory: build
-        run: ctest -C Release --output-on-failure
+        run: |
+          ctest -C Release --output-on-failure
+          # Run Robot Framework tests
+          robot --variable CLI_PATH:$PWD/standalone/liarsdice \
+                --outputdir ../test/robot/results \
+                --exclude skip \
+                ../test/robot/liarsdice_tests.robot \
+                ../test/robot/edge_cases.robot
