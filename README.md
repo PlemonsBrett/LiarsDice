@@ -1,13 +1,13 @@
 # 🎲 Liar's Dice (Boost Edition)
 
-A modern C++23 implementation of the classic Liar's Dice game using Boost libraries, featuring AI players, comprehensive testing with Robot Framework, and clean architecture.
+A modern C++20 implementation of the classic Liar's Dice game using Boost libraries, featuring AI players, comprehensive testing with Robot Framework, and clean architecture.
 
 [![Ubuntu](https://github.com/bplemons/LiarsDice/actions/workflows/ubuntu.yml/badge.svg)](https://github.com/bplemons/LiarsDice/actions/workflows/ubuntu.yml)
 [![macOS](https://github.com/bplemons/LiarsDice/actions/workflows/macos.yml/badge.svg)](https://github.com/bplemons/LiarsDice/actions/workflows/macos.yml)
 [![Windows](https://github.com/bplemons/LiarsDice/actions/workflows/windows.yml/badge.svg)](https://github.com/bplemons/LiarsDice/actions/workflows/windows.yml)
 [![Style](https://github.com/bplemons/LiarsDice/actions/workflows/style.yml/badge.svg)](https://github.com/bplemons/LiarsDice/actions/workflows/style.yml)
 [![codecov](https://codecov.io/gh/bplemons/LiarsDice/branch/main/graph/badge.svg)](https://codecov.io/gh/bplemons/LiarsDice)
-[![C++23](https://img.shields.io/badge/C%2B%2B-23-blue.svg)](https://en.cppreference.com/w/cpp/23)
+[![C++20](https://img.shields.io/badge/C%2B%2B-20-blue.svg)](https://en.cppreference.com/w/cpp/20)
 [![CMake](https://img.shields.io/badge/CMake-3.14+-green.svg)](https://cmake.org/)
 [![Boost](https://img.shields.io/badge/Boost-1.70+-orange.svg)](https://www.boost.org/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
@@ -30,7 +30,7 @@ Liar's Dice is a multiplayer dice game where players make increasingly bold clai
 
 ### Prerequisites
 
-- **C++23 compatible compiler** (GCC 12+, Clang 15+, or MSVC 2022+)
+- **C++20 compatible compiler** (GCC 11+, Clang 13+, or MSVC 2019+)
 - **CMake 3.14+**
 - **Boost 1.70+** (will be found automatically on most systems)
 - **Python 3.8+** (for Robot Framework tests)

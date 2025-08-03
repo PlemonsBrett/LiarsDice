@@ -9,7 +9,6 @@ on:
 env:
   CTEST_OUTPUT_ON_FAILURE: 1
   CPM_SOURCE_CACHE: ${{ github.workspace }}/cpm_modules
-  COMMIT_SHA: ${{ github.sha }}
 
 jobs:
   build:

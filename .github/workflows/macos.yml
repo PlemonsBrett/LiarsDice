@@ -9,7 +9,6 @@ on:
 env:
   CPM_SOURCE_CACHE: ${{ github.workspace }}/cpm_modules
   CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-  COMMIT_SHA: ${{ github.sha }}
 
 jobs:
   build:
@@ -41,7 +40,6 @@ jobs:
           ctest -C Release --output-on-failure
           # Run Robot Framework tests
           robot --variable CLI_PATH:$PWD/standalone/liarsdice \
-                --variable SEED:${{ env.COMMIT_SHA }} \
                 --outputdir ../test/robot/results \
                 --exclude skip \
                 ../test/robot/liarsdice_tests.robot \

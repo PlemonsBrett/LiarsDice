@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a modern C++23 implementation of the Liar's Dice game with Boost libraries. The project is based on the ModernCppStarter template and features:
+This is a modern C++20 implementation of the Liar's Dice game with Boost libraries. The project is based on the ModernCppStarter template and features:
 
 - Point-based elimination system (5 starting points, differential point loss)
 - AI players with configurable strategies
@@ -20,7 +20,7 @@ This is a modern C++23 implementation of the Liar's Dice game with Boost librari
 
 # Run the game
 ./build/standalone/liarsdice
-./build/standalone/liarsdice --seed $COMMIT_SHA    # Deterministic mode using commit SHA
+./build/standalone/liarsdice --seed 12345    # Deterministic mode
 
 # Run all tests
 ./test.sh
@@ -303,9 +303,9 @@ The project follows ModernCppStarter patterns with platform-specific CI/CD workf
 
 ### Key Workflow Features
 - **CPM caching**: Uses `$CPM_SOURCE_CACHE` for dependency caching
-- **Commit SHA seeding**: Release builds use `$COMMIT_SHA` for deterministic testing
 - **Codecov integration**: Automatic coverage reporting on Ubuntu
 - **Cross-platform testing**: All platforms test with Boost dependencies
+- **Fixed seed testing**: Tests use deterministic seeds (e.g., 12345) for reproducibility
 
 ## Known Issues
 

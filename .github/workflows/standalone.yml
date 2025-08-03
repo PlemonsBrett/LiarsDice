@@ -8,7 +8,6 @@ on:
 
 env:
   CPM_SOURCE_CACHE: ${{ github.workspace }}/cpm_modules
-  COMMIT_SHA: ${{ github.sha }}
 
 jobs:
   build:
@@ -49,4 +48,4 @@ jobs:
       - name: Test executable
         run: |
           ./build/liarsdice --help
-          echo "2" | ./build/liarsdice --seed ${{ env.COMMIT_SHA }} || true
+          echo "2" | ./build/liarsdice --seed 12345 || true
