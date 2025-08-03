@@ -7,7 +7,7 @@ url: "https://plemonsbrett.github.io" # the base hostname & protocol for your si
 show_downloads: true
 
 # Build settings
-theme: pages-themes/cayman@v0.2.0
+remote_theme: pages-themes/cayman@v0.2.0
 plugins:
   - jekyll-remote-theme
   - jekyll-seo-tag
