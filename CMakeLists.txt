@@ -35,7 +35,8 @@ find_package(Boost 1.70.0 REQUIRED COMPONENTS
   filesystem
   serialization
   thread
-        container
+  container
+  timer
 )
 
 # Add Boost.DI (header-only library)
@@ -46,12 +47,12 @@ CPMAddPackage(
   DOWNLOAD_ONLY YES
 )
 
-# Add Boost.SIMD (header-only SIMD library)
+# Add xsimd (modern SIMD library)
 CPMAddPackage(
-        NAME boost-simd
-        GITHUB_REPOSITORY agenium-scale/boost.simd
-        GIT_TAG develop
-        DOWNLOAD_ONLY YES
+        NAME xsimd
+        GITHUB_REPOSITORY xtensor-stack/xsimd
+        GIT_TAG 13.0.0
+        OPTIONS "BUILD_TESTS OFF"
 )
 
 CPMAddPackage(
@@ -99,9 +100,9 @@ if(boost-di_ADDED)
   target_include_directories(${PROJECT_NAME} PRIVATE ${boost-di_SOURCE_DIR}/include)
 endif()
 
-# Add Boost.SIMD include directory if available
-if (boost-simd_ADDED)
-  target_include_directories(${PROJECT_NAME} PUBLIC ${boost-simd_SOURCE_DIR}/include)
+# Add xsimd if available
+if (xsimd_ADDED)
+  target_link_libraries(${PROJECT_NAME} PUBLIC xsimd)
 endif ()
 
 target_include_directories(
