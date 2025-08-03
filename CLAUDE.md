@@ -32,6 +32,8 @@ This is a modern C++20 implementation of the Liar's Dice game with Boost librari
 ./build/test/test_ai
 ./build/test/test_service_container
 ./build/test/test_game_state_storage
+./build/test/test_data_structures
+./build/test/test_statistics
 
 # Run Robot Framework tests
 ./test/robot/run_tests.sh
@@ -174,6 +176,43 @@ The project includes advanced data structures for game analytics and AI optimiza
 - Cache statistics tracking (hit rate, misses, evictions)
 - Used for AI decision caching and expensive computation memoization
 
+## Statistical Data Containers
+
+The project includes comprehensive statistical analysis tools using Boost libraries:
+
+### StatisticalAccumulator
+
+- Powered by `boost::accumulators` for single-pass statistics
+- Calculates mean, variance, min/max, median, skewness, kurtosis
+- Rolling window statistics for recent data analysis
+- Specialized `DiceRollAccumulator` for game-specific metrics
+- Normality testing and coefficient of variation
+
+### Histogram
+
+- Built on `boost::histogram` with automatic axis type selection
+- Statistical analysis: mode, percentiles, entropy
+- Specialized `DiceHistogram` with fairness testing
+- 2D histograms for correlation analysis
+- Efficient binning for large datasets
+
+### TimeSeries
+
+- Uses `boost::circular_buffer` for bounded time-ordered data
+- Moving averages (simple and exponential)
+- Linear trend detection with regression analysis
+- Outlier detection using z-score method
+- Autocorrelation and seasonal decomposition
+- Specialized `GameMetricsTimeSeries` for performance tracking
+
+### ProbabilityDistribution
+
+- Unified interface for `boost::math` distributions
+- Implementations: Normal, Binomial, Poisson, Uniform, Exponential, Beta
+- Random sampling with `boost::random`
+- Hypothesis testing: Kolmogorov-Smirnov and Chi-square tests
+- Bayesian inference utilities for adaptive AI
+
 ## Key Design Patterns
 
 - **Separation of Concerns**: Library vs. application code
@@ -209,11 +248,26 @@ The project includes advanced data structures for game analytics and AI optimiza
 - Expects specific prompts: "Enter the number of players," "How many AI players"
 - Type conversion: Always use str() in send_input to avoid float/string errors
 
+## Dependencies
+
+- **Boost 1.82.0+**: Core dependency for advanced features
+  - boost::container (flat_map, flat_set)
+  - boost::numeric::ublas (sparse matrices)
+  - boost::circular_buffer (ring buffers)
+  - boost::multi_index (LRU cache)
+  - boost::accumulators (statistics)
+  - boost::histogram (binned data)
+  - boost::math (probability distributions)
+  - boost::random (random sampling)
+  - boost::pool (memory allocation)
+  - boost::signals2 (event system)
+  - boost::test (unit testing)
+
 ## Known Issues
 
 1. Robot Framework tests with multiple AIs may timeout
 2. Logging can impact performance in tight loops
-3. Boost.Container required but may not be available on all systems
+3. Boost libraries required - ensure full Boost installation
 
 ## Development Workflow
 

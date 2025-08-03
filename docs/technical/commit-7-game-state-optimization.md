@@ -395,8 +395,215 @@ interactions.increment(caller_id, target_id);
 auto top_interactions = interactions.find_top_n(10);
 ```
 
+## Statistical Data Containers
+
+### 1. StatisticalAccumulator
+
+The `StatisticalAccumulator` class provides comprehensive running statistics using `boost::accumulators`:
+
+```cpp
+template<typename T = double, std::size_t WindowSize = 100>
+class StatisticalAccumulator {
+    using accumulator_set = acc::accumulator_set<T,
+        acc::stats<
+            acc::tag::count, acc::tag::mean, acc::tag::variance,
+            acc::tag::min, acc::tag::max, acc::tag::median,
+            acc::tag::skewness, acc::tag::kurtosis
+        >
+    >;
+};
+```
+
+**Features:**
+
+- Single-pass calculation of multiple statistics
+- Rolling window statistics for recent data
+- Moment calculations up to 4th order
+- Normality testing based on skewness/kurtosis
+- Specialized `DiceRollAccumulator` for game-specific metrics
+
+**Use Cases:**
+
+- Real-time performance monitoring
+- AI decision quality tracking
+- Player behavior analysis
+- Game balance validation
+
+### 2. Histogram Template
+
+Flexible histogram implementation using `boost::histogram`:
+
+```cpp
+template<typename T = double>
+class Histogram {
+    using histogram_type = decltype(
+        bh::make_histogram(std::declval<axis_type>())
+    );
+    
+    // Automatic axis selection based on type
+    using axis_type = std::conditional_t<
+        std::is_integral_v<T>,
+        bh::axis::integer<T>,
+        bh::axis::regular<T>
+    >;
+};
+```
+
+**Features:**
+
+- Type-aware axis selection (integer vs regular)
+- Statistical analysis (mean, variance, mode, percentiles)
+- Entropy calculation for distribution analysis
+- Normalized probability density output
+- Specialized `DiceHistogram` with fairness testing
+- 2D histograms for correlation analysis
+
+**Use Cases:**
+
+- Dice roll distribution analysis
+- Response time profiling
+- Score distribution tracking
+- AI decision frequency analysis
+
+### 3. TimeSeries Container
+
+Time-ordered data management with `boost::circular_buffer`:
+
+```cpp
+template<typename T, std::size_t MaxSize = 1000>
+class TimeSeries {
+    using buffer_type = boost::circular_buffer<TimePoint<T>>;
+    
+    struct TimePoint {
+        std::chrono::steady_clock::time_point timestamp;
+        T value;
+    };
+};
+```
+
+**Features:**
+
+- Automatic old data removal (ring buffer)
+- Moving average calculations (SMA, EMA)
+- Linear trend detection with regression
+- Outlier detection using z-score method
+- Autocorrelation analysis
+- Time window queries
+- Resampling to fixed intervals
+
+**Specialized Types:**
+
+- `GameMetricsTimeSeries`: Performance tracking with stability detection
+
+**Use Cases:**
+
+- Frame rate monitoring
+- Player activity tracking
+- AI performance trends
+- Network latency analysis
+
+### 4. ProbabilityDistribution Interface
+
+Unified interface for `boost::math` distributions:
+
+```cpp
+class IProbabilityDistribution {
+    virtual double pdf(double x) const = 0;
+    virtual double cdf(double x) const = 0;
+    virtual double quantile(double p) const = 0;
+    virtual double sample(boost::random::mt19937& gen) const = 0;
+};
+```
+
+**Implemented Distributions:**
+
+- `NormalDistribution`: Gaussian with μ, σ parameters
+- `BinomialDistribution`: n trials with probability p
+- `PoissonDistribution`: Event counting with rate λ
+- `UniformDistribution`: Equal probability in [a, b]
+- `ExponentialDistribution`: Time between events
+- `BetaDistribution`: Probability modeling with α, β
+
+**Statistical Tools:**
+
+- `HypothesisTest`: KS-test and chi-square tests
+- `BayesianInference`: Beta distribution updates
+- `DistributionFactory`: Factory pattern for creation
+
+**Use Cases:**
+
+- AI decision probability modeling
+- Game event timing (exponential)
+- Win rate estimation (beta)
+- Statistical hypothesis testing
+
+## Performance Characteristics
+
+### Statistical Container Comparison
+
+| Container              | Memory  | Update | Query | Use Case              |
+|------------------------|---------|--------|-------|-----------------------|
+| StatisticalAccumulator | O(1)    | O(1)   | O(1)  | Running statistics    |
+| Histogram              | O(bins) | O(1)   | O(1)  | Distribution analysis |
+| TimeSeries             | O(n)    | O(1)   | O(k)  | Temporal data         |
+| ProbabilityDist        | O(1)    | N/A    | O(1)  | Statistical modeling  |
+
+### Integration Examples
+
+#### Real-time Game Analytics
+
+```cpp
+// Track frame times
+GameMetricsTimeSeries frame_times;
+frame_times.record_metric(16.67); // 60 FPS
+
+// Analyze dice fairness
+DiceHistogram dice_stats;
+for (auto roll : game_rolls) {
+    dice_stats.add(roll);
+}
+bool fair = dice_stats.is_fair(0.05);
+
+// AI performance tracking
+StatisticalAccumulator<double> ai_scores;
+ai_scores.add(ai_decision_quality);
+auto stats = ai_scores.get_statistics();
+```
+
+#### Bayesian AI Adaptation
+
+```cpp
+// Track opponent bluff rate
+BetaDistribution bluff_prior(1.0, 1.0); // Uniform prior
+auto updated = BayesianInference::update_beta(
+    bluff_prior,
+    bluffs_detected,
+    honest_plays
+);
+double estimated_bluff_rate = updated->mean();
+```
+
+## Testing Coverage
+
+Comprehensive test suite with 18+ test cases:
+
+- Statistical accumulator edge cases
+- Histogram binning accuracy
+- Time series trend detection
+- Distribution parameter validation
+- Hypothesis test correctness
+- Numerical stability checks
+
+All tests passing with proper handling of:
+
+- Floating-point precision
+- Edge cases (empty data, single values)
+- Extreme values and outliers
+- Time synchronization issues
+
 ## Conclusion
 
-The optimized game state representation combined with these high-performance data structures provides a comprehensive
-foundation for advanced game features. The design balances memory efficiency, cache performance, and ease of use, making
-it suitable for real-time gameplay, AI analysis, and game analytics.
+The optimized game state representation combined with these high-performance data structures and statistical containers
+provides a comprehensive foundation for advanced game features. The design balances memory efficiency, cache
+performance, statistical accuracy, and ease of use, making it suitable for real-time gameplay, AI analysis, game
+analytics, and adaptive behavior modeling.
