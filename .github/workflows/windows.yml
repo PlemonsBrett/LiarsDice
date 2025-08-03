@@ -1,0 +1,47 @@
+name: Windows
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  CPM_SOURCE_CACHE: ${{ github.workspace }}/cpm_modules
+  COMMIT_SHA: ${{ github.sha }}
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache
+        uses: actions/cache@v3
+        with:
+          path: "**/cpm_modules"
+          key: ${{ github.workflow }}-cpm-modules-${{ hashFiles('**/CMakeLists.txt', '**/*.cmake') }}
+
+      - name: Install dependencies
+        run: |
+          choco install ninja
+          choco install boost-msvc-14.3
+
+      - name: Setup Cpp
+        uses: aminya/setup-cpp@v1
+        with:
+          compiler: msvc
+          vcvarsall: true
+          cmake: true
+          ninja: true
+
+      - name: Configure
+        run: cmake -Bbuild -H. -DCMAKE_BUILD_TYPE=Release -G Ninja
+
+      - name: Build
+        run: cmake --build build -j4
+
+      - name: Test
+        working-directory: build
+        run: ctest -C Release --output-on-failure

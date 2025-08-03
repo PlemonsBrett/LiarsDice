@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a modern C++20 implementation of the Liar's Dice game with Boost libraries. The project features:
+This is a modern C++23 implementation of the Liar's Dice game with Boost libraries. The project is based on the ModernCppStarter template and features:
 
 - Point-based elimination system (5 starting points, differential point loss)
 - AI players with configurable strategies
@@ -20,7 +20,7 @@ This is a modern C++20 implementation of the Liar's Dice game with Boost librari
 
 # Run the game
 ./build/standalone/liarsdice
-./build/standalone/liarsdice --seed 12345    # Deterministic mode
+./build/standalone/liarsdice --seed $COMMIT_SHA    # Deterministic mode using commit SHA
 
 # Run all tests
 ./test.sh
@@ -287,6 +287,25 @@ The project includes comprehensive statistical analysis tools using Boost librar
 - **boost.simd**: SIMD vectorization (via CPM)
   - Added as header-only dependency
   - Provides portable SIMD operations
+
+## GitHub Workflows
+
+The project follows ModernCppStarter patterns with platform-specific CI/CD workflows:
+
+### Platform-Specific Workflows
+- **ubuntu.yml**: Linux builds with code coverage
+- **macos.yml**: macOS builds and tests
+- **windows.yml**: Windows builds with MSVC
+- **standalone.yml**: Tests standalone executable
+- **install.yml**: Tests library installation
+- **style.yml**: Code formatting checks
+- **documentation.yaml**: Doxygen documentation deployment
+
+### Key Workflow Features
+- **CPM caching**: Uses `$CPM_SOURCE_CACHE` for dependency caching
+- **Commit SHA seeding**: Release builds use `$COMMIT_SHA` for deterministic testing
+- **Codecov integration**: Automatic coverage reporting on Ubuntu
+- **Cross-platform testing**: All platforms test with Boost dependencies
 
 ## Known Issues
 

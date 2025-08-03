@@ -1,4 +1,4 @@
-name: Install Test
+name: Install
 
 on:
   push:
@@ -9,9 +9,10 @@ on:
 env:
   CTEST_OUTPUT_ON_FAILURE: 1
   CPM_SOURCE_CACHE: ${{ github.workspace }}/cpm_modules
+  COMMIT_SHA: ${{ github.sha }}
 
 jobs:
-  install-test:
+  build:
     runs-on: ubuntu-latest
 
     steps:

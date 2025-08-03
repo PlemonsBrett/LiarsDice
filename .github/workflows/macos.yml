@@ -1,0 +1,48 @@
+name: macOS
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  CPM_SOURCE_CACHE: ${{ github.workspace }}/cpm_modules
+  CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+  COMMIT_SHA: ${{ github.sha }}
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache
+        uses: actions/cache@v3
+        with:
+          path: "**/cpm_modules"
+          key: ${{ github.workflow }}-cpm-modules-${{ hashFiles('**/CMakeLists.txt', '**/*.cmake') }}
+
+      - name: Install dependencies
+        run: |
+          brew install boost ninja ccache
+          pip3 install robotframework==7.0 pexpect==4.9.0 psutil==5.9.8
+
+      - name: Configure
+        run: cmake -Bbuild -H. -DCMAKE_BUILD_TYPE=Release -G Ninja
+
+      - name: Build
+        run: cmake --build build -j4
+
+      - name: Test
+        working-directory: build
+        run: |
+          ctest -C Release --output-on-failure
+          # Run Robot Framework tests
+          robot --variable CLI_PATH:$PWD/standalone/liarsdice \
+                --variable SEED:${{ env.COMMIT_SHA }} \
+                --outputdir ../test/robot/results \
+                --exclude skip \
+                ../test/robot/liarsdice_tests.robot \
+                ../test/robot/edge_cases.robot

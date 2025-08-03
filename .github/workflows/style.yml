@@ -1,4 +1,4 @@
-name: Code Style Check
+name: Style
 
 on:
   push:
@@ -10,7 +10,7 @@ env:
   CPM_SOURCE_CACHE: ${{ github.workspace }}/cpm_modules
 
 jobs:
-  format-check:
+  build:
     runs-on: ubuntu-latest
 
     steps:
