@@ -1,232 +1,120 @@
 # LiarsDice Documentation
 
-This directory contains the source files and configuration for the LiarsDice project documentation.
+This directory contains the documentation for the LiarsDice C++23 implementation.
 
 ## 📚 Documentation Structure
 
 ```sh
 docs/
 ├── README.md                 # This file
-├── requirements.txt          # Python dependencies for building docs
-├── sphinx/                   # Sphinx documentation source
-│   ├── conf.py              # Sphinx configuration
-│   ├── index.rst            # Main documentation index
-│   ├── _static/             # Custom CSS and assets
-│   ├── user/                # User guides and tutorials
-│   ├── architecture/        # System design documentation
-│   ├── api/                 # API reference (stubs, actual content from Doxygen)
-│   ├── development/         # Developer guides
-│   ├── technical/           # Technical decisions and analysis
-│   └── data/                # Data models, UML diagrams, schemas
-├── api/                     # Generated Doxygen API documentation (build output)
-└── html/                    # Generated Sphinx HTML documentation (build output)
+├── api/                      # API documentation
+│   ├── ai.md                # AI system documentation
+│   ├── configuration.md     # Configuration system documentation
+│   ├── core.md              # Core game mechanics documentation
+│   └── logging.md           # Logging system documentation
+├── architecture/             # System architecture documentation
+│   ├── ai-system.md         # AI architecture and design
+│   └── logging-and-configuration.md  # Logging and config architecture
+├── development/              # Developer guides
+│   └── logging-and-configuration-guide.md  # Implementation guide
+├── technical/                # Technical decisions and analysis
+│   ├── commit-1-di-architecture.md         # Dependency injection design
+│   ├── commit-2-testing-framework.md       # Testing framework setup
+│   ├── commit-3-logging-system.md          # Logging implementation
+│   ├── commit-4-configuration-system.md    # Configuration design
+│   ├── commit-5-validation-design.md       # Input validation design
+│   └── commit-6-ai-strategy.md            # AI strategy patterns
+└── design/                   # Design documents (empty)
 ```
 
-## 🏗️ Building Documentation
+## 📖 Documentation Overview
 
-### Prerequisites
+This documentation is organized as Markdown files providing comprehensive information about the LiarsDice C++23
+implementation. The documentation covers API references, system architecture, development guides, and technical design
+decisions.
 
-```bash
-# Install Python dependencies
-pip install -r requirements.txt
+## 📖 Documentation Content
 
-# Install Doxygen (for API documentation)
-brew install doxygen        # macOS
-sudo apt install doxygen    # Ubuntu/Debian
-```
+### API Documentation
 
-### Build Commands
-
-```bash
-# From project root directory:
-
-# Build all documentation (requires CMake setup)
-cmake -B build -S . -DLIARSDICE_BUILD_DOCS=ON
-cmake --build build --target docs
-
-# Build only user documentation (Sphinx)
-cmake --build build --target sphinx-html
-
-# Build only API documentation (Doxygen)  
-cmake --build build --target doxygen
-
-# Alternative: Build Sphinx directly
-cd docs/sphinx
-sphinx-build -b html . ../../build/docs/html
-```
-
-### View Documentation
-
-```bash
-# Serve locally
-python -m http.server 8080 -d build/docs/html
-
-# Then open http://localhost:8080
-```
-
-## 🚀 GitHub Pages Deployment
-
-The documentation is automatically deployed to GitHub Pages via GitHub Actions:
-
-### Automatic Deployment
-
-- **Primary Workflow**: `.github/workflows/docs-simple.yml` (lightweight, reliable)
-- **Alternative Workflow**: `.github/workflows/docs.yml` (full CMake build, manual trigger only)
-- **Trigger**: Push to `main` or `Enhancements-SoftwareEngineeringAndDesign` branches
-- **Output**: Available at `https://plemonsBrett.github.io/LiarsDice/`
-
-### Manual Deployment
-
-```bash
-# Build documentation
-cmake --build build --target docs
-
-# Deploy to GitHub Pages (requires gh CLI)
-gh workflow run docs.yml
-```
-
-## 📖 Documentation Types
-
-### User Documentation (Sphinx)
-
-- **Getting Started**: Setup and basic usage
-- **Building**: Detailed build instructions  
-- **Configuration**: Game and system configuration
-- **Running Games**: Gameplay instructions
+- **[Core API](api/core.md)**: Core game mechanics and interfaces
+- **[AI System](api/ai.md)**: AI strategy patterns and implementation
+- **[Configuration](api/configuration.md)**: Configuration system API
+- **[Logging](api/logging.md)**: Logging system API
 
 ### Architecture Documentation
 
-- **Overview**: System architecture and design patterns
-- **Dependency Injection**: DI container implementation
-- **Interfaces**: Interface design patterns
-- **Testing Strategy**: Comprehensive testing approach
-
-### API Reference (Doxygen)
-
-- **Core API**: Game engine interfaces and implementations
-- **Interfaces**: Complete interface reference
-- **Dependencies**: Dependency injection API
-- **Exceptions**: Error handling system
+- **[AI System Architecture](architecture/ai-system.md)**: AI design patterns and implementation
+- **[Logging & Configuration](architecture/logging-and-configuration.md)**: System infrastructure design
 
 ### Technical Documentation
 
-- **C++23 Features**: Modern language features used
-- **Performance**: Optimization strategies and considerations
-- **Virtual Constexpr**: Technical decision analysis
+- **[DI Architecture](technical/commit-1-di-architecture.md)**: Dependency injection design
+- **[Testing Framework](technical/commit-2-testing-framework.md)**: Test infrastructure setup
+- **[Logging System](technical/commit-3-logging-system.md)**: Logging implementation details
+- **[Configuration System](technical/commit-4-configuration-system.md)**: Configuration design
+- **[Validation Design](technical/commit-5-validation-design.md)**: Input validation patterns
+- **[AI Strategy](technical/commit-6-ai-strategy.md)**: AI strategy implementation
 
-### Data Models
+### Development Guides
 
-- **Modern UML**: Current C++23 architecture diagrams
-- **Legacy UML**: Historical architecture reference
-- **Database Schema**: Data persistence design
-- **AI Architecture**: AI enhancement system design
+- **[Logging & Configuration Guide](development/logging-and-configuration-guide.md)**: Implementation guide for
+  developers
 
 ## 🛠️ Contributing to Documentation
 
-### Adding New Pages
+### Adding New Documentation
 
-1. Create `.rst` files in appropriate `docs/sphinx/` subdirectory
-2. Add to relevant `toctree` in parent `index.rst` or section index
-3. Follow existing patterns for structure and formatting
+1. Create Markdown files in the appropriate subdirectory:
+    - `api/` for API documentation
+    - `architecture/` for system design documentation
+    - `technical/` for technical decisions and analysis
+    - `development/` for developer guides
+
+2. Follow the existing structure and formatting patterns
+
+3. Use clear, descriptive filenames that match the content
 
 ### Style Guidelines
 
-- Use reStructuredText (`.rst`) format
-- Include table of contents for longer pages
-- Use consistent heading hierarchy (`=`, `-`, `~`, `^`)
-- Add cross-references between related sections
-- Include code examples with proper syntax highlighting
-
-### Testing Documentation
-
-```bash
-# Check for syntax errors
-sphinx-build -b html -W docs/sphinx build/docs/test
-
-# Check links (requires internet)
-sphinx-build -b linkcheck docs/sphinx build/docs/linkcheck
-
-# Validate RST syntax
-rstcheck docs/sphinx/**/*.rst
-```
-
-## 🎨 Customization
-
-### Themes and Styling
-
-- **Theme**: Sphinx RTD (Read the Docs) theme
-- **Custom CSS**: `docs/sphinx/_static/custom.css`
-- **Logo**: Place in `docs/sphinx/_static/` and update `conf.py`
-
-### Extensions Used
-
-- **sphinxcontrib.mermaid**: UML and flowchart diagrams
-- **sphinx_tabs.tabs**: Tabbed content sections
-- **breathe**: Doxygen integration for API docs
-- **myst_parser**: Markdown support (if needed)
-
-### Configuration
-
-Main configuration in `docs/sphinx/conf.py`:
-
-- Project metadata
-- Extension configuration  
-- Theme customization
-- Cross-reference settings
-- Build options
+- Use Markdown format for all documentation
+- Include a clear heading structure
+- Add code examples with proper syntax highlighting
+- Link to related documentation where appropriate
+- Keep documentation concise but comprehensive
 
 ## 📝 Content Guidelines
 
 ### Technical Writing
 
 - **Clear and Concise**: Direct, actionable language
-- **Code Examples**: Include working code snippets
-- **Cross-References**: Link related concepts
-- **Visual Aids**: Use diagrams for complex concepts
+- **Code Examples**: Include working C++20 code snippets
+- **Cross-References**: Link to related documentation
+- **Consistency**: Follow established patterns and terminology
 
 ### Code Documentation
 
-- **API Docs**: Generated from source code comments
-- **Examples**: Include practical usage examples
-- **Error Handling**: Document exceptions and error conditions
+- **API Documentation**: Document public interfaces and their usage
+- **Implementation Details**: Explain design decisions and rationale
+- **Examples**: Provide practical usage examples
 - **Performance**: Note performance characteristics where relevant
 
-## 🔍 Troubleshooting
+## 🔍 Viewing Documentation
 
-### Common Issues
+The documentation can be viewed directly in GitHub or any Markdown viewer:
 
-**Sphinx build fails**:
+1. Navigate to the `docs/` directory in the repository
+2. Click on any `.md` file to view it rendered in GitHub
+3. Use the directory structure above to find specific topics
 
-```bash
-# Check dependencies
-pip install -r docs/requirements.txt
+### Local Viewing
 
-# Clean build
-rm -rf build/docs/
-cmake --build build --target sphinx-html
-```
-
-**Mermaid diagrams not rendering**:
+For local viewing with a Markdown preview:
 
 ```bash
-# Ensure extension is installed
-pip install sphinxcontrib-mermaid
+# Using VS Code
+code docs/
+
+# Using any Markdown viewer
+open docs/README.md  # macOS
 ```
-
-**Missing cross-references**:
-
-- Check file paths in `:doc:` directives
-- Ensure target files exist and are in toctree
-
-**GitHub Pages deployment fails**:
-
-- Check workflow file syntax
-- Verify repository has Pages enabled
-- Check workflow permissions in repository settings
-
-### Getting Help
-
-- Check [Sphinx documentation](https://www.sphinx-doc.org/)
-- Review [reStructuredText primer](https://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html)
-- See existing documentation files for examples
-- Check GitHub Actions logs for deployment issues

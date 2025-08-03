@@ -4,6 +4,8 @@
 /out/
 /_build/
 
+docs/notes/
+
 # CPM modules
 /cpm_modules/
 cpm-package-lock.cmake
