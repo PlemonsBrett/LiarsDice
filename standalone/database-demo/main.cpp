@@ -2,10 +2,13 @@
 #include <liarsdice/database/database_config.hpp>
 #include <liarsdice/database/database_connection.hpp>
 #include <liarsdice/database/connection_manager.hpp>
+#include <liarsdice/database/schema_manager.hpp>
 #include <boost/filesystem.hpp>
 #include <iostream>
 #include <string>
 #include <iomanip>
+#include <ctime>
+#include <sstream>
 
 namespace fs = boost::filesystem;
 using namespace liarsdice::database;
@@ -19,7 +22,12 @@ void print_menu() {
     std::cout << "5. Delete player\n";
     std::cout << "6. Show table schema\n";
     std::cout << "7. Run transaction test\n";
-    std::cout << "0. Exit\n";
+    std::cout << "\n=== Schema Management ===\n";
+    std::cout << "8. Show current schema version\n";
+    std::cout << "9. Apply migrations\n";
+    std::cout << "10. Show migration history\n";
+    std::cout << "11. Load and apply project migrations\n";
+    std::cout << "\n0. Exit\n";
     std::cout << "Choice: ";
 }
 
@@ -312,6 +320,152 @@ void run_transaction_test(DatabaseManager& db) {
     }
 }
 
+void show_schema_version(SchemaManager& schema_mgr) {
+    std::cout << "\n=== Current Schema Version ===\n";
+    
+    auto version_result = schema_mgr.get_current_version();
+    if (!version_result) {
+        std::cout << "✗ Error: " << version_result.error().full_message() << "\n";
+        return;
+    }
+    
+    std::cout << "Current version: " << version_result.value() << "\n";
+    
+    // Show pending migrations
+    auto pending = schema_mgr.get_pending_migrations();
+    if (!pending) {
+        std::cout << "✗ Error getting pending migrations: " << pending.error().full_message() << "\n";
+        return;
+    }
+    
+    if (pending.value().empty()) {
+        std::cout << "✓ Database is up to date\n";
+    } else {
+        std::cout << "\nPending migrations:\n";
+        for (const auto* migration : pending.value()) {
+            auto& ver = migration->get_version();
+            std::cout << "  - Version " << ver.version << ": " << ver.description << "\n";
+        }
+    }
+}
+
+void apply_migrations(SchemaManager& schema_mgr) {
+    std::cout << "\n=== Apply Migrations ===\n";
+    
+    std::cout << "Target version (-1 for latest): ";
+    int target;
+    std::cin >> target;
+    std::cin.ignore();
+    
+    auto result = schema_mgr.migrate_to(target);
+    if (!result) {
+        std::cout << "✗ Error: " << result.error().full_message() << "\n";
+        return;
+    }
+    
+    std::cout << "✓ Migrations applied successfully\n";
+}
+
+void show_migration_history(SchemaManager& schema_mgr) {
+    std::cout << "\n=== Migration History ===\n";
+    
+    auto history = schema_mgr.get_applied_migrations();
+    if (!history) {
+        std::cout << "✗ Error: " << history.error().full_message() << "\n";
+        return;
+    }
+    
+    if (history.value().empty()) {
+        std::cout << "No migrations have been applied yet\n";
+        return;
+    }
+    
+    std::cout << std::setw(10) << "Version" 
+              << std::setw(30) << "Description"
+              << std::setw(20) << "Applied At"
+              << std::setw(15) << "Checksum" << "\n";
+    std::cout << std::string(75, '-') << "\n";
+    
+    for (const auto& migration : history.value()) {
+        // Format timestamp
+        auto time_t = std::chrono::system_clock::to_time_t(migration.applied_at);
+        std::tm tm = *std::localtime(&time_t);
+        std::ostringstream time_ss;
+        time_ss << std::put_time(&tm, "%Y-%m-%d %H:%M");
+        
+        std::cout << std::setw(10) << migration.version
+                  << std::setw(30) << migration.description
+                  << std::setw(20) << time_ss.str()
+                  << std::setw(15) << migration.checksum.substr(0, 12) << "...\n";
+    }
+}
+
+void load_project_migrations(SchemaManager& schema_mgr) {
+    std::cout << "\n=== Load Project Migrations ===\n";
+    
+    // Look for migrations directory relative to current path
+    auto migrations_dir = fs::current_path().parent_path().parent_path() / "migrations";
+    
+    if (!fs::exists(migrations_dir)) {
+        std::cout << "✗ Migrations directory not found at: " << migrations_dir << "\n";
+        std::cout << "Creating demo migrations instead...\n";
+        
+        // Create demo migrations
+        schema_mgr.add_migration(std::make_unique<Migration>(
+            1, "Create demo schema",
+            R"(
+                CREATE TABLE demo_players (
+                    id INTEGER PRIMARY KEY,
+                    username TEXT UNIQUE NOT NULL,
+                    rating INTEGER DEFAULT 1000
+                );
+                CREATE INDEX idx_demo_rating ON demo_players(rating);
+            )",
+            "DROP TABLE IF EXISTS demo_players;"
+        ));
+        
+        schema_mgr.add_migration(std::make_unique<Migration>(
+            2, "Add statistics table",
+            R"(
+                CREATE TABLE demo_stats (
+                    player_id INTEGER PRIMARY KEY,
+                    games_played INTEGER DEFAULT 0,
+                    win_rate REAL DEFAULT 0.0,
+                    FOREIGN KEY (player_id) REFERENCES demo_players(id)
+                );
+            )",
+            "DROP TABLE IF EXISTS demo_stats;"
+        ));
+        
+        std::cout << "✓ Added 2 demo migrations\n";
+    } else {
+        std::cout << "Loading migrations from: " << migrations_dir << "\n";
+        
+        auto count = schema_mgr.load_migrations_from_directory(migrations_dir);
+        if (!count) {
+            std::cout << "✗ Error: " << count.error().full_message() << "\n";
+            return;
+        }
+        
+        std::cout << "✓ Loaded " << count.value() << " migrations\n";
+    }
+    
+    // Apply migrations
+    std::cout << "\nApply loaded migrations? (y/n): ";
+    char apply;
+    std::cin >> apply;
+    std::cin.ignore();
+    
+    if (apply == 'y' || apply == 'Y') {
+        auto result = schema_mgr.migrate_to(-1);
+        if (!result) {
+            std::cout << "✗ Error: " << result.error().full_message() << "\n";
+            return;
+        }
+        std::cout << "✓ All migrations applied successfully\n";
+    }
+}
+
 int main() {
     try {
         // Set up database directory
@@ -340,8 +494,9 @@ int main() {
             std::cout << "ConnectionManager initialized successfully\n";
         }
         
-        // Create database manager
+        // Create database manager and schema manager
         DatabaseManager db_mgr;
+        SchemaManager schema_mgr(db_mgr);
         
         // Main loop
         while (true) {
@@ -372,6 +527,18 @@ int main() {
                     break;
                 case 7:
                     run_transaction_test(db_mgr);
+                    break;
+                case 8:
+                    show_schema_version(schema_mgr);
+                    break;
+                case 9:
+                    apply_migrations(schema_mgr);
+                    break;
+                case 10:
+                    show_migration_history(schema_mgr);
+                    break;
+                case 11:
+                    load_project_migrations(schema_mgr);
                     break;
                 case 0:
                     std::cout << "\nShutting down...\n";
