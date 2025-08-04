@@ -1,7 +1,8 @@
 #ifndef LIARSDICE_SQLITE_EXTENSIONS_HPP
 #define LIARSDICE_SQLITE_EXTENSIONS_HPP
 
-#include <boost/dll/shared_library.hpp>
+// Note: Boost.DLL functionality simplified for now
+// #include <boost/dll.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/thread/mutex.hpp>
 #include <sqlite3.h>
@@ -27,7 +28,7 @@ public:
     struct Extension {
         std::string name;
         fs::path path;
-        std::unique_ptr<boost::dll::shared_library> library;
+        // std::unique_ptr<boost::dll::shared_library> library; // Simplified for now
         ExtensionInitFunc init_func;
         bool loaded;
     };
@@ -194,42 +195,16 @@ private:
      * @param ext Extension to load
      */
     void load_extension_internal(sqlite3* db, Extension& ext) {
-        try {
-            // Load the shared library
-            ext.library = std::make_unique<boost::dll::shared_library>(
-                ext.path, 
-                boost::dll::load_mode::rtld_lazy | boost::dll::load_mode::rtld_local
-            );
-
-            // Try to load using SQLite's built-in mechanism first
-            char* error_msg = nullptr;
-            int result = sqlite3_load_extension(db, ext.path.string().c_str(), nullptr, &error_msg);
-            
-            if (result == SQLITE_OK) {
-                ext.loaded = true;
-            } else {
-                std::string error = error_msg ? error_msg : "Unknown error";
-                sqlite3_free(error_msg);
-                
-                // Try manual loading as fallback
-                std::string init_func_name = "sqlite3_" + ext.name + "_init";
-                if (ext.library->has(init_func_name)) {
-                    ext.init_func = ext.library->get<ExtensionInitFunc>(init_func_name);
-                    
-                    result = ext.init_func(db, &error_msg, nullptr);
-                    if (result == SQLITE_OK) {
-                        ext.loaded = true;
-                    } else {
-                        error = error_msg ? error_msg : "Extension init failed";
-                        sqlite3_free(error_msg);
-                        throw std::runtime_error("Failed to initialize extension " + ext.name + ": " + error);
-                    }
-                } else {
-                    throw std::runtime_error("Failed to load extension " + ext.name + ": " + error);
-                }
-            }
-        } catch (const std::exception& e) {
-            throw std::runtime_error("Failed to load extension " + ext.name + ": " + e.what());
+        // Use SQLite's built-in extension loading mechanism
+        char* error_msg = nullptr;
+        int result = sqlite3_load_extension(db, ext.path.string().c_str(), nullptr, &error_msg);
+        
+        if (result == SQLITE_OK) {
+            ext.loaded = true;
+        } else {
+            std::string error = error_msg ? error_msg : "Unknown error";
+            sqlite3_free(error_msg);
+            throw std::runtime_error("Failed to load extension " + ext.name + ": " + error);
         }
     }
 

@@ -134,6 +134,18 @@ target_link_libraries(test_database
 )
 set_target_properties(test_database PROPERTIES CXX_STANDARD 20)
 
+# Database connection tests
+add_executable(test_database_connection source/test_database_connection.cpp)
+target_link_libraries(test_database_connection
+        PRIVATE
+        LiarsDice::LiarsDice
+        Boost::unit_test_framework
+        Boost::filesystem
+        Boost::thread
+        $<$<TARGET_EXISTS:sqlite3>:sqlite3>
+)
+set_target_properties(test_database_connection PROPERTIES CXX_STANDARD 20)
+
 # Add tests to CTest
 add_test(NAME DiceTests COMMAND test_dice)
 add_test(NAME PlayerTests COMMAND test_player)
@@ -145,6 +157,7 @@ add_test(NAME StatisticsTests COMMAND test_statistics)
 add_test(NAME PerformanceTests COMMAND test_performance)
 add_test(NAME BayesianTests COMMAND test_bayesian)
 add_test(NAME DatabaseTests COMMAND test_database)
+add_test(NAME DatabaseConnectionTests COMMAND test_database_connection)
 # add_test(NAME BoostDITests COMMAND test_boost_di)
 add_test(NAME ServiceContainerTests COMMAND test_service_container)
 
