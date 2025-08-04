@@ -38,8 +38,11 @@ BOOST_AUTO_TEST_CASE(BetaPriorBasicTests) {
     double expected_mode = (alpha - 1) / (alpha + beta - 2);
     BOOST_CHECK_CLOSE(*mode, expected_mode, 0.001);
     
-    // Test PDF
-    BOOST_CHECK_CLOSE(beta_prior.pdf(0.3), 1.6537, 1.0); // Allow 1% tolerance
+    // Test PDF - Beta(2,5) at x=0.3
+    // PDF = Gamma(2+5)/(Gamma(2)*Gamma(5)) * x^(2-1) * (1-x)^(5-1)
+    // PDF = Gamma(7)/(Gamma(2)*Gamma(5)) * 0.3^1 * 0.7^4
+    // PDF = 6!/(1!*4!) * 0.3 * 0.2401 = 30 * 0.3 * 0.2401 = 2.1609
+    BOOST_CHECK_CLOSE(beta_prior.pdf(0.3), 2.1609, 0.1); // 0.1% tolerance
     BOOST_CHECK_EQUAL(beta_prior.pdf(-0.1), 0.0);
     BOOST_CHECK_EQUAL(beta_prior.pdf(1.1), 0.0);
     
@@ -216,7 +219,7 @@ BOOST_AUTO_TEST_SUITE(BayesianAnalyzerTests)
 
 BOOST_AUTO_TEST_CASE(BetaBernoulliConjugateUpdateTest) {
     // Classic Beta-Bernoulli conjugate example
-    BayesianAnalyzer<double> analyzer;
+    BayesianAnalyzer<double> analyzer(42); // Use deterministic seed
     
     // Set Beta(1, 1) uniform prior
     auto prior = std::make_shared<BetaPrior<double>>(1.0, 1.0);
@@ -245,7 +248,7 @@ BOOST_AUTO_TEST_CASE(BetaBernoulliConjugateUpdateTest) {
 }
 
 BOOST_AUTO_TEST_CASE(GammaPoissonConjugateUpdateTest) {
-    BayesianAnalyzer<double> analyzer;
+    BayesianAnalyzer<double> analyzer(42); // Use deterministic seed
     
     // Gamma(2, 1) prior
     auto prior = std::make_shared<GammaPrior<double>>(2.0, 1.0);
@@ -269,7 +272,7 @@ BOOST_AUTO_TEST_CASE(GammaPoissonConjugateUpdateTest) {
 
 BOOST_AUTO_TEST_CASE(ModelComparisonTest) {
     // Compare two models with different priors
-    BayesianAnalyzer<double> model1, model2;
+    BayesianAnalyzer<double> model1(42), model2(42); // Use deterministic seed
     
     // Model 1: Optimistic prior Beta(8, 2)
     model1.set_prior(std::make_shared<BetaPrior<double>>(8.0, 2.0));
@@ -291,7 +294,7 @@ BOOST_AUTO_TEST_CASE(ModelComparisonTest) {
 }
 
 BOOST_AUTO_TEST_CASE(DiagnosticsTest) {
-    BayesianAnalyzer<double> analyzer;
+    BayesianAnalyzer<double> analyzer(42); // Use deterministic seed
     
     analyzer.set_prior(std::make_shared<BetaPrior<double>>(1.0, 1.0));
     analyzer.set_likelihood(std::make_shared<BernoulliLikelihood<double>>());
@@ -317,7 +320,8 @@ BOOST_AUTO_TEST_CASE(ConjugateUpdateTest) {
     auto prior = std::make_shared<BetaPrior<double>>(2.0, 3.0);
     auto likelihood = std::make_shared<BernoulliLikelihood<double>>();
     
-    PosteriorCalculator<double> calculator(prior, likelihood);
+    // Use deterministic seed for testing
+    PosteriorCalculator<double> calculator(prior, likelihood, 42);
     
     // Data: 4 successes, 1 failure
     boost::numeric::ublas::vector<double> data(5);
@@ -339,7 +343,8 @@ BOOST_AUTO_TEST_CASE(InformationGainTest) {
     auto prior = std::make_shared<BetaPrior<double>>(1.0, 1.0); // Uniform prior
     auto likelihood = std::make_shared<BernoulliLikelihood<double>>();
     
-    PosteriorCalculator<double> calculator(prior, likelihood);
+    // Use deterministic seed for testing
+    PosteriorCalculator<double> calculator(prior, likelihood, 42);
     
     // Strong evidence
     boost::numeric::ublas::vector<double> data(20);
@@ -365,7 +370,8 @@ BOOST_AUTO_TEST_CASE(PredictiveSamplingTest) {
     auto prior = std::make_shared<BetaPrior<double>>(5.0, 5.0);
     auto likelihood = std::make_shared<BernoulliLikelihood<double>>();
     
-    PosteriorCalculator<double> calculator(prior, likelihood);
+    // Use deterministic seed for testing
+    PosteriorCalculator<double> calculator(prior, likelihood, 42);
     
     // Get predictive samples
     auto samples = calculator.predictive_sample(1000);

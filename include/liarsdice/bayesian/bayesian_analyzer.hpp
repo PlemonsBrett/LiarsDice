@@ -50,8 +50,9 @@ public:
     
     /**
      * @brief Construct a Bayesian analyzer with optional configuration
+     * @param seed Optional seed for deterministic testing (nullopt for random)
      */
-    BayesianAnalyzer() = default;
+    BayesianAnalyzer(std::optional<unsigned int> seed = std::nullopt) : seed_(seed) {}
     
     /**
      * @brief Set the prior distribution for analysis
@@ -81,7 +82,7 @@ public:
         
         // Create posterior calculator if not exists
         if (!posterior_) {
-            posterior_ = std::make_shared<PosteriorCalculator<T>>(prior_, likelihood_);
+            posterior_ = std::make_shared<PosteriorCalculator<T>>(prior_, likelihood_, seed_);
         }
         
         // Update with new data
@@ -211,6 +212,7 @@ private:
     prior_ptr prior_;
     likelihood_ptr likelihood_;
     posterior_ptr posterior_;
+    std::optional<unsigned int> seed_;
 };
 
 /**

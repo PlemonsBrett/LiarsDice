@@ -44,12 +44,15 @@ public:
      * @brief Construct a posterior calculator
      * @param prior Prior distribution
      * @param likelihood Likelihood function
+     * @param seed Optional seed for deterministic testing (nullopt for random)
      */
-    PosteriorCalculator(prior_ptr prior, likelihood_ptr likelihood)
+    PosteriorCalculator(prior_ptr prior, likelihood_ptr likelihood,
+                       std::optional<unsigned int> seed = std::nullopt)
         : prior_(std::move(prior)), 
           likelihood_(std::move(likelihood)),
           n_observations_(0),
-          log_marginal_likelihood_(0) {
+          log_marginal_likelihood_(0),
+          seed_(seed) {
         
         // Check for conjugacy
         is_conjugate_ = prior_->is_conjugate_to(likelihood_->family());
@@ -238,8 +241,13 @@ public:
      */
     [[nodiscard]] vector_type predictive_sample(std::size_t n_samples) const {
         vector_type samples(n_samples);
-        std::random_device rd;
-        boost::random::mt19937 gen(rd());
+        boost::random::mt19937 gen;
+        if (seed_) {
+            gen.seed(*seed_);
+        } else {
+            std::random_device rd;
+            gen.seed(rd());
+        }
         
         if (is_conjugate_ && conjugate_posterior_) {
             // Direct sampling from conjugate posterior
@@ -320,6 +328,9 @@ private:
     std::vector<T> posterior_samples_;
     std::vector<T> importance_weights_;
     
+    // Optional seed for deterministic testing
+    std::optional<unsigned int> seed_;
+    
     /**
      * @brief Update using conjugate prior relationships
      */
@@ -390,8 +401,13 @@ private:
         // This is a simplified version; real implementation would be more sophisticated
         
         const std::size_t n_particles = 1000;
-        std::random_device rd;
-        boost::random::mt19937 gen(rd());
+        boost::random::mt19937 gen;
+        if (seed_) {
+            gen.seed(*seed_);
+        } else {
+            std::random_device rd;
+            gen.seed(rd());
+        }
         
         // Generate particles from prior
         auto prior_samples = prior_->sample(n_particles, gen);
