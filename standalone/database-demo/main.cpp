@@ -3,6 +3,9 @@
 #include <liarsdice/database/database_connection.hpp>
 #include <liarsdice/database/connection_manager.hpp>
 #include <liarsdice/database/schema_manager.hpp>
+#include <liarsdice/database/schema_validator.hpp>
+#include <liarsdice/database/database_initializer.hpp>
+#include <liarsdice/database/backup_manager.hpp>
 #include <boost/filesystem.hpp>
 #include <iostream>
 #include <string>
@@ -27,6 +30,12 @@ void print_menu() {
     std::cout << "9. Apply migrations\n";
     std::cout << "10. Show migration history\n";
     std::cout << "11. Load and apply project migrations\n";
+    std::cout << "\n=== Advanced Features ===\n";
+    std::cout << "12. Validate schema constraints\n";
+    std::cout << "13. Initialize database from config\n";
+    std::cout << "14. Create backup\n";
+    std::cout << "15. List backups\n";
+    std::cout << "16. Restore from backup\n";
     std::cout << "\n0. Exit\n";
     std::cout << "Choice: ";
 }

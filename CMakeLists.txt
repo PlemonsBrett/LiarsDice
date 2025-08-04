@@ -37,6 +37,8 @@ find_package(Boost 1.70.0 REQUIRED COMPONENTS
   thread
   container
   timer
+  iostreams
+  regex
 )
 
 # Add Boost.DI (header-only library)
@@ -125,6 +127,8 @@ target_link_libraries(${PROJECT_NAME}
     Boost::serialization
     Boost::thread
     Boost::container
+    Boost::iostreams
+    Boost::regex
     $<$<TARGET_EXISTS:sqlite3>:sqlite3>
   PUBLIC
     Boost::boost
