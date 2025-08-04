@@ -59,6 +59,11 @@ public:
             return boost::system::error_code();
         }
         
+        // Check if this is a URI (starts with "file:")
+        if (path.substr(0, 5) == "file:") {
+            flags |= SQLITE_OPEN_URI;
+        }
+        
         sqlite3* db_raw = nullptr;
         int result = sqlite3_open_v2(path.c_str(), &db_raw, flags, nullptr);
         
@@ -245,21 +250,33 @@ public:
     
 private:
     /**
-     * @brief Configure connection settings
+     * @brief Configure connection settings (must be called with mutex locked)
      */
     void configure_connection() {
         if (!connection_) return;
         
-        // Set pragmas for performance and safety
-        execute("PRAGMA journal_mode=WAL");
-        execute("PRAGMA synchronous=NORMAL");
-        execute("PRAGMA foreign_keys=ON");
-        execute("PRAGMA cache_size=-64000"); // 64MB cache
-        execute("PRAGMA temp_store=MEMORY");
-        execute("PRAGMA mmap_size=268435456"); // 256MB mmap
+        // Execute pragmas directly without locking again
+        char* error_msg = nullptr;
         
-        // Set busy timeout
-        set_busy_timeout(5000); // 5 seconds
+        // Set pragmas for performance and safety
+        const char* pragmas[] = {
+            "PRAGMA journal_mode=WAL",
+            "PRAGMA synchronous=NORMAL",
+            "PRAGMA foreign_keys=ON",
+            "PRAGMA cache_size=-64000", // 64MB cache
+            "PRAGMA temp_store=MEMORY",
+            "PRAGMA mmap_size=268435456" // 256MB mmap
+        };
+        
+        for (const char* pragma : pragmas) {
+            int result = sqlite3_exec(connection_.get(), pragma, nullptr, nullptr, &error_msg);
+            if (result != SQLITE_OK && error_msg) {
+                sqlite3_free(error_msg);
+            }
+        }
+        
+        // Set busy timeout directly
+        sqlite3_busy_timeout(connection_.get(), 5000); // 5 seconds
     }
     
     /**

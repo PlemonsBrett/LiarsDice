@@ -273,7 +273,7 @@ private:
         io_context_.reset();
     }
     
-    // Singleton members
+    // Singleton members - static definitions in connection_manager.cpp
     static std::unique_ptr<ConnectionManager> instance_;
     static boost::once_flag init_flag_;
     
@@ -293,9 +293,7 @@ private:
     size_t thread_pool_size_;
 };
 
-// Static member definitions
-std::unique_ptr<ConnectionManager> ConnectionManager::instance_;
-boost::once_flag ConnectionManager::init_flag_ = BOOST_ONCE_INIT;
+// Static member declarations - definitions moved to connection_manager.cpp
 
 } // namespace liarsdice::database
 

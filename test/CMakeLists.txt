@@ -146,6 +146,31 @@ set_target_properties(test_database PROPERTIES CXX_STANDARD 20)
 # )
 # set_target_properties(test_database_connection PROPERTIES CXX_STANDARD 20)
 
+# Database manager tests
+add_executable(test_database_manager source/test_database_manager.cpp)
+target_link_libraries(test_database_manager
+        PRIVATE
+        LiarsDice::LiarsDice
+        Boost::unit_test_framework
+        Boost::filesystem
+        Boost::thread
+        Boost::log
+        $<$<TARGET_EXISTS:sqlite3>:sqlite3>
+)
+set_target_properties(test_database_manager PROPERTIES CXX_STANDARD 20)
+
+# Database manager simple tests
+add_executable(test_database_manager_simple source/test_database_manager_simple.cpp)
+target_link_libraries(test_database_manager_simple
+        PRIVATE
+        LiarsDice::LiarsDice
+        Boost::unit_test_framework
+        Boost::filesystem
+        $<$<TARGET_EXISTS:sqlite3>:sqlite3>
+)
+set_target_properties(test_database_manager_simple PROPERTIES CXX_STANDARD 20)
+
+
 # Add tests to CTest
 add_test(NAME DiceTests COMMAND test_dice)
 add_test(NAME PlayerTests COMMAND test_player)
@@ -157,6 +182,8 @@ add_test(NAME StatisticsTests COMMAND test_statistics)
 add_test(NAME PerformanceTests COMMAND test_performance)
 add_test(NAME BayesianTests COMMAND test_bayesian)
 add_test(NAME DatabaseTests COMMAND test_database)
+add_test(NAME DatabaseManagerTests COMMAND test_database_manager)
+add_test(NAME DatabaseManagerSimpleTests COMMAND test_database_manager_simple)
 # Temporarily disabled due to hanging issue
 # add_test(NAME DatabaseConnectionTests COMMAND test_database_connection)
 # add_test(NAME BoostDITests COMMAND test_boost_di)
