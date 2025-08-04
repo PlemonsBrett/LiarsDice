@@ -10,8 +10,11 @@ include(../cmake/tools.cmake)
 
 include(../cmake/CPM.cmake)
 
-# Add the main library as a dependency
-CPMAddPackage(NAME LiarsDice SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/..)
+# When building standalone, check if parent project is available
+if(NOT TARGET LiarsDice::LiarsDice)
+  # Add the main library as a dependency
+  CPMAddPackage(NAME LiarsDice SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/..)
+endif()
 
 # ---- Create standalone executable ----
 

@@ -114,6 +114,15 @@ target_link_libraries(test_performance
 )
 set_target_properties(test_performance PROPERTIES CXX_STANDARD 20)
 
+# Bayesian inference tests
+add_executable(test_bayesian source/test_bayesian.cpp)
+target_link_libraries(test_bayesian
+        PRIVATE
+        LiarsDice::LiarsDice
+        Boost::unit_test_framework
+)
+set_target_properties(test_bayesian PROPERTIES CXX_STANDARD 20)
+
 # Add tests to CTest
 add_test(NAME DiceTests COMMAND test_dice)
 add_test(NAME PlayerTests COMMAND test_player)
@@ -123,6 +132,7 @@ add_test(NAME GameStateStorageTests COMMAND test_game_state_storage)
 add_test(NAME DataStructuresTests COMMAND test_data_structures)
 add_test(NAME StatisticsTests COMMAND test_statistics)
 add_test(NAME PerformanceTests COMMAND test_performance)
+add_test(NAME BayesianTests COMMAND test_bayesian)
 # add_test(NAME BoostDITests COMMAND test_boost_di)
 add_test(NAME ServiceContainerTests COMMAND test_service_container)
 

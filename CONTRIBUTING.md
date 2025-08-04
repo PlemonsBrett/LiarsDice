@@ -1,6 +1,7 @@
 # Contributing to Liar's Dice
 
-Thank you for your interest in contributing to this modern C++23 implementation of Liar's Dice! This document provides guidelines and information for contributors.
+Thank you for your interest in contributing to this modern C++20 implementation of Liar's Dice! This document provides
+guidelines and information for contributors.
 
 ## Table of Contents
 
@@ -15,21 +16,23 @@ Thank you for your interest in contributing to this modern C++23 implementation 
 
 ## Project Overview
 
-This is a modern C++23 implementation of the Liar's Dice game following industry best practices. The project is organized as a library (`liarsdice_core`) with a CLI application, AI players, and comprehensive testing infrastructure including automated Robot Framework tests.
+This is a modern C++20 implementation of the Liar's Dice game following industry best practices. The project features
+advanced AI strategies with Bayesian inference, custom data structures optimized for gaming, and comprehensive testing
+infrastructure using Boost.Test and Robot Framework.
 
 ## Development Setup
 
 ### Prerequisites
 
 #### Required
-- **CMake 3.28+**: Build system
-- **C++23 Compiler**: GCC 12+, Clang 15+, or MSVC 2022+
+
+- **CMake 3.15+**: Build system with CPM (CMake Package Manager)
+- **C++20 Compiler**: GCC 12+, Clang 15+, or MSVC 2022+
+- **Git**: For CPM dependency management
 
 #### Optional
-- **Conan 2.0+**: Modern package manager (recommended for easier dependency management)
 - **Python 3.8+**: For Robot Framework tests
 - **Doxygen**: For API documentation
-- **Sphinx**: For user documentation
 
 ### Quick Start
 
@@ -38,14 +41,14 @@ This is a modern C++23 implementation of the Liar's Dice game following industry
 git clone <repository-url>
 cd LiarsDice
 
-# Build everything (Release by default, auto-detects Conan)
-./scripts/build.sh
+# Build everything (Release by default)
+./build.sh
 
 # Run tests
 ./scripts/test.sh
 
 # Run the game
-./build/bin/liarsdice-cli
+./build/standalone/liarsdice
 ```
 
 ### Build Commands
@@ -54,16 +57,16 @@ cd LiarsDice
 
 ```bash
 # Build with specific type
-./scripts/build.sh Debug
+./build.sh Debug
 
-# Build with Conan explicitly
-./scripts/build-conan.sh
-
-# Build without Conan (FetchContent)
-./scripts/build.sh Release no
+# Run all tests
+./test.sh
 
 # Run Robot Framework tests
-./tests/robot/run_tests.sh
+./test/robot/run_tests.sh
+
+# Clean build
+./clean.sh
 ```
 
 #### Manual CMake Commands
@@ -86,14 +89,11 @@ cmake --install build --prefix /usr/local
 
 ```bash
 # Available options (default values shown)
--DLIARSDICE_BUILD_TESTS=ON         # Build test suite
--DLIARSDICE_BUILD_EXAMPLES=ON      # Build example programs  
--DLIARSDICE_BUILD_BENCHMARKS=OFF   # Build performance benchmarks
--DLIARSDICE_BUILD_DOCS=OFF         # Build documentation
--DLIARSDICE_INSTALL=ON             # Generate install targets
--DLIARSDICE_USE_SANITIZERS=ON      # Enable sanitizers in debug builds
--DLIARSDICE_ENABLE_LOGGING=ON      # Enable spdlog logging
--DLIARSDICE_ENABLE_CONFIG=ON       # Enable configuration system
+-DLiarsDice_BUILD_TESTS=ON         # Build test suite
+-DLiarsDice_BUILD_EXAMPLES=ON      # Build example programs  
+-DLiarsDice_BUILD_DOCS=OFF         # Build documentation
+-DLiarsDice_USE_SANITIZERS=ON      # Enable sanitizers in debug builds
+-DLiarsDice_WARNINGS_AS_ERRORS=ON  # Treat warnings as errors
 ```
 
 ## Development Workflow
@@ -101,36 +101,36 @@ cmake --install build --prefix /usr/local
 ### Adding New Features
 
 1. Create a feature branch from `main`
-2. Implement in `src/liarsdice/` (library code)
+2. Implement in `source/` (source code)
 3. Add public interface to `include/liarsdice/`
-4. Write unit tests in `tests/unit/`
-5. Add Robot Framework tests in `tests/robot/`
-6. Update CLI app in `apps/liarsdice-cli/` if needed
-7. Update documentation (README.md, etc.)
+4. Write unit tests in `test/source/`
+5. Add Robot Framework tests in `test/robot/`
+6. Update CLI app in `standalone/` if needed
+7. Update documentation (README.md, Journal.MD, etc.)
 8. Submit a pull request
 
 ### Development Tools
 
 ```bash
-# Format code
-./scripts/format.sh
+# Build the project
+./build.sh
 
-# Check formatting (without changes)
-./scripts/format.sh --check
+# Run all tests
+./test.sh
 
-# Lint code
-./scripts/lint.sh
+# Clean build directory
+./clean.sh
 
-# Lint with automatic fixes
-./scripts/lint.sh --fix
+# Format code (if available)
+clang-format -i source/**/*.cpp include/**/*.hpp
 
-# Lint with verbose output
-./scripts/lint.sh --verbose
+# Lint code (if available)
+clang-tidy source/**/*.cpp -- -Iinclude
 ```
 
 ## Code Style Guidelines
 
-- **Language Standard**: C++23
+- **Language Standard**: C++20
 - **Formatting**: LLVM style (enforced by `.clang-format`)
 - **Linting**: Comprehensive rule set (enforced by `.clang-tidy`)
 - **Naming Conventions**:
@@ -153,19 +153,21 @@ cmake --install build --prefix /usr/local
 
 ## Testing Guidelines
 
-### Unit Tests (Catch2)
+### Unit Tests (Boost.Test)
 
-All new code should include comprehensive unit tests:
+All new code should include comprehensive unit tests using Boost.Test framework:
 
 ```bash
 # Run all tests
-./scripts/test.sh
+./test.sh
 
-# Run specific test by tag
-./scripts/test.sh --filter "[dice]"
+# Run specific test executable
+./build/test/test_dice
+./build/test/test_bayesian
+./build/test/test_ai
 
 # Run with verbose output
-./scripts/test.sh --verbose
+ctest --test-dir build --output-on-failure
 ```
 
 ### Robot Framework Tests
@@ -174,66 +176,83 @@ For CLI features, add end-to-end tests:
 
 ```bash
 # Run all automated tests
-./tests/robot/run_tests.sh
+./test/robot/run_tests.sh
 
 # Run specific test suite
-./tests/robot/run_tests.sh --suite main
+./test/robot/run_tests.sh --suite main
 
 # Run with specific tags
-./tests/robot/run_tests.sh --tag smoke
+./test/robot/run_tests.sh --tag smoke
 ```
 
 ### Test Coverage Areas
 
-- **Unit Tests**: Component-level testing with Catch2
+- **Unit Tests**: Component-level testing with Boost.Test
 - **Integration Tests**: Multi-component interaction testing
 - **Robot Framework Tests**: End-to-end CLI testing with Pexpect
 - **Performance Tests**: Response time and memory usage validation
+- **Bayesian Tests**: Statistical algorithm validation with deterministic seeding
 
 ## Project Structure
 
 ```
 LiarsDice/
-├── src/                    # Library implementation
+├── source/                # Library implementation
+│   ├── ai/               # AI strategies with statistical analysis
+│   ├── app/              # Application framework
+│   ├── core/             # Core game logic
+│   ├── di/               # Dependency injection
+│   ├── liarsdice/        # Bayesian inference engine
+│   │   └── bayesian/     # Bayesian analysis components
+│   ├── network/          # Network components
+│   └── ui/               # User interface
+├── include/              # Public API headers
 │   └── liarsdice/
-│       ├── core/          # Core game logic
-│       ├── ai/            # AI strategies
-│       ├── config/        # Configuration system
-│       └── logging/       # Logging infrastructure
-├── include/               # Public API headers
-│   └── liarsdice/
-├── apps/                  # Executable applications
-│   └── liarsdice-cli/
-├── tests/                 # Test suites
-│   ├── unit/             # Unit tests (Catch2)
-│   └── robot/            # Robot Framework tests
-├── examples/             # Usage examples
-├── cmake/                # CMake modules
-├── scripts/              # Build/development scripts
-└── docs/                 # Documentation
+│       ├── ai/           # AI interfaces
+│       ├── bayesian/     # Bayesian analysis
+│       ├── core/         # Core interfaces
+│       ├── data_structures/ # Custom data structures
+│       ├── performance/  # Performance optimizations
+│       └── statistics/   # Statistical algorithms
+├── standalone/           # Standalone executable
+├── test/                 # Test suites
+│   ├── source/          # Unit tests (Boost.Test)
+│   └── robot/           # Robot Framework tests
+├── cmake/               # CMake modules
+├── build.sh             # Main build script
+├── test.sh              # Test runner
+├── clean.sh             # Clean script
+├── Journal.MD           # Development journal
+├── CONTRIBUTING.md      # This file
+└── README.md            # Project overview
 ```
 
 ### Key Components
 
 - **Core Library**: `liarsdice::core` - Game logic and data models
-- **AI System**: `liarsdice::ai` - AI strategies with a factory pattern
-- **Configuration**: `liarsdice::config` - Hierarchical configuration system
-- **Logging**: `liarsdice::logging` - Structured logging with spdlog
-- **CLI Application**: Command-line interface using the library
+- **AI System**: `liarsdice::ai` - Statistical AI strategies with Bayesian inference
+- **Bayesian Engine**: `liarsdice::bayesian` - Advanced statistical analysis and inference
+- **Data Structures**: `liarsdice::data_structures` - Custom optimized containers (LRU cache, circular buffer, etc.)
+- **Performance**: `liarsdice::performance` - SIMD operations and custom allocators
+- **Statistics**: `liarsdice::statistics` - Statistical algorithms and accumulators
+- **Standalone Application**: Command-line game using the library
 
 ## Build System
 
-The project uses modern CMake with target-based configuration:
+The project uses modern CMake with CPM (CMake Package Manager) for dependencies:
 
 - **Main Targets**:
-  - `liarsdice::core` - Main library
-  - `liarsdice::warnings` - Compiler warnings interface
-  - `liarsdice-cli` - CLI executable
-  - `unit_tests` - Unit test executable
-  - `basic_game` - Example executable
+    - `LiarsDice` - Main library
+    - `LiarsDiceStandalone` - Standalone executable
+    - `test_*` - Individual test executables (test_dice, test_bayesian, etc.)
+
+- **Dependencies**:
+    - **Boost**: Math, test framework, and utility libraries
+    - **xsimd**: SIMD vectorization library
+    - **fmt**: String formatting library
 
 - **Compiler Features**:
-  - C++23 standard required
+    - C++20 standard required
   - IPO/LTO enabled for Release builds
   - Comprehensive warnings treated as errors
   - Address/UB sanitizers in Debug builds
@@ -243,10 +262,9 @@ The project uses modern CMake with target-based configuration:
 ### Pull Request Process
 
 1. **Before Submitting**:
-   - Ensure all tests pass (`./scripts/test.sh`)
-   - Run code formatting (`./scripts/format.sh`)
-   - Run linting and fix any issues (`./scripts/lint.sh`)
-   - Update documentation if needed
+    - Ensure all tests pass (`./test.sh`)
+    - Verify build completes successfully (`./build.sh`)
+    - Update documentation if needed (Journal.MD, README.md)
    - Add tests for new functionality
 
 2. **PR Guidelines**:
@@ -277,11 +295,11 @@ Types: feat, fix, docs, style, refactor, test, chore
 
 Example:
 ```
-feat: Add medium difficulty AI strategy
+feat: Implement Bayesian inference engine
 
-Implement statistical analysis and pattern recognition
-for more challenging gameplay. Includes configurable
-parameters for risk tolerance and bluff detection.
+Add comprehensive Bayesian analysis framework with
+PosteriorCalculator, PriorDistribution hierarchy, and
+LikelihoodFunction interface for advanced AI decision-making.
 
 Closes #123
 ```
@@ -295,10 +313,12 @@ Closes #123
 
 ## Additional Resources
 
-- [README.md—](README.md)Project overview and usage
+- [README.md](README.md) - Project overview and usage
+- [Journal.MD](Journal.MD) - Development journal and technical documentation
 - [CMake Documentation](https://cmake.org/documentation/)
-- [C++23 Reference](https://en.cppreference.com/)
-- [Catch2 Documentation](https://github.com/catchorg/Catch2)
+- [C++20 Reference](https://en.cppreference.com/)
+- [Boost Libraries](https://www.boost.org/) - Core mathematical and utility libraries
+- [CPM.cmake](https://github.com/cpm-cmake/CPM.cmake) - CMake Package Manager
 - [Robot Framework User Guide](https://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html)
 
 Thank you for contributing to Liar's Dice!
