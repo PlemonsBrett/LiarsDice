@@ -1,10 +1,11 @@
 name: Style
 
+# This workflow is integrated into the main CI workflow (.github/workflows/ci.yml)
+# It can still run independently for style-only checks
+
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+  workflow_dispatch:  # Allow manual trigger
+  workflow_call:      # Allow being called from other workflows
 
 env:
   CPM_SOURCE_CACHE: ${{ github.workspace }}/cpm_modules

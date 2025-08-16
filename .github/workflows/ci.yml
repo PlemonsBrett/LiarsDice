@@ -1,0 +1,318 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  CPM_SOURCE_CACHE: ${{ github.workspace }}/cpm_modules
+
+jobs:
+  # Step 1: Linting and Formatting Check
+  lint-format:
+    name: Lint & Format Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache
+        uses: actions/cache@v3
+        with:
+          path: "**/cpm_modules"
+          key: ${{ github.workflow }}-lint-${{ hashFiles('**/CMakeLists.txt', '**/*.cmake') }}
+
+      - name: Install format dependencies
+        run: |
+          pip3 install clang-format==14.0.6 cmake_format==0.6.11 pyyaml
+          sudo apt-get update
+          sudo apt-get install -y libboost-all-dev
+
+      - name: Check C++ formatting
+        run: |
+          echo "Checking C++ code formatting..."
+          find include source standalone test -name "*.cpp" -o -name "*.hpp" | \
+          xargs clang-format --dry-run --Werror 2>&1 | tee format_check.log || true
+          if grep -q "error:" format_check.log; then
+            echo "::error::C++ formatting issues found. Run 'clang-format -i' on affected files."
+            cat format_check.log
+            exit 1
+          else
+            echo "✅ C++ formatting check passed!"
+          fi
+
+      - name: Check CMake formatting
+        run: |
+          find . -name "CMakeLists.txt" -o -name "*.cmake" | \
+          grep -v build | grep -v cpm_modules | \
+          xargs cmake-format --check 2>&1 | tee cmake_format_check.log
+          if grep -q "would be reformatted" cmake_format_check.log; then
+            echo "::error::CMake formatting issues found!"
+            exit 1
+          else
+            echo "✅ CMake formatting check passed!"
+          fi
+
+  # Step 2: Build Library for each platform
+  build-library:
+    name: Build Library (${{ matrix.os }})
+    needs: lint-format
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        include:
+          - os: ubuntu-latest
+            compiler: gcc
+            generator: Ninja
+          - os: macos-latest
+            compiler: clang
+            generator: Ninja
+          - os: windows-latest
+            compiler: msvc
+            generator: Ninja
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            **/cpm_modules
+            ~/.cache/pip
+            ~/Library/Caches/pip
+            ~\AppData\Local\pip\Cache
+          key: ${{ github.workflow }}-${{ matrix.os }}-build-${{ hashFiles('**/CMakeLists.txt', '**/*.cmake') }}
+
+      - name: Install dependencies (Ubuntu)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libboost-all-dev ninja-build lcov
+
+      - name: Install dependencies (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          brew install boost ninja lcov
+
+      - name: Install dependencies (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          choco install ninja
+          choco install boost-msvc-14.3
+
+      - name: Configure CMake
+        run: |
+          cmake -S . -B build \
+            -DCMAKE_BUILD_TYPE=Release \
+            -G "${{ matrix.generator }}" \
+            -DLIARSDICE_BUILD_TESTS=ON \
+            -DLIARSDICE_BUILD_EXAMPLES=ON
+
+      - name: Build library
+        run: cmake --build build --config Release -j4
+
+      - name: Upload library artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: library-${{ matrix.os }}
+          path: |
+            build/libLiarsDice.*
+            build/LiarsDice.lib
+            build/*.a
+            build/*.so
+            build/*.dylib
+            build/*.dll
+
+  # Step 3: Run Tests
+  test-library:
+    name: Test Library (${{ matrix.os }})
+    needs: build-library
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            **/cpm_modules
+            ~/.cache/pip
+            ~/Library/Caches/pip
+            ~\AppData\Local\pip\Cache
+          key: ${{ github.workflow }}-${{ matrix.os }}-test-${{ hashFiles('**/CMakeLists.txt', '**/*.cmake') }}
+
+      - name: Install dependencies (Ubuntu)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libboost-all-dev ninja-build
+
+      - name: Install dependencies (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          brew install boost ninja
+
+      - name: Install dependencies (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          choco install ninja
+          choco install boost-msvc-14.3
+
+      - name: Configure and Build
+        run: |
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -G Ninja
+          cmake --build build --config Release -j4
+
+      - name: Run tests
+        run: |
+          cd build
+          ctest -C Release --output-on-failure --parallel 4
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results-${{ matrix.os }}
+          path: build/Testing/
+
+  # Step 4: Build Standalone Executable
+  build-standalone:
+    name: Build Standalone (${{ matrix.os }})
+    needs: test-library
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            **/cpm_modules
+            ~/.cache/pip
+            ~/Library/Caches/pip
+            ~\AppData\Local\pip\Cache
+          key: ${{ github.workflow }}-${{ matrix.os }}-standalone-${{ hashFiles('**/CMakeLists.txt', '**/*.cmake') }}
+
+      - name: Install dependencies (Ubuntu)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libboost-all-dev ninja-build
+
+      - name: Install dependencies (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          brew install boost ninja
+
+      - name: Install dependencies (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          choco install ninja
+          choco install boost-msvc-14.3
+
+      - name: Configure and Build
+        run: |
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -G Ninja
+          cmake --build build --config Release --target LiarsDiceStandalone -j4
+
+      - name: Test standalone executable
+        run: |
+          if [ "${{ runner.os }}" == "Windows" ]; then
+            ./build/standalone/liarsdice.exe --help
+            echo -e "2\n1\n" | ./build/standalone/liarsdice.exe --seed 12345 || true
+          else
+            ./build/standalone/liarsdice --help
+            printf "2\n1\n" | ./build/standalone/liarsdice --seed 12345 || true
+          fi
+        shell: bash
+
+      - name: Upload standalone artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: standalone-${{ matrix.os }}
+          path: |
+            build/standalone/liarsdice
+            build/standalone/liarsdice.exe
+
+  # Step 5: Test Installation
+  test-install:
+    name: Test Install (${{ matrix.os }})
+    needs: build-standalone
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            **/cpm_modules
+          key: ${{ github.workflow }}-${{ matrix.os }}-install-${{ hashFiles('**/CMakeLists.txt', '**/*.cmake') }}
+
+      - name: Install dependencies (Ubuntu)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libboost-all-dev
+
+      - name: Install dependencies (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          brew install boost
+
+      - name: Build and install library
+        run: |
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+          sudo cmake --build build --target install
+          rm -rf build
+
+      - name: Test installation
+        run: |
+          cmake -S test -B build -DTEST_INSTALLED_VERSION=1
+          cmake --build build --config Release
+
+  # Final summary job
+  ci-success:
+    name: CI Success
+    needs: [lint-format, test-library, build-standalone, test-install]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Check all jobs
+        run: |
+          if [[ "${{ needs.lint-format.result }}" != "success" ]]; then
+            echo "❌ Linting/Formatting failed"
+            exit 1
+          fi
+          if [[ "${{ needs.test-library.result }}" != "success" ]]; then
+            echo "❌ Library tests failed"
+            exit 1
+          fi
+          if [[ "${{ needs.build-standalone.result }}" != "success" ]]; then
+            echo "❌ Standalone build failed"
+            exit 1
+          fi
+          if [[ "${{ needs.test-install.result }}" != "success" ]]; then
+            echo "❌ Install test failed"
+            exit 1
+          fi
+          echo "✅ All CI checks passed!"

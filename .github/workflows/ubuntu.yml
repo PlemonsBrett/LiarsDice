@@ -1,10 +1,10 @@
 name: Ubuntu
 
+# DEPRECATED: This workflow is now part of the main CI workflow (.github/workflows/ci.yml)
+# Only kept for manual testing or specific Ubuntu debugging
+
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+  workflow_dispatch:  # Only manual trigger
 
 env:
   CPM_SOURCE_CACHE: ${{ github.workspace }}/cpm_modules
