@@ -24,9 +24,15 @@ jobs:
 
       - name: Install format dependencies
         run: |
-          pip3 install clang-format==14.0.6 cmake_format==0.6.11 pyyaml
+          # Install clang-format-20 for consistent formatting with local development
+          wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+          sudo add-apt-repository "deb http://apt.llvm.org/$(lsb_release -cs)/ llvm-toolchain-$(lsb_release -cs)-20 main"
           sudo apt-get update
-          sudo apt-get install -y libboost-all-dev
+          sudo apt-get install -y clang-format-20 libboost-all-dev
+          sudo ln -sf /usr/bin/clang-format-20 /usr/local/bin/clang-format
+          pip3 install cmake_format==0.6.11 pyyaml
+          echo "Using clang-format version:"
+          clang-format --version
 
       - name: Check C++ formatting
         run: |
