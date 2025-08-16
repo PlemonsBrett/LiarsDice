@@ -109,8 +109,15 @@ jobs:
         run: |
           choco install ninja
           choco install boost-msvc-14.3
+          echo "BOOST_ROOT=C:\local\boost_1_87_0" >> $env:GITHUB_ENV
+          echo "BOOST_LIBRARYDIR=C:\local\boost_1_87_0\lib64-msvc-14.3" >> $env:GITHUB_ENV
 
-      - name: Configure CMake
+      - name: Configure CMake (Windows)
+        if: runner.os == 'Windows'
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -G "${{ matrix.generator }}" -DLIARSDICE_BUILD_TESTS=ON -DLIARSDICE_BUILD_EXAMPLES=ON -DBOOST_ROOT="C:\local\boost_1_87_0" -DBOOST_LIBRARYDIR="C:\local\boost_1_87_0\lib64-msvc-14.3"
+        
+      - name: Configure CMake (Unix)
+        if: runner.os != 'Windows'
         run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -G "${{ matrix.generator }}" -DLIARSDICE_BUILD_TESTS=ON -DLIARSDICE_BUILD_EXAMPLES=ON
 
       - name: Build library
@@ -167,8 +174,17 @@ jobs:
         run: |
           choco install ninja
           choco install boost-msvc-14.3
+          echo "BOOST_ROOT=C:\local\boost_1_87_0" >> $env:GITHUB_ENV
+          echo "BOOST_LIBRARYDIR=C:\local\boost_1_87_0\lib64-msvc-14.3" >> $env:GITHUB_ENV
 
-      - name: Configure and Build
+      - name: Configure and Build (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -G Ninja -DBOOST_ROOT="C:\local\boost_1_87_0" -DBOOST_LIBRARYDIR="C:\local\boost_1_87_0\lib64-msvc-14.3"
+          cmake --build build --config Release -j4
+          
+      - name: Configure and Build (Unix)
+        if: runner.os != 'Windows'
         run: |
           cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -G Ninja
           cmake --build build --config Release -j4
@@ -224,8 +240,17 @@ jobs:
         run: |
           choco install ninja
           choco install boost-msvc-14.3
+          echo "BOOST_ROOT=C:\local\boost_1_87_0" >> $env:GITHUB_ENV
+          echo "BOOST_LIBRARYDIR=C:\local\boost_1_87_0\lib64-msvc-14.3" >> $env:GITHUB_ENV
 
-      - name: Configure and Build
+      - name: Configure and Build (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -G Ninja -DBOOST_ROOT="C:\local\boost_1_87_0" -DBOOST_LIBRARYDIR="C:\local\boost_1_87_0\lib64-msvc-14.3"
+          cmake --build build --config Release --target LiarsDiceStandalone -j4
+          
+      - name: Configure and Build (Unix)
+        if: runner.os != 'Windows'
         run: |
           cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -G Ninja
           cmake --build build --config Release --target LiarsDiceStandalone -j4
