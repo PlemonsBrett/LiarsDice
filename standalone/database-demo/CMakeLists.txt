@@ -6,7 +6,10 @@ project(DatabaseDemo LANGUAGES CXX)
 
 file(GLOB sources CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
 
-add_executable(${PROJECT_NAME} ${sources})
+# Check if target already exists to avoid conflicts
+if (NOT TARGET ${PROJECT_NAME})
+    add_executable(${PROJECT_NAME} ${sources})
+endif ()
 
 set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 20 OUTPUT_NAME "database-demo")
 
