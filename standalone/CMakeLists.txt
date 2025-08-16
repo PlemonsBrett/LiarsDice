@@ -11,7 +11,7 @@ include(../cmake/tools.cmake)
 include(../cmake/CPM.cmake)
 
 # When building standalone, check if parent project is available
-if(NOT TARGET LiarsDice::LiarsDice)
+if (NOT TARGET LiarsDice::LiarsDice AND NOT TARGET LiarsDice)
   # Add the main library as a dependency
   CPMAddPackage(NAME LiarsDice SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/..)
 endif()

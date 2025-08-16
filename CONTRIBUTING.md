@@ -314,7 +314,7 @@ Closes #123
 ## Additional Resources
 
 - [README.md](README.md) - Project overview and usage
-- [Journal.MD](Journal.MD) - Development journal and technical documentation
+- [Journal.MD](DataStructuresAndAlgorithmsJournal.MD) - Development journal and technical documentation
 - [CMake Documentation](https://cmake.org/documentation/)
 - [C++20 Reference](https://en.cppreference.com/)
 - [Boost Libraries](https://www.boost.org/) - Core mathematical and utility libraries

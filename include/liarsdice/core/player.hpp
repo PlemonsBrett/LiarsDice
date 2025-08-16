@@ -4,6 +4,7 @@
 #include <boost/signals2.hpp>
 #include <boost/serialization/access.hpp>
 #include <memory>
+#include <optional>
 #include <string>
 #include <vector>
 
