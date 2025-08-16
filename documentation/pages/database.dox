@@ -1,0 +1,376 @@
+/**
+ * @page database Database System
+ * @brief SQLite-based persistent storage for game data and statistics
+ * 
+ * @tableofcontents
+ * 
+ * @section database_overview Overview
+ * 
+ * The Liar's Dice database system provides persistent storage for game history, player statistics,
+ * AI behavior patterns, and performance metrics. Built on SQLite for portability and ease of deployment,
+ * the system includes connection pooling, schema versioning, and comprehensive error handling.
+ * 
+ * @section database_architecture Architecture
+ * 
+ * The database system consists of several key components:
+ * 
+ * @subsection database_manager Database Manager
+ * 
+ * The @ref liarsdice::database::DatabaseManager class provides the main interface for database operations:
+ * - Connection lifecycle management
+ * - Transaction support with RAII semantics
+ * - Prepared statement caching
+ * - Error handling and recovery
+ * 
+ * @code{.cpp}
+ * // Example usage
+ * DatabaseManager db("game_data.db");
+ * db.initialize();
+ * 
+ * auto transaction = db.beginTransaction();
+ * db.saveGameSession(session);
+ * db.updatePlayerStatistics(playerId, stats);
+ * transaction.commit();
+ * @endcode
+ * 
+ * @subsection connection_pool Connection Pool
+ * 
+ * The @ref liarsdice::database::ConnectionPool manages a pool of database connections for 
+ * concurrent access:
+ * - Thread-safe connection acquisition and release
+ * - Configurable pool size (default: 4 connections)
+ * - Automatic connection validation and recycling
+ * - Connection timeout handling
+ * 
+ * @code{.cpp}
+ * ConnectionPool pool("game_data.db", 4);
+ * {
+ *     auto conn = pool.acquire();
+ *     conn->execute("INSERT INTO games ...");
+ * } // Connection automatically returned to pool
+ * @endcode
+ * 
+ * @subsection schema_manager Schema Manager
+ * 
+ * The @ref liarsdice::database::SchemaManager handles database schema creation and migrations:
+ * - Version tracking for schema upgrades
+ * - Automatic migration execution
+ * - Rollback support for failed migrations
+ * - Schema validation
+ * 
+ * @section database_schema Database Schema
+ * 
+ * @subsection schema_tables Core Tables
+ * 
+ * **games** - Game session information
+ * @code{.sql}
+ * CREATE TABLE games (
+ *     id INTEGER PRIMARY KEY AUTOINCREMENT,
+ *     session_id TEXT UNIQUE NOT NULL,
+ *     start_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ *     end_time TIMESTAMP,
+ *     winner_id INTEGER,
+ *     total_rounds INTEGER DEFAULT 0,
+ *     game_mode TEXT,
+ *     seed INTEGER,
+ *     FOREIGN KEY (winner_id) REFERENCES players(id)
+ * );
+ * @endcode
+ * 
+ * **players** - Player information
+ * @code{.sql}
+ * CREATE TABLE players (
+ *     id INTEGER PRIMARY KEY AUTOINCREMENT,
+ *     name TEXT UNIQUE NOT NULL,
+ *     type TEXT CHECK(type IN ('human', 'ai_easy', 'ai_medium', 'ai_hard')),
+ *     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ *     games_played INTEGER DEFAULT 0,
+ *     games_won INTEGER DEFAULT 0,
+ *     total_points_lost INTEGER DEFAULT 0,
+ *     total_bluffs INTEGER DEFAULT 0,
+ *     successful_bluffs INTEGER DEFAULT 0,
+ *     total_calls INTEGER DEFAULT 0,
+ *     successful_calls INTEGER DEFAULT 0
+ * );
+ * @endcode
+ * 
+ * **game_players** - Players in each game
+ * @code{.sql}
+ * CREATE TABLE game_players (
+ *     game_id INTEGER NOT NULL,
+ *     player_id INTEGER NOT NULL,
+ *     position INTEGER NOT NULL,
+ *     final_position INTEGER,
+ *     points_lost INTEGER DEFAULT 0,
+ *     rounds_survived INTEGER DEFAULT 0,
+ *     PRIMARY KEY (game_id, player_id),
+ *     FOREIGN KEY (game_id) REFERENCES games(id),
+ *     FOREIGN KEY (player_id) REFERENCES players(id)
+ * );
+ * @endcode
+ * 
+ * **rounds** - Individual game rounds
+ * @code{.sql}
+ * CREATE TABLE rounds (
+ *     id INTEGER PRIMARY KEY AUTOINCREMENT,
+ *     game_id INTEGER NOT NULL,
+ *     round_number INTEGER NOT NULL,
+ *     starting_player_id INTEGER,
+ *     ending_player_id INTEGER,
+ *     last_guess_count INTEGER,
+ *     last_guess_face INTEGER,
+ *     actual_count INTEGER,
+ *     was_bluff BOOLEAN,
+ *     duration_ms INTEGER,
+ *     FOREIGN KEY (game_id) REFERENCES games(id),
+ *     FOREIGN KEY (starting_player_id) REFERENCES players(id),
+ *     FOREIGN KEY (ending_player_id) REFERENCES players(id)
+ * );
+ * @endcode
+ * 
+ * **actions** - Player actions within rounds
+ * @code{.sql}
+ * CREATE TABLE actions (
+ *     id INTEGER PRIMARY KEY AUTOINCREMENT,
+ *     round_id INTEGER NOT NULL,
+ *     player_id INTEGER NOT NULL,
+ *     action_type TEXT CHECK(action_type IN ('guess', 'call_liar')),
+ *     guess_count INTEGER,
+ *     guess_face INTEGER,
+ *     dice_state TEXT,  -- JSON array of dice values
+ *     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ *     decision_time_ms INTEGER,
+ *     FOREIGN KEY (round_id) REFERENCES rounds(id),
+ *     FOREIGN KEY (player_id) REFERENCES players(id)
+ * );
+ * @endcode
+ * 
+ * @subsection schema_ai_tables AI Analysis Tables
+ * 
+ * **ai_patterns** - Detected player behavior patterns
+ * @code{.sql}
+ * CREATE TABLE ai_patterns (
+ *     id INTEGER PRIMARY KEY AUTOINCREMENT,
+ *     player_id INTEGER NOT NULL,
+ *     pattern_type TEXT,
+ *     pattern_sequence TEXT,
+ *     occurrence_count INTEGER DEFAULT 1,
+ *     success_rate REAL,
+ *     last_seen TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ *     FOREIGN KEY (player_id) REFERENCES players(id)
+ * );
+ * @endcode
+ * 
+ * **ai_predictions** - AI prediction accuracy tracking
+ * @code{.sql}
+ * CREATE TABLE ai_predictions (
+ *     id INTEGER PRIMARY KEY AUTOINCREMENT,
+ *     game_id INTEGER NOT NULL,
+ *     ai_player_id INTEGER NOT NULL,
+ *     target_player_id INTEGER NOT NULL,
+ *     prediction_type TEXT,
+ *     predicted_value REAL,
+ *     actual_value REAL,
+ *     accuracy REAL,
+ *     round_number INTEGER,
+ *     FOREIGN KEY (game_id) REFERENCES games(id),
+ *     FOREIGN KEY (ai_player_id) REFERENCES players(id),
+ *     FOREIGN KEY (target_player_id) REFERENCES players(id)
+ * );
+ * @endcode
+ * 
+ * @subsection schema_performance_tables Performance Tables
+ * 
+ * **performance_metrics** - System performance tracking
+ * @code{.sql}
+ * CREATE TABLE performance_metrics (
+ *     id INTEGER PRIMARY KEY AUTOINCREMENT,
+ *     metric_name TEXT NOT NULL,
+ *     metric_value REAL NOT NULL,
+ *     unit TEXT,
+ *     context TEXT,
+ *     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+ * );
+ * @endcode
+ * 
+ * @section database_operations Common Operations
+ * 
+ * @subsection db_save_game Saving Game Data
+ * 
+ * @code{.cpp}
+ * void saveGame(const Game& game) {
+ *     DatabaseManager db("game_data.db");
+ *     
+ *     // Begin transaction for consistency
+ *     auto transaction = db.beginTransaction();
+ *     
+ *     try {
+ *         // Save game session
+ *         auto gameId = db.saveGameSession({
+ *             .sessionId = game.getSessionId(),
+ *             .startTime = game.getStartTime(),
+ *             .endTime = game.getEndTime(),
+ *             .winnerId = game.getWinner()->getId(),
+ *             .totalRounds = game.getRoundCount(),
+ *             .seed = game.getSeed()
+ *         });
+ *         
+ *         // Save player participation
+ *         for (const auto& player : game.getPlayers()) {
+ *             db.saveGamePlayer(gameId, player->getId(), {
+ *                 .position = player->getPosition(),
+ *                 .finalPosition = player->getFinalPosition(),
+ *                 .pointsLost = player->getPointsLost(),
+ *                 .roundsSurvived = player->getRoundsSurvived()
+ *             });
+ *         }
+ *         
+ *         // Save round details
+ *         for (const auto& round : game.getRounds()) {
+ *             db.saveRound(gameId, round);
+ *         }
+ *         
+ *         transaction.commit();
+ *     } catch (const std::exception& e) {
+ *         // Transaction automatically rolls back
+ *         throw;
+ *     }
+ * }
+ * @endcode
+ * 
+ * @subsection db_query_stats Querying Statistics
+ * 
+ * @code{.cpp}
+ * PlayerStatistics getPlayerStats(const std::string& playerName) {
+ *     DatabaseManager db("game_data.db");
+ *     
+ *     auto stmt = db.prepare(R"(
+ *         SELECT 
+ *             games_played,
+ *             games_won,
+ *             CAST(games_won AS REAL) / NULLIF(games_played, 0) as win_rate,
+ *             total_bluffs,
+ *             successful_bluffs,
+ *             CAST(successful_bluffs AS REAL) / NULLIF(total_bluffs, 0) as bluff_success_rate,
+ *             total_calls,
+ *             successful_calls,
+ *             CAST(successful_calls AS REAL) / NULLIF(total_calls, 0) as call_success_rate
+ *         FROM players
+ *         WHERE name = ?
+ *     )");
+ *     
+ *     stmt.bind(1, playerName);
+ *     
+ *     if (stmt.step()) {
+ *         return {
+ *             .gamesPlayed = stmt.column<int>(0),
+ *             .gamesWon = stmt.column<int>(1),
+ *             .winRate = stmt.column<double>(2),
+ *             .totalBluffs = stmt.column<int>(3),
+ *             .successfulBluffs = stmt.column<int>(4),
+ *             .bluffSuccessRate = stmt.column<double>(5),
+ *             .totalCalls = stmt.column<int>(6),
+ *             .successfulCalls = stmt.column<int>(7),
+ *             .callSuccessRate = stmt.column<double>(8)
+ *         };
+ *     }
+ *     
+ *     throw std::runtime_error("Player not found");
+ * }
+ * @endcode
+ * 
+ * @subsection db_ai_patterns AI Pattern Analysis
+ * 
+ * @code{.cpp}
+ * std::vector<BehaviorPattern> analyzePlayerPatterns(int playerId) {
+ *     DatabaseManager db("game_data.db");
+ *     
+ *     auto stmt = db.prepare(R"(
+ *         SELECT 
+ *             pattern_sequence,
+ *             occurrence_count,
+ *             success_rate
+ *         FROM ai_patterns
+ *         WHERE player_id = ?
+ *         AND occurrence_count >= 3  -- Minimum sample size
+ *         ORDER BY occurrence_count DESC
+ *         LIMIT 10
+ *     )");
+ *     
+ *     stmt.bind(1, playerId);
+ *     
+ *     std::vector<BehaviorPattern> patterns;
+ *     while (stmt.step()) {
+ *         patterns.push_back({
+ *             .sequence = stmt.column<std::string>(0),
+ *             .occurrences = stmt.column<int>(1),
+ *             .successRate = stmt.column<double>(2)
+ *         });
+ *     }
+ *     
+ *     return patterns;
+ * }
+ * @endcode
+ * 
+ * @section database_performance Performance Considerations
+ * 
+ * @subsection db_indexing Indexing Strategy
+ * 
+ * Key indexes for optimal query performance:
+ * 
+ * @code{.sql}
+ * -- Game lookup
+ * CREATE INDEX idx_games_session ON games(session_id);
+ * CREATE INDEX idx_games_time ON games(start_time, end_time);
+ * 
+ * -- Player statistics
+ * CREATE INDEX idx_players_name ON players(name);
+ * CREATE INDEX idx_game_players_player ON game_players(player_id);
+ * 
+ * -- Round and action queries
+ * CREATE INDEX idx_rounds_game ON rounds(game_id, round_number);
+ * CREATE INDEX idx_actions_round ON actions(round_id, player_id);
+ * 
+ * -- Pattern analysis
+ * CREATE INDEX idx_patterns_player ON ai_patterns(player_id, occurrence_count DESC);
+ * @endcode
+ * 
+ * @subsection db_optimization Query Optimization
+ * 
+ * - Use prepared statements for repeated queries
+ * - Batch inserts within transactions
+ * - Use connection pooling for concurrent access
+ * - Implement caching for frequently accessed statistics
+ * - Regular VACUUM operations for database maintenance
+ * 
+ * @section database_error_handling Error Handling
+ * 
+ * The database system uses a comprehensive exception hierarchy:
+ * 
+ * @code{.cpp}
+ * try {
+ *     db.executeQuery(sql);
+ * } catch (const DatabaseConnectionError& e) {
+ *     // Handle connection failures
+ * } catch (const DatabaseConstraintError& e) {
+ *     // Handle constraint violations
+ * } catch (const DatabaseTimeoutError& e) {
+ *     // Handle timeout conditions
+ * } catch (const DatabaseError& e) {
+ *     // Handle general database errors
+ * }
+ * @endcode
+ * 
+ * @section database_testing Testing Strategy
+ * 
+ * Database testing includes:
+ * - Unit tests for each database component
+ * - Integration tests for transaction handling
+ * - Performance benchmarks for query optimization
+ * - Stress tests for connection pooling
+ * - Migration tests for schema updates
+ * 
+ * @see liarsdice::database::DatabaseManager
+ * @see liarsdice::database::ConnectionPool
+ * @see liarsdice::database::SchemaManager
+ */
