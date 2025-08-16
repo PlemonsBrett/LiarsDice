@@ -2,9 +2,9 @@
 
 namespace liarsdice::di {
 
-ServiceContainer& get_service_container() {
+  ServiceContainer& get_service_container() {
     static ServiceContainer instance;
     return instance;
-}
+  }
 
-} // namespace liarsdice::di
+}  // namespace liarsdice::di

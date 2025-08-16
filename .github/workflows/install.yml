@@ -1,10 +1,10 @@
 name: Install
 
+# DEPRECATED: This workflow is now part of the main CI workflow (.github/workflows/ci.yml)
+# Only kept for manual testing or specific install debugging
+
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+  workflow_dispatch:  # Only manual trigger
 
 env:
   CTEST_OUTPUT_ON_FAILURE: 1
@@ -17,7 +17,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         with:
           path: "**/cpm_modules"
           key: ${{ github.workflow }}-cpm-modules-${{ hashFiles('**/CMakeLists.txt', '**/*.cmake') }}

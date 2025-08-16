@@ -7,33 +7,32 @@
 
 namespace liarsdice::core {
 
-class Dice {
-public:
+  class Dice {
+  public:
     static constexpr unsigned int MIN_VALUE = 1;
     static constexpr unsigned int MAX_VALUE = 6;
-    
+
     Dice();
     explicit Dice(unsigned int initial_value);
-    
+
     void roll();
     [[nodiscard]] unsigned int get_value() const noexcept { return value_; }
-    
+
     // Set seed for deterministic testing
     static void set_seed(unsigned int seed);
-    
+
     bool operator==(const Dice& other) const noexcept { return value_ == other.value_; }
     bool operator!=(const Dice& other) const noexcept { return !(*this == other); }
-    
-private:
+
+  private:
     friend class boost::serialization::access;
-    
-    template<class Archive>
-    void serialize(Archive& ar, const unsigned int version) {
-        ar & BOOST_SERIALIZATION_NVP(value_);
+
+    template <class Archive> void serialize(Archive& ar, const unsigned int version) {
+      ar& BOOST_SERIALIZATION_NVP(value_);
     }
-    
+
     unsigned int value_;
     static thread_local boost::random::mt19937 rng_;
-};
+  };
 
-} // namespace liarsdice::core
+}  // namespace liarsdice::core

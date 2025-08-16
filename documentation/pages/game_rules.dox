@@ -13,7 +13,7 @@ claims about the dice hidden under their cups. The last player with dice remaini
 - Dice values range from 1 to 6
 - **Wild Rule**: 1s are wild and count as any face value
 
-@subsection gameplay Gameplay Flow
+@subsection gameplay_flow Gameplay Flow
 
 1. **Starting a Round**
    - All players roll their dice secretly

@@ -45,7 +45,9 @@ EXTRACT_LOCAL_CLASSES = YES
 # Enable preprocessing
 ENABLE_PREPROCESSING = YES
 MACRO_EXPANSION = YES
-EXPAND_ONLY_PREDEF = NO
+EXPAND_ONLY_PREDEF = YES
+PREDEFINED = "concept=class" \
+             "requires="
 
 # Configure warnings
 WARN_IF_UNDOCUMENTED = NO

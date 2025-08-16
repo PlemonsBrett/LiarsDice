@@ -1,10 +1,10 @@
 name: Standalone
 
+# DEPRECATED: This workflow is now part of the main CI workflow (.github/workflows/ci.yml)
+# Only kept for manual testing or specific standalone debugging
+
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+  workflow_dispatch:  # Only manual trigger
 
 env:
   CPM_SOURCE_CACHE: ${{ github.workspace }}/cpm_modules
@@ -20,7 +20,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             **/cpm_modules
@@ -40,12 +40,12 @@ jobs:
           brew install boost ninja
 
       - name: Configure
-        run: cmake -Sstandalone -Bbuild -DCMAKE_BUILD_TYPE=Release -G Ninja
+        run: cmake -S . -Bbuild -DCMAKE_BUILD_TYPE=Release -G Ninja
 
       - name: Build
         run: cmake --build build -j4
 
       - name: Test executable
         run: |
-          ./build/liarsdice --help
-          echo "2" | ./build/liarsdice --seed 12345 || true
+          ./build/standalone/liarsdice --help
+          printf "2\n1\n" | ./build/standalone/liarsdice --seed 12345 || true

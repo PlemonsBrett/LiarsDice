@@ -13,7 +13,7 @@ Liar's Dice is a modern C++20 implementation of the classic dice game, featuring
 
 @section features Key Features
 
-@subsection gameplay Gameplay Features
+@subsection gameplay_features Gameplay Features
 - Multiple human and AI players
 - Point-based elimination system
 - Configurable game rules

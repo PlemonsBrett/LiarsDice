@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.14...3.28)
 project(
   LiarsDice
   VERSION 1.0
-  LANGUAGES CXX
+  LANGUAGES CXX C
 )
 
 # ---- Include guards ----
@@ -37,6 +37,8 @@ find_package(Boost 1.70.0 REQUIRED COMPONENTS
   thread
   container
   timer
+  iostreams
+  regex
 )
 
 # Add Boost.DI (header-only library)
@@ -61,6 +63,43 @@ CPMAddPackage(
   GITHUB_REPOSITORY fmtlib/fmt
   OPTIONS "FMT_INSTALL YES" # create an installable target
 )
+
+# Add SQLite3 for database support (version 3.47.2 - latest as of Dec 2024)
+CPMAddPackage(
+  NAME sqlite3
+  URL https://www.sqlite.org/2024/sqlite-amalgamation-3470200.zip
+  URL_HASH SHA256=aa73d8748095808471deaa8e6f34aa700e37f2f787f4425744f53fdd15a89c40
+  DOWNLOAD_ONLY YES
+)
+
+if(sqlite3_ADDED)
+  # Create SQLite3 library target
+  add_library(sqlite3 STATIC ${sqlite3_SOURCE_DIR}/sqlite3.c)
+  target_include_directories(sqlite3 PUBLIC 
+    $<BUILD_INTERFACE:${sqlite3_SOURCE_DIR}>
+    $<INSTALL_INTERFACE:include>
+  )
+  
+  # Enable SQLite3 features
+  target_compile_definitions(sqlite3 
+    PUBLIC 
+      SQLITE_ENABLE_FTS5          # Full-text search
+      SQLITE_ENABLE_JSON1         # JSON support
+      SQLITE_ENABLE_RTREE         # R-tree support
+      SQLITE_THREADSAFE=2         # Multi-threaded mode
+      SQLITE_ENABLE_LOAD_EXTENSION # Dynamic extension loading
+  )
+  
+  # Link with Boost.Thread for thread safety
+  target_link_libraries(sqlite3 PRIVATE Boost::thread)
+  
+  # Platform-specific flags
+  if(WIN32)
+    target_link_libraries(sqlite3 PRIVATE ws2_32)
+  else()
+    target_link_libraries(sqlite3 PRIVATE pthread dl)
+  endif()
+endif()
 
 # ---- Add source files ----
 
@@ -90,9 +129,12 @@ target_link_libraries(${PROJECT_NAME}
     Boost::filesystem
     Boost::serialization
     Boost::thread
-        Boost::container
+    Boost::container
+    Boost::iostreams
+    Boost::regex
   PUBLIC
     Boost::boost
+    $<$<TARGET_EXISTS:sqlite3>:sqlite3>
 )
 
 # Add Boost.DI include directory if available
@@ -126,7 +168,10 @@ packageProject(
   INCLUDE_DESTINATION include/${PROJECT_NAME}-${PROJECT_VERSION}
   VERSION_HEADER "${VERSION_HEADER_LOCATION}"
   COMPATIBILITY SameMajorVersion
-  DEPENDENCIES "fmt 10.2.1"
+  DEPENDENCIES 
+    "fmt 10.2.1"
+    "xsimd 13.0.0"
+    "Boost 1.70.0 COMPONENTS log log_setup unit_test_framework program_options system filesystem serialization thread container timer iostreams regex"
 )
 
 # ---- Add subdirectories ----
@@ -140,7 +185,10 @@ if (LIARSDICE_BUILD_TESTS)
   add_subdirectory(test)
 endif ()
 
-add_subdirectory(standalone)
+# Only add standalone when building the main project
+if (CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+    add_subdirectory(standalone)
+endif ()
 
 # ---- Documentation ----
 if (LIARSDICE_BUILD_DOCS)
