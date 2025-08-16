@@ -179,7 +179,10 @@ if (LIARSDICE_BUILD_TESTS)
   add_subdirectory(test)
 endif ()
 
-add_subdirectory(standalone)
+# Only add standalone when building the main project
+if (CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+    add_subdirectory(standalone)
+endif ()
 
 # ---- Documentation ----
 if (LIARSDICE_BUILD_DOCS)

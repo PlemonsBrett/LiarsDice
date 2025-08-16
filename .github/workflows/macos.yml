@@ -26,7 +26,7 @@ jobs:
       - name: Install dependencies
         run: |
           brew install boost ninja ccache
-          pip3 install robotframework==7.0 pexpect==4.9.0 psutil==5.9.8
+          pip3 install --break-system-packages robotframework==7.0 pexpect==4.9.0 psutil==5.9.8
 
       - name: Configure
         run: cmake -Bbuild -H. -DCMAKE_BUILD_TYPE=Release -G Ninja
