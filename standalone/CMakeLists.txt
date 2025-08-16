@@ -28,3 +28,6 @@ target_link_libraries(${PROJECT_NAME}
   PRIVATE 
     LiarsDice::LiarsDice
 )
+
+# Add subdirectories
+add_subdirectory(database-demo)

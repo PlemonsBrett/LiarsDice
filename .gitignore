@@ -140,3 +140,8 @@ vgcore.*
 # Local config overrides
 *.local
 local/
+# Documentation files in root
+@PlemonsBrett_LiarsDiceEnhancement_AI.rtf
+@Liar's Dice Game Enhancements.md
+CS 499 Milestone Four Guidelines and Rubric.html
+@Journal.MD

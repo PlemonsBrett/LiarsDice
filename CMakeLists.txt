@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.14...3.28)
 project(
   LiarsDice
   VERSION 1.0
-  LANGUAGES CXX
+  LANGUAGES CXX C
 )
 
 # ---- Include guards ----
@@ -37,6 +37,8 @@ find_package(Boost 1.70.0 REQUIRED COMPONENTS
   thread
   container
   timer
+  iostreams
+  regex
 )
 
 # Add Boost.DI (header-only library)
@@ -61,6 +63,40 @@ CPMAddPackage(
   GITHUB_REPOSITORY fmtlib/fmt
   OPTIONS "FMT_INSTALL YES" # create an installable target
 )
+
+# Add SQLite3 for database support
+CPMAddPackage(
+  NAME sqlite3
+  URL https://www.sqlite.org/2023/sqlite-amalgamation-3440200.zip
+  URL_HASH SHA256=833be89b53b3be8b40a2e3d5fedb635080e3edb204957244f3d6987c2bb2345f
+  DOWNLOAD_ONLY YES
+)
+
+if(sqlite3_ADDED)
+  # Create SQLite3 library target
+  add_library(sqlite3 STATIC ${sqlite3_SOURCE_DIR}/sqlite3.c)
+  target_include_directories(sqlite3 PUBLIC ${sqlite3_SOURCE_DIR})
+  
+  # Enable SQLite3 features
+  target_compile_definitions(sqlite3 
+    PUBLIC 
+      SQLITE_ENABLE_FTS5          # Full-text search
+      SQLITE_ENABLE_JSON1         # JSON support
+      SQLITE_ENABLE_RTREE         # R-tree support
+      SQLITE_THREADSAFE=2         # Multi-threaded mode
+      SQLITE_ENABLE_LOAD_EXTENSION # Dynamic extension loading
+  )
+  
+  # Link with Boost.Thread for thread safety
+  target_link_libraries(sqlite3 PRIVATE Boost::thread)
+  
+  # Platform-specific flags
+  if(WIN32)
+    target_link_libraries(sqlite3 PRIVATE ws2_32)
+  else()
+    target_link_libraries(sqlite3 PRIVATE pthread dl)
+  endif()
+endif()
 
 # ---- Add source files ----
 
@@ -90,7 +126,10 @@ target_link_libraries(${PROJECT_NAME}
     Boost::filesystem
     Boost::serialization
     Boost::thread
-        Boost::container
+    Boost::container
+    Boost::iostreams
+    Boost::regex
+    $<$<TARGET_EXISTS:sqlite3>:sqlite3>
   PUBLIC
     Boost::boost
 )
