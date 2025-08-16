@@ -17,4 +17,6 @@ set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 20 OUTPUT_NAME "da
 target_link_libraries(${PROJECT_NAME} 
     PRIVATE 
         LiarsDice::LiarsDice
+        ${Boost_LOG_LIBRARY}
+        ${Boost_LOG_SETUP_LIBRARY}
 )
