@@ -31,11 +31,7 @@ namespace liarsdice::app {
     std::optional<unsigned int> random_seed;  // For deterministic testing
   };
 
-  enum class ParseResult {
-    Success,
-    Help,
-    Error
-  };
+  enum class ParseResult { Success, Help, Error };
 
   class Application {
   public:
