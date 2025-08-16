@@ -19,7 +19,8 @@ enum class DatabaseErrorType {
     ConstraintViolation,
     Timeout,
     InvalidParameter,
-    InternalError
+    InternalError,
+    BackupFailed
 };
 
 /**
