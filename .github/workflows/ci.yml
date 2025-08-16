@@ -111,12 +111,7 @@ jobs:
           choco install boost-msvc-14.3
 
       - name: Configure CMake
-        run: |
-          cmake -S . -B build \
-            -DCMAKE_BUILD_TYPE=Release \
-            -G "${{ matrix.generator }}" \
-            -DLIARSDICE_BUILD_TESTS=ON \
-            -DLIARSDICE_BUILD_EXAMPLES=ON
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -G "${{ matrix.generator }}" -DLIARSDICE_BUILD_TESTS=ON -DLIARSDICE_BUILD_EXAMPLES=ON
 
       - name: Build library
         run: cmake --build build --config Release -j4
