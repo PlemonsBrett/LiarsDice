@@ -29,7 +29,7 @@ namespace liarsdice::app {
 
       init_logging();
 
-      BOOST_LOG_TRIVIAL(info) << "=== Liar's Dice v1.0 (Boost Edition) ===";
+      BOOST_LOG_TRIVIAL(info) << "=== Liar's Dice v0.1.0 (Boost Edition) ===";
       BOOST_LOG_TRIVIAL(info) << "Application started";
 
       // Main application loop
