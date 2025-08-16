@@ -10,6 +10,12 @@
 #include <string>
 #include <chrono>
 #include <functional>
+#ifndef _WIN32
+#include <sys/stat.h>  // For file permissions
+#include <sys/types.h> // For mode_t
+#else
+typedef unsigned short mode_t;  // Define mode_t for Windows
+#endif
 
 namespace liarsdice::database {
 
@@ -47,12 +53,15 @@ public:
     }
     
     /**
-     * @brief Open a database connection
+     * @brief Open a database connection with secure file permissions
      * @param path Database file path or URI
      * @param flags SQLite open flags
+     * @param file_mode Unix file permissions (default: 0600 - owner read/write only)
      * @return Error code if failed
      */
-    boost::system::error_code open(const std::string& path, int flags = SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE) {
+    boost::system::error_code open(const std::string& path, 
+                                   int flags = SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE,
+                                   mode_t file_mode = 0600) {
         boost::lock_guard<boost::mutex> lock(mutex_);
         
         if (state_ == State::Connected) {
@@ -60,27 +69,72 @@ public:
         }
         
         // Check if this is a URI (starts with "file:")
-        if (path.substr(0, 5) == "file:") {
+        bool is_uri = (path.substr(0, 5) == "file:");
+        if (is_uri) {
             flags |= SQLITE_OPEN_URI;
         }
         
-        sqlite3* db_raw = nullptr;
-        int result = sqlite3_open_v2(path.c_str(), &db_raw, flags, nullptr);
-        
-        if (result != SQLITE_OK) {
-            if (db_raw) {
-                sqlite3_close(db_raw);
+        // For new database files, set secure permissions before creation
+        if (!is_uri && (flags & SQLITE_OPEN_CREATE)) {
+            // Extract directory path and ensure it exists with secure permissions
+            size_t last_slash = path.find_last_of("/\\");
+            if (last_slash != std::string::npos) {
+                std::string dir_path = path.substr(0, last_slash);
+                #ifndef _WIN32
+                // Set umask temporarily for secure file creation
+                mode_t old_mask = umask(~file_mode & 0777);
+                #endif
+                
+                sqlite3* db_raw = nullptr;
+                int result = sqlite3_open_v2(path.c_str(), &db_raw, flags, nullptr);
+                
+                #ifndef _WIN32
+                // Restore original umask
+                umask(old_mask);
+                
+                // Explicitly set file permissions on the database file
+                if (result == SQLITE_OK) {
+                    chmod(path.c_str(), file_mode);
+                    // Also set permissions on associated files
+                    chmod((path + "-wal").c_str(), file_mode);
+                    chmod((path + "-shm").c_str(), file_mode);
+                }
+                #endif
+                
+                if (result != SQLITE_OK) {
+                    if (db_raw) {
+                        sqlite3_close(db_raw);
+                    }
+                    state_ = State::Error;
+                    return boost::system::error_code(result, boost::system::generic_category());
+                }
+                
+                // Set up connection with custom deleter
+                connection_ = ConnectionPtr(db_raw, [](sqlite3* db) {
+                    if (db) {
+                        sqlite3_close(db);
+                    }
+                });
             }
-            state_ = State::Error;
-            return boost::system::error_code(result, boost::system::generic_category());
+        } else {
+            sqlite3* db_raw = nullptr;
+            int result = sqlite3_open_v2(path.c_str(), &db_raw, flags, nullptr);
+            
+            if (result != SQLITE_OK) {
+                if (db_raw) {
+                    sqlite3_close(db_raw);
+                }
+                state_ = State::Error;
+                return boost::system::error_code(result, boost::system::generic_category());
+            }
+            
+            // Set up connection with custom deleter
+            connection_ = ConnectionPtr(db_raw, [](sqlite3* db) {
+                if (db) {
+                    sqlite3_close(db);
+                }
+            });
         }
-        
-        // Set up connection with custom deleter
-        connection_ = ConnectionPtr(db_raw, [](sqlite3* db) {
-            if (db) {
-                sqlite3_close(db);
-            }
-        });
         
         state_ = State::Connected;
         connection_string_ = path;
@@ -89,7 +143,41 @@ public:
         // Configure connection settings
         configure_connection();
         
+        // Perform initial health check
+        if (!check_health()) {
+            close();
+            state_ = State::Error;
+            return boost::system::error_code(SQLITE_CORRUPT, boost::system::generic_category());
+        }
+        
         return boost::system::error_code();
+    }
+    
+    /**
+     * @brief Check connection health
+     * @return true if connection is healthy
+     */
+    bool check_health() const {
+        if (!connection_) {
+            return false;
+        }
+        
+        // Quick integrity check
+        sqlite3_stmt* stmt = nullptr;
+        int result = sqlite3_prepare_v2(connection_.get(), "PRAGMA quick_check", -1, &stmt, nullptr);
+        
+        if (result != SQLITE_OK) {
+            return false;
+        }
+        
+        bool is_healthy = false;
+        if (sqlite3_step(stmt) == SQLITE_ROW) {
+            const char* status = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0));
+            is_healthy = (status && std::string(status) == "ok");
+        }
+        
+        sqlite3_finalize(stmt);
+        return is_healthy;
     }
     
     /**

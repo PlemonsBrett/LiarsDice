@@ -36,8 +36,8 @@ public:
         bool enable_health_checks;
         
         PoolConfig() 
-            : min_connections(2)
-            , max_connections(10)
+            : min_connections(5)  // Increased from 2 for better concurrency
+            , max_connections(20)  // Increased from 10 for higher loads
             , idle_timeout(300) // 5 minutes
             , health_check_interval(60) // 1 minute
             , connection_timeout(10)
@@ -300,9 +300,8 @@ private:
             return false;
         }
         
-        // Simple health check - execute a quick query
-        auto error = conn->execute("SELECT 1");
-        return !error;
+        // Use the enhanced health check method
+        return conn->check_health();
     }
     
     /**

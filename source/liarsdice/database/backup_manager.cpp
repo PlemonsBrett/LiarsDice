@@ -55,6 +55,18 @@ DatabaseResult<BackupInfo> BackupManager::create_backup(const std::string& backu
             return DatabaseError(copy_result.error());
         }
         
+        // Check backup size against limit
+        size_t file_size_bytes = boost::filesystem::file_size(backup_path);
+        size_t file_size_mb = file_size_bytes / (1024 * 1024);
+        
+        if (file_size_mb > retention_policy_.max_backup_size_mb) {
+            // Remove the oversized backup
+            boost::filesystem::remove(backup_path);
+            return DatabaseError(DatabaseErrorType::BackupFailed,
+                               "Backup size (" + std::to_string(file_size_mb) + " MB) exceeds maximum allowed size (" +
+                               std::to_string(retention_policy_.max_backup_size_mb) + " MB)");
+        }
+        
         // Create backup info
         BackupInfo info = create_backup_info(backup_path, "manual");
         
@@ -101,6 +113,19 @@ DatabaseResult<BackupInfo> BackupManager::create_scheduled_backup(const std::str
         auto copy_result = copy_database_file(backup_path);
         if (!copy_result) {
             return DatabaseError(copy_result.error());
+        }
+        
+        // Check backup size against limit
+        size_t file_size_bytes = boost::filesystem::file_size(backup_path);
+        size_t file_size_mb = file_size_bytes / (1024 * 1024);
+        
+        if (file_size_mb > retention_policy_.max_backup_size_mb) {
+            // Remove the oversized backup
+            boost::filesystem::remove(backup_path);
+            return DatabaseError(DatabaseErrorType::BackupFailed,
+                               "Scheduled backup size (" + std::to_string(file_size_mb) + 
+                               " MB) exceeds maximum allowed size (" +
+                               std::to_string(retention_policy_.max_backup_size_mb) + " MB)");
         }
         
         BackupInfo info = create_backup_info(backup_path, backup_type);

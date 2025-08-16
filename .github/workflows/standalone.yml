@@ -40,12 +40,12 @@ jobs:
           brew install boost ninja
 
       - name: Configure
-        run: cmake -Sstandalone -Bbuild -DCMAKE_BUILD_TYPE=Release -G Ninja
+        run: cmake -S . -Bbuild -DCMAKE_BUILD_TYPE=Release -G Ninja
 
       - name: Build
         run: cmake --build build -j4
 
       - name: Test executable
         run: |
-          ./build/liarsdice --help
-          echo "2" | ./build/liarsdice --seed 12345 || true
+          ./build/standalone/liarsdice --help
+          echo "2" | ./build/standalone/liarsdice --seed 12345 || true

@@ -36,7 +36,7 @@ jobs:
           ninja: true
 
       - name: Configure
-        run: cmake -Bbuild -H. -DCMAKE_BUILD_TYPE=Release -G Ninja
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -G Ninja
 
       - name: Build
         run: cmake --build build -j4

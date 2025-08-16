@@ -64,11 +64,11 @@ CPMAddPackage(
   OPTIONS "FMT_INSTALL YES" # create an installable target
 )
 
-# Add SQLite3 for database support
+# Add SQLite3 for database support (version 3.47.2 - latest as of Dec 2024)
 CPMAddPackage(
   NAME sqlite3
-  URL https://www.sqlite.org/2023/sqlite-amalgamation-3440200.zip
-  URL_HASH SHA256=833be89b53b3be8b40a2e3d5fedb635080e3edb204957244f3d6987c2bb2345f
+  URL https://www.sqlite.org/2024/sqlite-amalgamation-3470200.zip
+  URL_HASH SHA256=f1b2ee412c28d7472bc95ba996368d6f0cdcf00362affdadb6bda4c6e611b65f
   DOWNLOAD_ONLY YES
 )
 
@@ -165,7 +165,7 @@ packageProject(
   INCLUDE_DESTINATION include/${PROJECT_NAME}-${PROJECT_VERSION}
   VERSION_HEADER "${VERSION_HEADER_LOCATION}"
   COMPATIBILITY SameMajorVersion
-  DEPENDENCIES "fmt 10.2.1"
+  DEPENDENCIES "fmt 10.2.1" "xsimd 13.0.0"
 )
 
 # ---- Add subdirectories ----

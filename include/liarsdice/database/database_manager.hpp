@@ -13,6 +13,7 @@
 #include <chrono>
 #include <functional>
 #include <memory>
+#include <list>
 
 namespace liarsdice::database {
 
@@ -86,7 +87,7 @@ public:
     }
     
     /**
-     * @brief Prepare a statement with caching
+     * @brief Prepare a statement with caching and LRU eviction
      * @param sql SQL statement to prepare
      * @return Prepared statement or error
      */
@@ -96,11 +97,42 @@ public:
         // Check cache first
         auto it = statement_cache_.find(sql);
         if (it != statement_cache_.end()) {
+            // Update LRU position
+            auto lru_it = cache_lru_map_[sql];
+            cache_lru_list_.erase(lru_it);
+            cache_lru_list_.push_front(sql);
+            cache_lru_map_[sql] = cache_lru_list_.begin();
+            
             // Reset and return cached statement
             it->second->reset();
             it->second->clear_bindings();
             BOOST_LOG_TRIVIAL(trace) << "Using cached prepared statement";
             return it->second;
+        }
+        
+        // Check cache size limits before adding new statement
+        if (statement_cache_.size() >= MAX_CACHED_STATEMENTS) {
+            // Evict least recently used statement
+            std::string lru_key = cache_lru_list_.back();
+            cache_lru_list_.pop_back();
+            cache_lru_map_.erase(lru_key);
+            statement_cache_.erase(lru_key);
+            BOOST_LOG_TRIVIAL(trace) << "Evicted LRU statement from cache";
+        }
+        
+        // Check estimated memory usage
+        CacheStats stats = get_cache_stats();
+        if (stats.cache_memory_estimate > MAX_CACHE_MEMORY_MB * 1024 * 1024) {
+            // Clear half of the cache if memory limit exceeded
+            size_t to_remove = statement_cache_.size() / 2;
+            for (size_t i = 0; i < to_remove && !cache_lru_list_.empty(); ++i) {
+                std::string lru_key = cache_lru_list_.back();
+                cache_lru_list_.pop_back();
+                cache_lru_map_.erase(lru_key);
+                statement_cache_.erase(lru_key);
+            }
+            BOOST_LOG_TRIVIAL(warning) << "Cache memory limit exceeded, cleared " 
+                                       << to_remove << " statements";
         }
         
         // Prepare new statement
@@ -126,10 +158,13 @@ public:
             
             auto stmt = std::make_shared<PreparedStatement>(stmt_raw, sql);
             
-            // Cache the statement
+            // Cache the statement with LRU tracking
             statement_cache_[sql] = stmt;
+            cache_lru_list_.push_front(sql);
+            cache_lru_map_[sql] = cache_lru_list_.begin();
             
-            BOOST_LOG_TRIVIAL(debug) << "Prepared and cached statement: " << sql;
+            BOOST_LOG_TRIVIAL(debug) << "Prepared and cached statement: " << sql 
+                                    << " (cache size: " << statement_cache_.size() << ")";
             
             return stmt;
             
@@ -351,9 +386,15 @@ public:
     bool in_transaction() const { return in_transaction_; }
     
 private:
-    // Statement cache
+    // Cache size limits
+    static constexpr size_t MAX_CACHED_STATEMENTS = 100;
+    static constexpr size_t MAX_CACHE_MEMORY_MB = 10;
+    
+    // Statement cache with LRU tracking
     mutable boost::mutex cache_mutex_;
     boost::unordered_map<std::string, std::shared_ptr<PreparedStatement>> statement_cache_;
+    std::list<std::string> cache_lru_list_;  // LRU tracking
+    boost::unordered_map<std::string, std::list<std::string>::iterator> cache_lru_map_;
     
     // Transaction management
     bool in_transaction_;

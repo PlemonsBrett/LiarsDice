@@ -7,8 +7,10 @@
 #include <boost/thread/thread.hpp>
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/executor_work_guard.hpp>
+#include <boost/log/trivial.hpp>
 #include <memory>
 #include <atomic>
+#include <chrono>
 
 namespace liarsdice::database {
 
@@ -90,30 +92,54 @@ public:
     }
     
     /**
-     * @brief Execute a transaction with automatic rollback on failure
+     * @brief Execute a transaction with automatic rollback on failure and timeout
      * @param func Function to execute within transaction
+     * @param timeout_ms Maximum time in milliseconds (default: 30 seconds)
      * @return Error code if transaction failed
      */
     template<typename Func>
-    boost::system::error_code execute_transaction(Func func) {
+    boost::system::error_code execute_transaction(Func func, 
+                                                  std::chrono::milliseconds timeout_ms = std::chrono::milliseconds(30000)) {
         auto conn = acquire_connection();
         if (!conn) {
             return boost::system::error_code(SQLITE_CANTOPEN, boost::system::generic_category());
         }
         
-        // Begin transaction
+        // Set busy timeout on the connection
+        sqlite3_busy_timeout(conn->get(), static_cast<int>(timeout_ms.count()));
+        
+        // Begin transaction with timeout tracking
+        auto start_time = std::chrono::steady_clock::now();
         auto error = conn->begin_transaction();
         if (error) {
             return error;
         }
         
         try {
+            // Check if we've exceeded timeout
+            auto elapsed = std::chrono::steady_clock::now() - start_time;
+            if (elapsed > timeout_ms) {
+                conn->rollback();
+                BOOST_LOG_TRIVIAL(warning) << "Transaction timed out after " 
+                                          << std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count() << "ms";
+                return boost::system::error_code(SQLITE_BUSY, boost::system::generic_category());
+            }
+            
             // Execute user function
             error = func(*conn);
             
             if (error) {
                 conn->rollback();
                 return error;
+            }
+            
+            // Check timeout again before commit
+            elapsed = std::chrono::steady_clock::now() - start_time;
+            if (elapsed > timeout_ms) {
+                conn->rollback();
+                BOOST_LOG_TRIVIAL(warning) << "Transaction timed out during commit after " 
+                                          << std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count() << "ms";
+                return boost::system::error_code(SQLITE_BUSY, boost::system::generic_category());
             }
             
             // Commit transaction
