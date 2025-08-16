@@ -11,6 +11,10 @@ option(TEST_INSTALLED_VERSION "Test the version found by find_package" OFF)
 
 include(../cmake/tools.cmake)
 
+# --- Import formatting ----
+
+include(../cmake/Format.cmake)
+
 # ---- Dependencies ----
 
 # Parent project already provides LiarsDice target

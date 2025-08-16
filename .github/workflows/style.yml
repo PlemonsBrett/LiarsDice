@@ -27,8 +27,25 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libboost-all-dev
 
-      - name: Configure
-        run: cmake -Stest -Bbuild
+      - name: Check C++ formatting
+        run: |
+          echo "Checking C++ code formatting..."
+          find include source standalone test -name "*.cpp" -o -name "*.hpp" | \
+          xargs clang-format --dry-run --Werror 2>&1 | tee format_check.log || true
+          if grep -q "error:" format_check.log; then
+            echo "::error::C++ formatting issues found. Run 'clang-format -i' on affected files."
+            cat format_check.log
+            exit 1
+          else
+            echo "C++ formatting check passed!"
+          fi
 
-      - name: Check code style
-        run: cmake --build build --target check-format
+      - name: Check CMake formatting
+        run: |
+          find . -name "CMakeLists.txt" -o -name "*.cmake" | \
+          grep -v build | grep -v cpm_modules | \
+          xargs cmake-format --check 2>&1 | tee cmake_format_check.log
+          if grep -q "would be reformatted" cmake_format_check.log; then
+            echo "CMake formatting issues found!"
+            exit 1
+          fi
