@@ -20,8 +20,11 @@ namespace liarsdice::app {
   int Application::run(int argc, char* argv[]) {
     try {
       // Parse command line arguments
-      if (!parse_command_line(argc, argv, config_)) {
-        return 1;
+      auto parse_result = parse_command_line(argc, argv, config_);
+      if (parse_result == ParseResult::Help) {
+        return 0;  // Help was shown, exit successfully
+      } else if (parse_result == ParseResult::Error) {
+        return 1;  // Error occurred
       }
 
       init_logging();
@@ -116,7 +119,7 @@ namespace liarsdice::app {
     return desc;
   }
 
-  bool Application::parse_command_line(int argc, char* argv[], AppConfig& config) {
+  ParseResult Application::parse_command_line(int argc, char* argv[], AppConfig& config) {
     try {
       auto desc = setup_program_options();
       po::variables_map vm;
@@ -125,7 +128,7 @@ namespace liarsdice::app {
 
       if (vm.count("help")) {
         std::cout << desc << std::endl;
-        return false;
+        return ParseResult::Help;
       }
 
       config.verbose = vm.count("verbose");
@@ -137,11 +140,11 @@ namespace liarsdice::app {
         config.random_seed = vm["seed"].as<unsigned int>();
       }
 
-      return true;
+      return ParseResult::Success;
 
     } catch (const po::error& e) {
       std::cerr << "Command line error: " << e.what() << std::endl;
-      return false;
+      return ParseResult::Error;
     }
   }
 

@@ -31,6 +31,12 @@ namespace liarsdice::app {
     std::optional<unsigned int> random_seed;  // For deterministic testing
   };
 
+  enum class ParseResult {
+    Success,
+    Help,
+    Error
+  };
+
   class Application {
   public:
     Application();
@@ -48,7 +54,7 @@ namespace liarsdice::app {
     void init_logging();
     void setup_signal_handlers();
     po::options_description setup_program_options();
-    bool parse_command_line(int argc, char* argv[], AppConfig& config);
+    ParseResult parse_command_line(int argc, char* argv[], AppConfig& config);
 
     // CLI Interface (Robot Framework compatible)
     void show_welcome();
