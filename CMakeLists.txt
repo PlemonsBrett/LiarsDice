@@ -75,7 +75,10 @@ CPMAddPackage(
 if(sqlite3_ADDED)
   # Create SQLite3 library target
   add_library(sqlite3 STATIC ${sqlite3_SOURCE_DIR}/sqlite3.c)
-  target_include_directories(sqlite3 PUBLIC ${sqlite3_SOURCE_DIR})
+  target_include_directories(sqlite3 PUBLIC 
+    $<BUILD_INTERFACE:${sqlite3_SOURCE_DIR}>
+    $<INSTALL_INTERFACE:include>
+  )
   
   # Enable SQLite3 features
   target_compile_definitions(sqlite3 
@@ -129,9 +132,9 @@ target_link_libraries(${PROJECT_NAME}
     Boost::container
     Boost::iostreams
     Boost::regex
-    $<$<TARGET_EXISTS:sqlite3>:sqlite3>
   PUBLIC
     Boost::boost
+    $<$<TARGET_EXISTS:sqlite3>:sqlite3>
 )
 
 # Add Boost.DI include directory if available

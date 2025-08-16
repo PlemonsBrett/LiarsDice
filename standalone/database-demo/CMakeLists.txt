@@ -20,3 +20,8 @@ target_link_libraries(${PROJECT_NAME}
         ${Boost_LOG_LIBRARY}
         ${Boost_LOG_SETUP_LIBRARY}
 )
+
+# Add explicit dependency on sqlite3 if it exists
+if(TARGET sqlite3)
+    add_dependencies(${PROJECT_NAME} sqlite3)
+endif()
