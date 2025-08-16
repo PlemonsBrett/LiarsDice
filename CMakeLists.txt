@@ -168,7 +168,10 @@ packageProject(
   INCLUDE_DESTINATION include/${PROJECT_NAME}-${PROJECT_VERSION}
   VERSION_HEADER "${VERSION_HEADER_LOCATION}"
   COMPATIBILITY SameMajorVersion
-  DEPENDENCIES "fmt 10.2.1" "xsimd 13.0.0"
+  DEPENDENCIES 
+    "fmt 10.2.1"
+    "xsimd 13.0.0"
+    "Boost 1.70.0 COMPONENTS log log_setup unit_test_framework program_options system filesystem serialization thread container timer iostreams regex"
 )
 
 # ---- Add subdirectories ----

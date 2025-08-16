@@ -1,0 +1,150 @@
+name: Update Version
+
+on:
+  # Only run on main branch after a merge
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to set (e.g., 1.1.0)'
+        required: false
+        type: string
+
+jobs:
+  update-version:
+    name: Update Project Version
+    runs-on: ubuntu-latest
+    # Only run if this is not already a version bump commit
+    if: |
+      github.event_name == 'workflow_dispatch' || 
+      !contains(github.event.head_commit.message, 'chore: bump version')
+    
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure Git
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+
+      - name: Get latest version tag
+        id: latest_tag
+        run: |
+          LATEST_TAG=$(git tag -l "v*.*.*" | sort -V | tail -n1)
+          if [[ -z "$LATEST_TAG" ]]; then
+            LATEST_TAG="v0.0.0"
+          fi
+          echo "latest_tag=${LATEST_TAG}" >> $GITHUB_OUTPUT
+          echo "Latest version tag: ${LATEST_TAG}"
+
+      - name: Determine next version
+        id: next_version
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]] && [[ -n "${{ github.event.inputs.version }}" ]]; then
+            # Manual version override
+            VERSION="${{ github.event.inputs.version }}"
+            VERSION="${VERSION#v}"  # Remove v prefix if present
+          else
+            # Auto-determine based on commits
+            LATEST_TAG="${{ steps.latest_tag.outputs.latest_tag }}"
+            CURRENT_VERSION="${LATEST_TAG#v}"
+            IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT_VERSION"
+            
+            # Check commit messages since last tag
+            if [[ "$LATEST_TAG" == "v0.0.0" ]]; then
+              COMPARE_FROM=$(git rev-list --max-parents=0 HEAD)
+            else
+              COMPARE_FROM="$LATEST_TAG"
+            fi
+            
+            # Check if there are any new commits
+            COMMIT_COUNT=$(git rev-list ${COMPARE_FROM}..HEAD --count)
+            if [[ "$COMMIT_COUNT" -eq 0 ]]; then
+              echo "No new commits since last version"
+              echo "skip=true" >> $GITHUB_OUTPUT
+              exit 0
+            fi
+            
+            # Determine version bump type
+            if git log ${COMPARE_FROM}..HEAD --pretty=format:"%B" | grep -q "BREAKING CHANGE:\|^[a-z]*!:"; then
+              MAJOR=$((MAJOR + 1))
+              MINOR=0
+              PATCH=0
+              BUMP_TYPE="major"
+            elif git log ${COMPARE_FROM}..HEAD --pretty=format:"%s" | grep -qE "^feat(\(.*\))?:"; then
+              MINOR=$((MINOR + 1))
+              PATCH=0
+              BUMP_TYPE="minor"
+            else
+              PATCH=$((PATCH + 1))
+              BUMP_TYPE="patch"
+            fi
+            
+            VERSION="${MAJOR}.${MINOR}.${PATCH}"
+            echo "bump_type=${BUMP_TYPE}" >> $GITHUB_OUTPUT
+          fi
+          
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "Next version: ${VERSION}"
+
+      - name: Update version in files
+        if: steps.next_version.outputs.skip != 'true'
+        run: |
+          VERSION="${{ steps.next_version.outputs.version }}"
+          
+          # Update CMakeLists.txt
+          IFS='.' read -r major minor patch <<< "$VERSION"
+          sed -i "s/VERSION [0-9]\+\.[0-9]\+/VERSION ${major}.${minor}/" CMakeLists.txt
+          
+          # Update application.cpp if it exists
+          if [[ -f "source/app/application.cpp" ]]; then
+            sed -i "s/Liar's Dice v[0-9]\+\.[0-9]\+\.[0-9]\+/Liar's Dice v${VERSION}/" source/app/application.cpp
+            sed -i "s/Liar's Dice v[0-9]\+\.[0-9]\+/Liar's Dice v${VERSION}/" source/app/application.cpp
+          fi
+          
+          # Update README if it has version badges
+          if [[ -f "README.md" ]]; then
+            sed -i "s/version-[0-9]\+\.[0-9]\+\.[0-9]\+/version-${VERSION}/g" README.md
+          fi
+
+      - name: Update CHANGELOG
+        if: steps.next_version.outputs.skip != 'true'
+        run: |
+          VERSION="${{ steps.next_version.outputs.version }}"
+          DATE=$(date +%Y-%m-%d)
+          
+          # Create a temporary file with the new version section
+          cat << EOF > CHANGELOG_NEW.md
+          ## [${VERSION}] - ${DATE}
+          
+          EOF
+          
+          # Insert after [Unreleased] section
+          if grep -q "## \[Unreleased\]" CHANGELOG.md; then
+            awk '/## \[Unreleased\]/{print; print ""; getline; print; while(getline > 0) {print > "CHANGELOG_REST.md"} exit}' CHANGELOG.md > CHANGELOG_TOP.md
+            cat CHANGELOG_TOP.md CHANGELOG_NEW.md CHANGELOG_REST.md > CHANGELOG.md
+            rm -f CHANGELOG_TOP.md CHANGELOG_NEW.md CHANGELOG_REST.md
+          fi
+
+      - name: Commit version changes
+        if: steps.next_version.outputs.skip != 'true'
+        run: |
+          VERSION="${{ steps.next_version.outputs.version }}"
+          git add -A
+          git commit -m "chore: bump version to ${VERSION} [skip ci]" || exit 0
+
+      - name: Create version tag
+        if: steps.next_version.outputs.skip != 'true'
+        run: |
+          VERSION="${{ steps.next_version.outputs.version }}"
+          git tag -a "v${VERSION}" -m "Version ${VERSION}"
+
+      - name: Push changes
+        if: steps.next_version.outputs.skip != 'true'
+        run: |
+          git push origin main
+          git push origin --tags
