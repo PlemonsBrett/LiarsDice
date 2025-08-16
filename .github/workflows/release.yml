@@ -1,0 +1,445 @@
+name: Release
+
+on:
+  push:
+    branches: [ main ]
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g., v1.0.0)'
+        required: true
+        type: string
+
+env:
+  CPM_SOURCE_CACHE: ${{ github.workspace }}/cpm_modules
+
+jobs:
+  build-artifacts:
+    name: Build ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        include:
+          - os: ubuntu-latest
+            artifact_name: liarsdice-linux-x64
+            build_name: liarsdice
+          - os: macos-latest
+            artifact_name: liarsdice-macos-universal
+            build_name: liarsdice
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            **/cpm_modules
+            ~/.cache/pip
+            ~/Library/Caches/pip
+          key: ${{ github.workflow }}-${{ matrix.os }}-release-${{ hashFiles('**/CMakeLists.txt', '**/*.cmake') }}
+
+      - name: Install dependencies (Ubuntu)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libboost-all-dev ninja-build
+
+      - name: Install dependencies (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          brew install boost ninja
+
+      - name: Configure CMake
+        run: |
+          cmake -S . -B build \
+            -DCMAKE_BUILD_TYPE=Release \
+            -G Ninja \
+            -DLIARSDICE_BUILD_TESTS=OFF \
+            -DLIARSDICE_BUILD_DOCS=OFF
+
+      - name: Build standalone executable
+        run: |
+          cmake --build build --config Release --target LiarsDiceStandalone -j4
+
+      - name: Test executable
+        run: |
+          ./build/standalone/liarsdice --help
+          echo "2\n1\n" | timeout 5 ./build/standalone/liarsdice --seed 12345 || true
+
+      - name: Create distribution directory
+        run: |
+          mkdir -p dist
+          cp build/standalone/${{ matrix.build_name }} dist/
+          cp README.md dist/
+          cp LICENSE dist/ || echo "No LICENSE file"
+          
+      - name: Create archive (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          cd dist
+          tar -czf ../${{ matrix.artifact_name }}.tar.gz *
+          cd ..
+          
+      - name: Create archive (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          cd dist
+          zip -r ../${{ matrix.artifact_name }}.zip *
+          cd ..
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: |
+            ${{ matrix.artifact_name }}.tar.gz
+            ${{ matrix.artifact_name }}.zip
+          if-no-files-found: error
+          retention-days: 30
+
+  create-release:
+    name: Create Release
+    needs: build-artifacts
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get latest version tag
+        id: latest_tag
+        run: |
+          # Get the latest semantic version tag
+          LATEST_TAG=$(git tag -l "v*.*.*" | sort -V | tail -n1)
+          if [[ -z "$LATEST_TAG" ]]; then
+            LATEST_TAG="v0.0.0"
+            echo "No previous version found, starting from v0.0.0"
+          fi
+          echo "latest_tag=${LATEST_TAG}" >> $GITHUB_OUTPUT
+          echo "Latest version tag: ${LATEST_TAG}"
+
+      - name: Determine version
+        id: version
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]] && [[ -n "${{ github.event.inputs.version }}" ]]; then
+            # Manual version override
+            VERSION="${{ github.event.inputs.version }}"
+            echo "Using manual version: ${VERSION}"
+          elif [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            # Tagged release
+            VERSION="${GITHUB_REF#refs/tags/}"
+            echo "Using tag version: ${VERSION}"
+          else
+            # Auto-increment based on conventional commits
+            LATEST_TAG="${{ steps.latest_tag.outputs.latest_tag }}"
+            
+            # Parse current version
+            CURRENT_VERSION="${LATEST_TAG#v}"
+            IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT_VERSION"
+            
+            # Check commit messages since last tag to determine version bump
+            if [[ "$LATEST_TAG" == "v0.0.0" ]]; then
+              # First release
+              COMPARE_FROM=$(git rev-list --max-parents=0 HEAD)
+            else
+              COMPARE_FROM="$LATEST_TAG"
+            fi
+            
+            # Check for breaking changes (major version bump)
+            if git log ${COMPARE_FROM}..HEAD --pretty=format:"%B" | grep -q "BREAKING CHANGE:\|^[a-z]*!:"; then
+              echo "Found breaking changes - major version bump"
+              MAJOR=$((MAJOR + 1))
+              MINOR=0
+              PATCH=0
+            # Check for new features (minor version bump)
+            elif git log ${COMPARE_FROM}..HEAD --pretty=format:"%s" | grep -qE "^feat(\(.*\))?:"; then
+              echo "Found new features - minor version bump"
+              MINOR=$((MINOR + 1))
+              PATCH=0
+            # Check for fixes (patch version bump)
+            elif git log ${COMPARE_FROM}..HEAD --pretty=format:"%s" | grep -qE "^fix(\(.*\))?:"; then
+              echo "Found bug fixes - patch version bump"
+              PATCH=$((PATCH + 1))
+            # Default to patch bump for any other changes
+            else
+              echo "Other changes - patch version bump"
+              PATCH=$((PATCH + 1))
+            fi
+            
+            VERSION="v${MAJOR}.${MINOR}.${PATCH}"
+            echo "Auto-generated version: ${VERSION}"
+            
+            # For development builds from main, append commit SHA
+            if [[ "${{ github.event_name }}" == "push" ]] && [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+              SHORT_SHA=$(git rev-parse --short HEAD)
+              # Check if we have any new commits since the calculated version
+              if git rev-list ${COMPARE_FROM}..HEAD --count | grep -q "^0$"; then
+                echo "No new commits, keeping version as-is"
+              else
+                # Add pre-release identifier for continuous deployment
+                VERSION="${VERSION}-dev.${SHORT_SHA}"
+                echo "Development version: ${VERSION}"
+              fi
+            fi
+          fi
+          
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "Final version: ${VERSION}"
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts/
+
+      - name: List artifacts
+        run: |
+          echo "Downloaded artifacts:"
+          ls -la artifacts/
+
+      - name: Get previous release tag
+        id: prev_tag
+        run: |
+          # Get the most recent tag before this one
+          PREV_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          if [[ -z "$PREV_TAG" ]]; then
+            # If no previous tag, use initial commit
+            PREV_TAG=$(git rev-list --max-parents=0 HEAD)
+          fi
+          echo "prev_tag=${PREV_TAG}" >> $GITHUB_OUTPUT
+          echo "Previous tag/commit: ${PREV_TAG}"
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          # Generate changelog based on conventional commits
+          cat << 'SCRIPT' > generate_changelog.sh
+          #!/bin/bash
+          
+          PREV_TAG="${1}"
+          CURRENT_REF="${2:-HEAD}"
+          
+          echo "## What's Changed"
+          echo ""
+          
+          # Features
+          FEATURES=$(git log ${PREV_TAG}..${CURRENT_REF} --pretty=format:"%s" | grep -E "^feat(\(.*\))?:" | sed 's/^feat\(.*\): //')
+          if [[ -n "$FEATURES" ]]; then
+            echo "### ✨ Features"
+            echo "$FEATURES" | while IFS= read -r line; do
+              [[ -n "$line" ]] && echo "- $line"
+            done
+            echo ""
+          fi
+          
+          # Bug Fixes
+          FIXES=$(git log ${PREV_TAG}..${CURRENT_REF} --pretty=format:"%s" | grep -E "^fix(\(.*\))?:" | sed 's/^fix\(.*\): //')
+          if [[ -n "$FIXES" ]]; then
+            echo "### 🐛 Bug Fixes"
+            echo "$FIXES" | while IFS= read -r line; do
+              [[ -n "$line" ]] && echo "- $line"
+            done
+            echo ""
+          fi
+          
+          # Performance Improvements
+          PERF=$(git log ${PREV_TAG}..${CURRENT_REF} --pretty=format:"%s" | grep -E "^perf(\(.*\))?:" | sed 's/^perf\(.*\): //')
+          if [[ -n "$PERF" ]]; then
+            echo "### ⚡ Performance Improvements"
+            echo "$PERF" | while IFS= read -r line; do
+              [[ -n "$line" ]] && echo "- $line"
+            done
+            echo ""
+          fi
+          
+          # Documentation
+          DOCS=$(git log ${PREV_TAG}..${CURRENT_REF} --pretty=format:"%s" | grep -E "^docs(\(.*\))?:" | sed 's/^docs\(.*\): //')
+          if [[ -n "$DOCS" ]]; then
+            echo "### 📚 Documentation"
+            echo "$DOCS" | while IFS= read -r line; do
+              [[ -n "$line" ]] && echo "- $line"
+            done
+            echo ""
+          fi
+          
+          # Style changes
+          STYLE=$(git log ${PREV_TAG}..${CURRENT_REF} --pretty=format:"%s" | grep -E "^style(\(.*\))?:" | sed 's/^style\(.*\): //')
+          if [[ -n "$STYLE" ]]; then
+            echo "### 💄 Style"
+            echo "$STYLE" | while IFS= read -r line; do
+              [[ -n "$line" ]] && echo "- $line"
+            done
+            echo ""
+          fi
+          
+          # Refactoring
+          REFACTOR=$(git log ${PREV_TAG}..${CURRENT_REF} --pretty=format:"%s" | grep -E "^refactor(\(.*\))?:" | sed 's/^refactor\(.*\): //')
+          if [[ -n "$REFACTOR" ]]; then
+            echo "### ♻️ Refactoring"
+            echo "$REFACTOR" | while IFS= read -r line; do
+              [[ -n "$line" ]] && echo "- $line"
+            done
+            echo ""
+          fi
+          
+          # Tests
+          TESTS=$(git log ${PREV_TAG}..${CURRENT_REF} --pretty=format:"%s" | grep -E "^test(\(.*\))?:" | sed 's/^test\(.*\): //')
+          if [[ -n "$TESTS" ]]; then
+            echo "### 🧪 Tests"
+            echo "$TESTS" | while IFS= read -r line; do
+              [[ -n "$line" ]] && echo "- $line"
+            done
+            echo ""
+          fi
+          
+          # Build/CI changes
+          BUILD=$(git log ${PREV_TAG}..${CURRENT_REF} --pretty=format:"%s" | grep -E "^(build|ci)(\(.*\))?:" | sed 's/^\(build\|ci\)\(.*\): //')
+          if [[ -n "$BUILD" ]]; then
+            echo "### 🔧 Build System / CI"
+            echo "$BUILD" | while IFS= read -r line; do
+              [[ -n "$line" ]] && echo "- $line"
+            done
+            echo ""
+          fi
+          
+          # Other changes (not following conventional commits)
+          OTHER=$(git log ${PREV_TAG}..${CURRENT_REF} --pretty=format:"%s" | grep -v -E "^(feat|fix|perf|docs|style|refactor|test|build|ci|chore)(\(.*\))?:")
+          if [[ -n "$OTHER" ]]; then
+            echo "### 📦 Other Changes"
+            echo "$OTHER" | while IFS= read -r line; do
+              [[ -n "$line" ]] && echo "- $line"
+            done
+            echo ""
+          fi
+          
+          # Contributors
+          echo "### 👥 Contributors"
+          git log ${PREV_TAG}..${CURRENT_REF} --pretty=format:"%an" | sort -u | while IFS= read -r author; do
+            echo "- $author"
+          done
+          echo ""
+          
+          # Stats
+          echo "### 📊 Stats"
+          COMMIT_COUNT=$(git rev-list ${PREV_TAG}..${CURRENT_REF} --count)
+          FILE_COUNT=$(git diff --name-only ${PREV_TAG}..${CURRENT_REF} | wc -l | tr -d ' ')
+          echo "- $COMMIT_COUNT commits"
+          echo "- $FILE_COUNT files changed"
+          
+          SCRIPT
+          
+          chmod +x generate_changelog.sh
+          CHANGELOG=$(./generate_changelog.sh "${{ steps.prev_tag.outputs.prev_tag }}" "HEAD")
+          
+          # Save to file for release notes
+          cat << EOF > RELEASE_NOTES.md
+          # Liar's Dice ${{ steps.version.outputs.version }}
+          
+          $CHANGELOG
+          
+          ## 🎲 Game Features
+          - Classic Liar's Dice gameplay with point-based elimination
+          - AI opponents with configurable difficulty (Easy/Medium)
+          - Deterministic mode with seed support for testing
+          - Cross-platform support (Linux, macOS)
+          
+          ## 📦 Installation
+          
+          ### Linux
+          \`\`\`bash
+          tar -xzf liarsdice-linux-x64.tar.gz
+          ./liarsdice
+          \`\`\`
+          
+          ### macOS
+          \`\`\`bash
+          unzip liarsdice-macos-universal.zip
+          ./liarsdice
+          \`\`\`
+          
+          ## 🎮 Quick Start
+          \`\`\`bash
+          # Start a game with default settings
+          ./liarsdice
+          
+          # Use Medium AI difficulty
+          ./liarsdice --medium-ai
+          
+          # Set a seed for deterministic gameplay
+          ./liarsdice --seed 12345
+          
+          # Show all options
+          ./liarsdice --help
+          \`\`\`
+          
+          ---
+          **Full Changelog**: https://github.com/${{ github.repository }}/compare/${{ steps.prev_tag.outputs.prev_tag }}...${{ steps.version.outputs.version }}
+          EOF
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.version.outputs.version }}
+          name: Liar's Dice ${{ steps.version.outputs.version }}
+          body_path: RELEASE_NOTES.md
+          draft: false
+          prerelease: ${{ contains(steps.version.outputs.version, '-') }}
+          files: |
+            artifacts/liarsdice-linux-x64/*.tar.gz
+            artifacts/liarsdice-macos-universal/*.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  cleanup-old-releases:
+    name: Cleanup Old Releases
+    needs: create-release
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && !contains(github.ref, 'tags/')
+    
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Delete old dev releases
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const releases = await github.rest.repos.listReleases({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              per_page: 100
+            });
+            
+            // Keep only the 5 most recent dev releases
+            const devReleases = releases.data
+              .filter(r => r.prerelease && r.tag_name.includes('-'))
+              .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+            
+            const toDelete = devReleases.slice(5);
+            
+            for (const release of toDelete) {
+              console.log(`Deleting old dev release: ${release.tag_name}`);
+              
+              // Delete the release
+              await github.rest.repos.deleteRelease({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                release_id: release.id
+              });
+              
+              // Delete the tag
+              try {
+                await github.rest.git.deleteRef({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  ref: `tags/${release.tag_name}`
+                });
+              } catch (e) {
+                console.log(`Could not delete tag ${release.tag_name}: ${e.message}`);
+              }
+            }
