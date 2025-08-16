@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>liarsdice::di namespace | Liar's
+Dice</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,400i,600,600i%7CSource+Code+Pro:400,400i,600" />
+  <link rel="stylesheet" href="m-dark+documentation.compiled.css" />
+  <link rel="icon" href="favicon-dark.png" type="image/png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#22272e" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+</head>
+<body>
+<header><nav id="navigation">
+  <div class="m-container">
+    <div class="m-row">
+      <a href="index.html" id="m-navbar-brand" class="m-col-t-8 m-col-m-none m-left-m">Liar's
+Dice</a>
+      <div class="m-col-t-4 m-hide-m m-text-right m-nopadr">
+        <a href="#search" class="m-doc-search-icon" title="Search" onclick="return showSearch()"><svg style="height: 0.9rem;" viewBox="0 0 16 16">
+          <path id="m-doc-search-icon-path" d="m6 0c-3.31 0-6 2.69-6 6 0 3.31 2.69 6 6 6 1.49 0 2.85-0.541 3.89-1.44-0.0164 0.338 0.147 0.759 0.5 1.15l3.22 3.79c0.552 0.614 1.45 0.665 2 0.115 0.55-0.55 0.499-1.45-0.115-2l-3.79-3.22c-0.392-0.353-0.812-0.515-1.15-0.5 0.895-1.05 1.44-2.41 1.44-3.89 0-3.31-2.69-6-6-6zm0 1.56a4.44 4.44 0 0 1 4.44 4.44 4.44 4.44 0 0 1-4.44 4.44 4.44 4.44 0 0 1-4.44-4.44 4.44 4.44 0 0 1 4.44-4.44z"/>
+        </svg></a>
+        <a id="m-navbar-show" href="#navigation" title="Show navigation"></a>
+        <a id="m-navbar-hide" href="#" title="Hide navigation"></a>
+      </div>
+      <div id="m-navbar-collapse" class="m-col-t-12 m-show-m m-col-m-none m-right-m">
+        <div class="m-row">
+          <ol class="m-col-t-6 m-col-m-none">
+            <li><a href="modules.html">Modules</a></li>
+            <li><a href="namespaces.html">Namespaces</a></li>
+            <li><a href="annotated.html">Classes</a></li>
+          </ol>
+          <ol class="m-col-t-6 m-col-m-none" start="4">
+            <li><a href="files.html">Files</a></li>
+            <li class="m-show-m"><a href="#search" class="m-doc-search-icon" title="Search" onclick="return showSearch()"><svg style="height: 0.9rem;" viewBox="0 0 16 16">
+              <use href="#m-doc-search-icon-path" />
+            </svg></a></li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav></header>
+<main><article>
+  <div class="m-container m-container-inflatable">
+    <div class="m-row">
+      <div class="m-col-l-10 m-push-l-1">
+        <h1>
+          <span class="m-breadcrumb"><a href="namespaceliarsdice.html">liarsdice</a>::<wbr/></span>di <span class="m-thin">namespace</span>
+        </h1>
+        <p>Dependency injection framework.</p>
+        <nav class="m-block m-default">
+          <h3>Contents</h3>
+          <ul>
+            <li>
+              Reference
+              <ul>
+                <li><a href="#namespaces">Namespaces</a></li>
+                <li><a href="#nested-classes">Classes</a></li>
+                <li><a href="#enum-members">Enums</a></li>
+                <li><a href="#typedef-members">Typedefs</a></li>
+                <li><a href="#func-members">Functions</a></li>
+                <li><a href="#var-members">Variables</a></li>
+              </ul>
+            </li>
+          </ul>
+        </nav>
+<p>The di namespace provides a lightweight DI container:</p><ul><li>Service registration and resolution</li><li>Lifetime management</li><li>Type-safe service access</li><li>Configuration injection</li><li>Testing support with mock services</li></ul>
+        <section id="namespaces">
+          <h2><a href="#namespaces">Namespaces</a></h2>
+          <dl class="m-doc">
+            <dt>namespace <a href="namespaceliarsdice_1_1di_1_1testing.html" class="m-doc">testing</a></dt>
+            <dd><span></span></dd>
+          </dl>
+        </section>
+        <section id="nested-classes">
+          <h2><a href="#nested-classes">Classes</a></h2>
+          <dl class="m-doc">
+            <dt>
+              class <a href="classliarsdice_1_1di_1_1ServiceContainer.html" class="m-doc">ServiceContainer</a>
+            </dt>
+            <dd><span></span></dd>
+            <dt>
+              class <a href="classliarsdice_1_1di_1_1ServiceContainerException.html" class="m-doc">ServiceContainerException</a>
+            </dt>
+            <dd><span></span></dd>
+          </dl>
+        </section>
+        <section id="enum-members">
+          <h2><a href="#enum-members">Enums</a></h2>
+          <dl class="m-doc">
+            <dt>
+              <span class="m-doc-wrap-bumper">enum class <a href="#a36660797cb9d1777adf687ea4c380577" class="m-doc">ServiceLifetime</a> { </span><span class="m-doc-wrap"><a href="#a36660797cb9d1777adf687ea4c380577ab1f023eff9a6b5308d6024e4c6b3d475" class="m-doc">Transient</a>,
+              <a href="#a36660797cb9d1777adf687ea4c380577a6ff5f73c8b5ebd311406568c8ef50bfd" class="m-doc">Singleton</a>,
+              <a href="#a36660797cb9d1777adf687ea4c380577a423f62fd0413b98ab4dd487ec060e628" class="m-doc">Scoped</a> }</span>
+            </dt>
+            <dd><span></span></dd>
+          </dl>
+        </section>
+        <section id="typedef-members">
+          <h2><a href="#typedef-members">Typedefs</a></h2>
+          <dl class="m-doc">
+            <dt>
+              <div class="m-doc-template">template&lt;typename T&gt;</div>
+              using <a href="#a9ec562e6a028c734f1f41f1b4ebe546f" class="m-doc">ServiceFactory</a> = std::function&lt;std::shared_ptr&lt;T&gt;()&gt;
+            </dt>
+            <dd><span></span></dd>
+            <dt>
+              using <a href="#abd6b42a0f4d3325ea56a4bc4afbcc423" class="m-doc">injector_config</a> = di::config
+            </dt>
+            <dd><span></span></dd>
+            <dt>
+              <div class="m-doc-template">template&lt;typename T&gt;</div>
+              using <a href="#a47bd9ca94918291a4aca451c4710e40b" class="m-doc">shared</a> = std::shared_ptr&lt;T&gt;
+            </dt>
+            <dd><span></span></dd>
+            <dt>
+              <div class="m-doc-template">template&lt;typename T&gt;</div>
+              using <a href="#ac72364fc38279d55992f9c4b99b4bff9" class="m-doc">unique</a> = std::unique_ptr&lt;T&gt;
+            </dt>
+            <dd><span></span></dd>
+          </dl>
+        </section>
+        <section id="func-members">
+          <h2><a href="#func-members">Functions</a></h2>
+          <dl class="m-doc">
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a href="#ab8e2cd5f72333ef11db8121eb9ab54a7" class="m-doc">get_service_container</a>(</span><span class="m-doc-wrap">) -&gt; <a href="classliarsdice_1_1di_1_1ServiceContainer.html" class="m-doc">ServiceContainer</a>&amp;</span>
+            </dt>
+            <dd><span></span></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a href="#adf9edc76b6b2022ca62091a2f60014c4" class="m-doc">operator&lt;&lt;</a>(</span><span class="m-doc-wrap">std::ostream&amp; os,
+              <a href="namespaceliarsdice_1_1di.html#a36660797cb9d1777adf687ea4c380577" class="m-doc">ServiceLifetime</a> lifetime) -&gt; std::ostream&amp;</span>
+            </dt>
+            <dd><span></span></dd>
+            <dt>
+              <div class="m-doc-template">template&lt;typename T, typename... Args&gt;</div>
+              <span class="m-doc-wrap-bumper">auto <a href="#a355b19cc5d2ca028e49dc339b69f631e" class="m-doc">make_factory</a>(</span><span class="m-doc-wrap">) -&gt; auto</span>
+            </dt>
+            <dd><span></span></dd>
+            <dt>
+              <div class="m-doc-template">template&lt;typename Interface, typename Implementation&gt;</div>
+              <span class="m-doc-wrap-bumper">auto <a href="#abfb42755bd74b03f02a5a18a2c688bbd" class="m-doc">bind_interface</a>(</span><span class="m-doc-wrap">) -&gt; auto</span>
+            </dt>
+            <dd><span></span></dd>
+            <dt>
+              <div class="m-doc-template">template&lt;typename Interface, typename Implementation&gt;</div>
+              <span class="m-doc-wrap-bumper">auto <a href="#a7f1400b1e4766c5797c972e312a717f2" class="m-doc">bind_singleton</a>(</span><span class="m-doc-wrap">) -&gt; auto</span>
+            </dt>
+            <dd><span></span></dd>
+            <dt>
+              <div class="m-doc-template">template&lt;typename T&gt;</div>
+              <span class="m-doc-wrap-bumper">auto <a href="#ae0055a01cd6d778379f1667c56c22529" class="m-doc">bind_instance</a>(</span><span class="m-doc-wrap">std::shared_ptr&lt;T&gt; instance) -&gt; auto</span>
+            </dt>
+            <dd><span></span></dd>
+            <dt>
+              <div class="m-doc-template">template&lt;typename... Bindings&gt;</div>
+              <span class="m-doc-wrap-bumper">auto <a href="#a17408f8a46a89b4d588e3b8d53bb74ca" class="m-doc">make_injector</a>(</span><span class="m-doc-wrap">Bindings &amp;&amp; ... bindings) -&gt; auto</span>
+            </dt>
+            <dd><span></span></dd>
+          </dl>
+        </section>
+        <section id="var-members">
+          <h2><a href="#var-members">Variables</a></h2>
+          <dl class="m-doc">
+            <dt>
+              auto <a href="#a0c20dd7c533f06f18c6aa0bfd8c5c72e" class="m-doc">singleton</a> <span class="m-label m-flat m-primary">constexpr</span>
+            </dt>
+            <dd><span></span></dd>
+            <dt>
+              auto <a href="#a8373df0c1a66848c4663f5a64bf84df1" class="m-doc">unique_scope</a> <span class="m-label m-flat m-primary">constexpr</span>
+            </dt>
+            <dd><span></span></dd>
+          </dl>
+        </section>
+        <section>
+          <h2>Enum documentation</h2>
+          <section class="m-doc-details" id="a36660797cb9d1777adf687ea4c380577"><div>
+            <h3>
+              enum class liarsdice::<wbr />di::<wbr /><a href="#a36660797cb9d1777adf687ea4c380577" class="m-doc-self">ServiceLifetime</a>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="service__container_8hpp.html">&lt;liarsdice/di/service_container.hpp&gt;</a></div>
+            </h3>
+            <p><span></span></p>
+          </div></section>
+        </section>
+        <section>
+          <h2>Typedef documentation</h2>
+          <section class="m-doc-details" id="a9ec562e6a028c734f1f41f1b4ebe546f"><div>
+            <h3>
+              <div class="m-doc-include m-code m-inverted m-right-m m-text-right"><span class="cp">#include</span> <a class="cpf" href="service__container_8hpp.html">&lt;liarsdice/di/service_container.hpp&gt;</a></div>
+              <div class="m-doc-template">
+                template&lt;typename T&gt;
+              </div>
+              using liarsdice::<wbr />di::<wbr /><a href="#a9ec562e6a028c734f1f41f1b4ebe546f" class="m-doc-self">ServiceFactory</a> = std::function&lt;std::shared_ptr&lt;T&gt;()&gt;
+            </h3>
+            <p><span></span></p>
+          </div></section>
+          <section class="m-doc-details" id="abd6b42a0f4d3325ea56a4bc4afbcc423"><div>
+            <h3>
+              using liarsdice::<wbr />di::<wbr /><a href="#abd6b42a0f4d3325ea56a4bc4afbcc423" class="m-doc-self">injector_config</a> = di::config
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="container_8hpp.html">&lt;liarsdice/di/container.hpp&gt;</a></div>
+            </h3>
+            <p><span></span></p>
+          </div></section>
+          <section class="m-doc-details" id="a47bd9ca94918291a4aca451c4710e40b"><div>
+            <h3>
+              <div class="m-doc-include m-code m-inverted m-right-m m-text-right"><span class="cp">#include</span> <a class="cpf" href="container_8hpp.html">&lt;liarsdice/di/container.hpp&gt;</a></div>
+              <div class="m-doc-template">
+                template&lt;typename T&gt;
+              </div>
+              using liarsdice::<wbr />di::<wbr /><a href="#a47bd9ca94918291a4aca451c4710e40b" class="m-doc-self">shared</a> = std::shared_ptr&lt;T&gt;
+            </h3>
+            <p><span></span></p>
+          </div></section>
+          <section class="m-doc-details" id="ac72364fc38279d55992f9c4b99b4bff9"><div>
+            <h3>
+              <div class="m-doc-include m-code m-inverted m-right-m m-text-right"><span class="cp">#include</span> <a class="cpf" href="container_8hpp.html">&lt;liarsdice/di/container.hpp&gt;</a></div>
+              <div class="m-doc-template">
+                template&lt;typename T&gt;
+              </div>
+              using liarsdice::<wbr />di::<wbr /><a href="#ac72364fc38279d55992f9c4b99b4bff9" class="m-doc-self">unique</a> = std::unique_ptr&lt;T&gt;
+            </h3>
+            <p><span></span></p>
+          </div></section>
+        </section>
+        <section>
+          <h2>Function documentation</h2>
+          <section class="m-doc-details" id="ab8e2cd5f72333ef11db8121eb9ab54a7"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper"><a href="classliarsdice_1_1di_1_1ServiceContainer.html" class="m-doc">ServiceContainer</a>&amp; liarsdice::<wbr />di::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#ab8e2cd5f72333ef11db8121eb9ab54a7" class="m-doc-self">get_service_container</a>(</span><span class="m-doc-wrap">)</span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="service__container_8hpp.html">&lt;liarsdice/di/service_container.hpp&gt;</a></div>
+            </h3>
+            <p><span></span></p>
+          </div></section>
+          <section class="m-doc-details" id="adf9edc76b6b2022ca62091a2f60014c4"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">std::ostream&amp; liarsdice::<wbr />di::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#adf9edc76b6b2022ca62091a2f60014c4" class="m-doc-self">operator&lt;&lt;</a>(</span><span class="m-doc-wrap">std::ostream&amp; os,
+              <a href="namespaceliarsdice_1_1di.html#a36660797cb9d1777adf687ea4c380577" class="m-doc">ServiceLifetime</a> lifetime)</span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="service__container_8hpp.html">&lt;liarsdice/di/service_container.hpp&gt;</a></div>
+            </h3>
+            <p><span></span></p>
+          </div></section>
+          <section class="m-doc-details" id="a355b19cc5d2ca028e49dc339b69f631e"><div>
+            <h3>
+              <div class="m-doc-include m-code m-inverted m-right-m m-text-right"><span class="cp">#include</span> <a class="cpf" href="container_8hpp.html">&lt;liarsdice/di/container.hpp&gt;</a></div>
+              <div class="m-doc-template">
+                template&lt;typename T, typename... Args&gt;
+              </div>
+              <span class="m-doc-wrap-bumper">auto liarsdice::<wbr />di::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a355b19cc5d2ca028e49dc339b69f631e" class="m-doc-self">make_factory</a>(</span><span class="m-doc-wrap">)</span></span>
+            </h3>
+            <p><span></span></p>
+          </div></section>
+          <section class="m-doc-details" id="abfb42755bd74b03f02a5a18a2c688bbd"><div>
+            <h3>
+              <div class="m-doc-include m-code m-inverted m-right-m m-text-right"><span class="cp">#include</span> <a class="cpf" href="container_8hpp.html">&lt;liarsdice/di/container.hpp&gt;</a></div>
+              <div class="m-doc-template">
+                template&lt;typename Interface, typename Implementation&gt;
+              </div>
+              <span class="m-doc-wrap-bumper">auto liarsdice::<wbr />di::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#abfb42755bd74b03f02a5a18a2c688bbd" class="m-doc-self">bind_interface</a>(</span><span class="m-doc-wrap">)</span></span>
+            </h3>
+            <p><span></span></p>
+          </div></section>
+          <section class="m-doc-details" id="a7f1400b1e4766c5797c972e312a717f2"><div>
+            <h3>
+              <div class="m-doc-include m-code m-inverted m-right-m m-text-right"><span class="cp">#include</span> <a class="cpf" href="container_8hpp.html">&lt;liarsdice/di/container.hpp&gt;</a></div>
+              <div class="m-doc-template">
+                template&lt;typename Interface, typename Implementation&gt;
+              </div>
+              <span class="m-doc-wrap-bumper">auto liarsdice::<wbr />di::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a7f1400b1e4766c5797c972e312a717f2" class="m-doc-self">bind_singleton</a>(</span><span class="m-doc-wrap">)</span></span>
+            </h3>
+            <p><span></span></p>
+          </div></section>
+          <section class="m-doc-details" id="ae0055a01cd6d778379f1667c56c22529"><div>
+            <h3>
+              <div class="m-doc-include m-code m-inverted m-right-m m-text-right"><span class="cp">#include</span> <a class="cpf" href="container_8hpp.html">&lt;liarsdice/di/container.hpp&gt;</a></div>
+              <div class="m-doc-template">
+                template&lt;typename T&gt;
+              </div>
+              <span class="m-doc-wrap-bumper">auto liarsdice::<wbr />di::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#ae0055a01cd6d778379f1667c56c22529" class="m-doc-self">bind_instance</a>(</span><span class="m-doc-wrap">std::shared_ptr&lt;T&gt; instance)</span></span>
+            </h3>
+            <p><span></span></p>
+          </div></section>
+          <section class="m-doc-details" id="a17408f8a46a89b4d588e3b8d53bb74ca"><div>
+            <h3>
+              <div class="m-doc-include m-code m-inverted m-right-m m-text-right"><span class="cp">#include</span> <a class="cpf" href="container_8hpp.html">&lt;liarsdice/di/container.hpp&gt;</a></div>
+              <div class="m-doc-template">
+                template&lt;typename... Bindings&gt;
+              </div>
+              <span class="m-doc-wrap-bumper">auto liarsdice::<wbr />di::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a17408f8a46a89b4d588e3b8d53bb74ca" class="m-doc-self">make_injector</a>(</span><span class="m-doc-wrap">Bindings &amp;&amp; ... bindings)</span></span>
+            </h3>
+            <p><span></span></p>
+          </div></section>
+        </section>
+        <section>
+          <h2>Variable documentation</h2>
+          <section class="m-doc-details" id="a0c20dd7c533f06f18c6aa0bfd8c5c72e"><div>
+            <h3>
+              auto liarsdice::<wbr />di::<wbr /><a href="#a0c20dd7c533f06f18c6aa0bfd8c5c72e" class="m-doc-self">singleton</a> <span class="m-label m-primary">constexpr</span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="container_8hpp.html">&lt;liarsdice/di/container.hpp&gt;</a></div>
+            </h3>
+            <p><span></span></p>
+          </div></section>
+          <section class="m-doc-details" id="a8373df0c1a66848c4663f5a64bf84df1"><div>
+            <h3>
+              auto liarsdice::<wbr />di::<wbr /><a href="#a8373df0c1a66848c4663f5a64bf84df1" class="m-doc-self">unique_scope</a> <span class="m-label m-primary">constexpr</span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="container_8hpp.html">&lt;liarsdice/di/container.hpp&gt;</a></div>
+            </h3>
+            <p><span></span></p>
+          </div></section>
+        </section>
+      </div>
+    </div>
+  </div>
+</article></main>
+<div class="m-doc-search" id="search">
+  <a href="#!" onclick="return hideSearch()"></a>
+  <div class="m-container">
+    <div class="m-row">
+      <div class="m-col-m-8 m-push-m-2">
+        <div class="m-doc-search-header m-text m-small">
+          <div><span class="m-label m-default">Tab</span> / <span class="m-label m-default">T</span> to search, <span class="m-label m-default">Esc</span> to close</div>
+          <div id="search-symbolcount">&hellip;</div>
+        </div>
+        <div class="m-doc-search-content">
+          <form>
+            <input type="search" name="q" id="search-input" placeholder="Loading &hellip;" disabled="disabled" autofocus="autofocus" autocomplete="off" spellcheck="false" />
+          </form>
+          <noscript class="m-text m-danger m-text-center">Unlike everything else in the docs, the search functionality <em>requires</em> JavaScript.</noscript>
+          <div id="search-help" class="m-text m-dim m-text-center">
+            <p class="m-noindent">Search for symbols, directories, files, pages or
+            modules. You can omit any prefix from the symbol or file path; adding a
+            <code>:</code> or <code>/</code> suffix lists all members of given symbol or
+            directory.</p>
+            <p class="m-noindent">Use <span class="m-label m-dim">&darr;</span>
+            / <span class="m-label m-dim">&uarr;</span> to navigate through the list,
+            <span class="m-label m-dim">Enter</span> to go.
+            <span class="m-label m-dim">Tab</span> autocompletes common prefix, you can
+            copy a link to the result using <span class="m-label m-dim">⌘</span>
+            <span class="m-label m-dim">L</span> while <span class="m-label m-dim">⌘</span>
+            <span class="m-label m-dim">M</span> produces a Markdown link.</p>
+          </div>
+          <div id="search-notfound" class="m-text m-warning m-text-center">Sorry, nothing was found.</div>
+          <ul id="search-results"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="search-v2.js"></script>
+<script src="searchdata-v2.js" async="async"></script>
+<footer><nav>
+  <div class="m-container">
+    <div class="m-row">
+      <div class="m-col-l-10 m-push-l-1">
+        <p>Liar's
+Dice. Created with <a href="https://doxygen.org/">Doxygen</a> 1.10.0 and <a href="https://mcss.mosra.cz/">m.css</a>.</p>
+      </div>
+    </div>
+  </div>
+</nav></footer>
+</body>
+</html>

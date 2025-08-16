@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Architecture | Liar's
+Dice</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,400i,600,600i%7CSource+Code+Pro:400,400i,600" />
+  <link rel="stylesheet" href="m-dark+documentation.compiled.css" />
+  <link rel="icon" href="favicon-dark.png" type="image/png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#22272e" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+</head>
+<body>
+<header><nav id="navigation">
+  <div class="m-container">
+    <div class="m-row">
+      <a href="index.html" id="m-navbar-brand" class="m-col-t-8 m-col-m-none m-left-m">Liar's
+Dice</a>
+      <div class="m-col-t-4 m-hide-m m-text-right m-nopadr">
+        <a href="#search" class="m-doc-search-icon" title="Search" onclick="return showSearch()"><svg style="height: 0.9rem;" viewBox="0 0 16 16">
+          <path id="m-doc-search-icon-path" d="m6 0c-3.31 0-6 2.69-6 6 0 3.31 2.69 6 6 6 1.49 0 2.85-0.541 3.89-1.44-0.0164 0.338 0.147 0.759 0.5 1.15l3.22 3.79c0.552 0.614 1.45 0.665 2 0.115 0.55-0.55 0.499-1.45-0.115-2l-3.79-3.22c-0.392-0.353-0.812-0.515-1.15-0.5 0.895-1.05 1.44-2.41 1.44-3.89 0-3.31-2.69-6-6-6zm0 1.56a4.44 4.44 0 0 1 4.44 4.44 4.44 4.44 0 0 1-4.44 4.44 4.44 4.44 0 0 1-4.44-4.44 4.44 4.44 0 0 1 4.44-4.44z"/>
+        </svg></a>
+        <a id="m-navbar-show" href="#navigation" title="Show navigation"></a>
+        <a id="m-navbar-hide" href="#" title="Hide navigation"></a>
+      </div>
+      <div id="m-navbar-collapse" class="m-col-t-12 m-show-m m-col-m-none m-right-m">
+        <div class="m-row">
+          <ol class="m-col-t-6 m-col-m-none">
+            <li><a href="modules.html">Modules</a></li>
+            <li><a href="namespaces.html">Namespaces</a></li>
+            <li><a href="annotated.html">Classes</a></li>
+          </ol>
+          <ol class="m-col-t-6 m-col-m-none" start="4">
+            <li><a href="files.html">Files</a></li>
+            <li class="m-show-m"><a href="#search" class="m-doc-search-icon" title="Search" onclick="return showSearch()"><svg style="height: 0.9rem;" viewBox="0 0 16 16">
+              <use href="#m-doc-search-icon-path" />
+            </svg></a></li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav></header>
+<main><article>
+  <div class="m-container m-container-inflatable">
+    <div class="m-row">
+      <div class="m-col-l-10 m-push-l-1">
+        <h1>
+          Architecture
+        </h1>
+<section id="arch_overview"><h2><a href="#arch_overview">Architecture Overview</a></h2><p>The Liar&#x27;s Dice project follows clean architecture principles with clear separation of concerns and dependency inversion. The architecture is designed to be testable, maintainable, and extensible.</p></section><section id="layers"><h2><a href="#layers">Architectural Layers</a></h2><section id="core_layer"><h3><a href="#core_layer">Core Layer</a></h3><p>The innermost layer containing business logic and domain entities:</p><ul><li><strong>Game</strong>: Central game controller managing game flow and rules</li><li><strong>Player</strong>: Base class for human and AI players</li><li><strong>Dice</strong>: Dice rolling and management</li><li><strong>Guess</strong>: Game guess validation and comparison</li><li><strong>GameEvents</strong>: Event system for decoupled communication</li></ul></section><section id="ai_layer"><h3><a href="#ai_layer">AI Layer</a></h3><p>Strategy pattern implementation for AI players:</p><ul><li><strong>IAIStrategy</strong>: Pure virtual interface for AI strategies</li><li><strong>AIStrategyFactory</strong>: Factory with type erasure for strategy creation</li><li><strong>EasyAIStrategy</strong>: Simple heuristics-based AI</li><li><strong>MediumAIStrategy</strong>: Statistical analysis with pattern recognition</li><li><strong>HardAIStrategy</strong>: Advanced opponent modeling (future)</li></ul></section><section id="infrastructure"><h3><a href="#infrastructure">Infrastructure Layer</a></h3><p>Supporting services and utilities:</p><ul><li><strong>Logging</strong>: Structured logging with spdlog</li><li><strong>Configuration</strong>: Hierarchical configuration system</li><li><strong>Exceptions</strong>: Custom exception hierarchy</li><li><strong>Data Structures</strong>: High-performance containers</li><li><strong>Statistics</strong>: Statistical analysis tools</li></ul></section><section id="application"><h3><a href="#application">Application Layer</a></h3><p>User interface and application logic:</p><ul><li><strong>CLI Application</strong>: Command-line interface</li><li><strong>Game Setup</strong>: Player configuration and initialization</li><li><strong>UI Rendering</strong>: Console-based game visualization</li></ul></section></section><section id="patterns"><h2><a href="#patterns">Design Patterns</a></h2><section id="dependency_injection"><h3><a href="#dependency_injection">Dependency Injection</a></h3><p>Custom lightweight DI container for managing dependencies:</p><pre class="m-code"><span class="c1">// Service registration</span>
+<span class="n">ServiceContainer</span><span class="w"> </span><span class="n">container</span><span class="p">;</span>
+<span class="n">container</span><span class="p">.</span><span class="n">register_service</span><span class="o">&lt;</span><span class="n">ILogger</span><span class="o">&gt;</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">ConsoleLogger</span><span class="o">&gt;</span><span class="p">());</span>
+<span class="n">container</span><span class="p">.</span><span class="n">register_service</span><span class="o">&lt;</span><span class="n">IConfig</span><span class="o">&gt;</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">JsonConfig</span><span class="o">&gt;</span><span class="p">());</span>
+
+<span class="c1">// Service resolution</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">logger</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">container</span><span class="p">.</span><span class="n">get_service</span><span class="o">&lt;</span><span class="n">ILogger</span><span class="o">&gt;</span><span class="p">();</span></pre></section><section id="factory_pattern"><h3><a href="#factory_pattern">Factory Pattern</a></h3><p>AI strategy creation with type erasure:</p><pre class="m-code"><span class="n">AIStrategyFactory</span><span class="o">&amp;</span><span class="w"> </span><span class="n">factory</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AIStrategyFactory</span><span class="o">::</span><span class="n">instance</span><span class="p">();</span>
+<span class="n">factory</span><span class="p">.</span><span class="n">register_strategy</span><span class="p">(</span><span class="s">&quot;easy&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">[]()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">make_unique</span><span class="o">&lt;</span><span class="n">EasyAIStrategy</span><span class="o">&gt;</span><span class="p">();</span><span class="w"> </span>
+<span class="p">});</span>
+
+<span class="k">auto</span><span class="w"> </span><span class="n">strategy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">factory</span><span class="p">.</span><span class="n">create</span><span class="p">(</span><span class="s">&quot;easy&quot;</span><span class="p">);</span></pre></section><section id="observer_pattern"><h3><a href="#observer_pattern">Observer Pattern</a></h3><p>Event-driven communication using Boost.Signals2:</p><pre class="m-code"><span class="c1">// Event subscription</span>
+<span class="n">game_events</span><span class="p">.</span><span class="n">on_round_start</span><span class="p">.</span><span class="n">connect</span><span class="p">([](</span><span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="o">&amp;</span><span class="w"> </span><span class="n">state</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">render_game_state</span><span class="p">(</span><span class="n">state</span><span class="p">);</span>
+<span class="p">});</span>
+
+<span class="c1">// Event emission</span>
+<span class="n">game_events</span><span class="p">.</span><span class="n">on_round_start</span><span class="p">(</span><span class="n">current_state</span><span class="p">);</span></pre></section></section><section id="data_flow"><h2><a href="#data_flow">Data Flow</a></h2><section id="game_flow"><h3><a href="#game_flow">Game Flow Architecture</a></h3><ol><li><strong>Initialization</strong>: DI container setup, configuration loading</li><li><strong>Game Setup</strong>: Player creation, AI strategy selection</li><li><strong>Game Loop</strong>: Round management, turn processing</li><li><strong>Event Processing</strong>: UI updates, logging, state tracking</li><li><strong>Game End</strong>: Winner determination, cleanup</li></ol></section><section id="ai_decision"><h3><a href="#ai_decision">AI Decision Flow</a></h3><ol><li><strong>Context Gathering</strong>: Current game state, history analysis</li><li><strong>Strategy Execution</strong>: Pattern matching, probability calculation</li><li><strong>Decision Making</strong>: Action selection (guess/call liar)</li><li><strong>Learning</strong>: Pattern storage, opponent modeling</li></ol></section></section><section id="memory"><h2><a href="#memory">Memory Architecture</a></h2><section id="state_storage"><h3><a href="#state_storage">Game State Storage</a></h3><p>Optimized memory layout for game states:</p><ul><li><strong>CompactGameState</strong>: 8-byte bit-packed representation</li><li><strong>GameStateStorage</strong>: Cache-efficient flat containers</li><li><strong>GameHistory</strong>: Ring buffer with pool allocation</li></ul></section><section id="allocators"><h3><a href="#allocators">Custom Allocators</a></h3><p>Performance-optimized memory management:</p><ul><li><strong>FastPoolAllocator</strong>: Small object allocation</li><li><strong>SimdAllocator</strong>: Aligned memory for SIMD</li><li><strong>MemoryArena</strong>: Bulk temporary allocations</li></ul></section></section><section id="threading"><h2><a href="#threading">Threading Model</a></h2><p>The game currently uses a single-threaded model with provisions for future parallelization:</p><ul><li>Event handling is thread-safe</li><li>Logging system is thread-safe</li><li>AI calculations can be parallelized</li><li>SIMD operations use parallel algorithms</li></ul></section><section id="extensibility"><h2><a href="#extensibility">Extensibility Points</a></h2><section id="new_ai"><h3><a href="#new_ai">Adding New AI Strategies</a></h3><ol><li>Inherit from IAIStrategy interface</li><li>Implement decision-making logic</li><li>Register with AIStrategyFactory</li><li>Add configuration support</li></ol></section><section id="new_ui"><h3><a href="#new_ui">Adding New UI Types</a></h3><ol><li>Create new rendering module</li><li>Subscribe to game events</li><li>Implement display logic</li><li>Configure via DI container</li></ol></section><section id="new_rules"><h3><a href="#new_rules">Adding Game Variations</a></h3><ol><li>Extend Game class or create variant</li><li>Modify validation rules</li><li>Update AI strategies</li><li>Add configuration options</li></ol></section></section><section id="best_practices"><h2><a href="#best_practices">Architectural Best Practices</a></h2><ul><li><strong>Dependency Inversion</strong>: Depend on abstractions, not concretions</li><li><strong>Single Responsibility</strong>: Each class has one reason to change</li><li><strong>Open/Closed</strong>: Open for extension, closed for modification</li><li><strong>Interface Segregation</strong>: Small, focused interfaces</li><li><strong>Separation of Concerns</strong>: Clear boundaries between layers</li></ul></section>
+      </div>
+    </div>
+  </div>
+</article></main>
+<div class="m-doc-search" id="search">
+  <a href="#!" onclick="return hideSearch()"></a>
+  <div class="m-container">
+    <div class="m-row">
+      <div class="m-col-m-8 m-push-m-2">
+        <div class="m-doc-search-header m-text m-small">
+          <div><span class="m-label m-default">Tab</span> / <span class="m-label m-default">T</span> to search, <span class="m-label m-default">Esc</span> to close</div>
+          <div id="search-symbolcount">&hellip;</div>
+        </div>
+        <div class="m-doc-search-content">
+          <form>
+            <input type="search" name="q" id="search-input" placeholder="Loading &hellip;" disabled="disabled" autofocus="autofocus" autocomplete="off" spellcheck="false" />
+          </form>
+          <noscript class="m-text m-danger m-text-center">Unlike everything else in the docs, the search functionality <em>requires</em> JavaScript.</noscript>
+          <div id="search-help" class="m-text m-dim m-text-center">
+            <p class="m-noindent">Search for symbols, directories, files, pages or
+            modules. You can omit any prefix from the symbol or file path; adding a
+            <code>:</code> or <code>/</code> suffix lists all members of given symbol or
+            directory.</p>
+            <p class="m-noindent">Use <span class="m-label m-dim">&darr;</span>
+            / <span class="m-label m-dim">&uarr;</span> to navigate through the list,
+            <span class="m-label m-dim">Enter</span> to go.
+            <span class="m-label m-dim">Tab</span> autocompletes common prefix, you can
+            copy a link to the result using <span class="m-label m-dim">⌘</span>
+            <span class="m-label m-dim">L</span> while <span class="m-label m-dim">⌘</span>
+            <span class="m-label m-dim">M</span> produces a Markdown link.</p>
+          </div>
+          <div id="search-notfound" class="m-text m-warning m-text-center">Sorry, nothing was found.</div>
+          <ul id="search-results"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="search-v2.js"></script>
+<script src="searchdata-v2.js" async="async"></script>
+<footer><nav>
+  <div class="m-container">
+    <div class="m-row">
+      <div class="m-col-l-10 m-push-l-1">
+        <p>Liar's
+Dice. Created with <a href="https://doxygen.org/">Doxygen</a> 1.10.0 and <a href="https://mcss.mosra.cz/">m.css</a>.</p>
+      </div>
+    </div>
+  </div>
+</nav></footer>
+</body>
+</html>

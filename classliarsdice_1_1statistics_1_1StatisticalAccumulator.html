@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>liarsdice::statistics::StatisticalAccumulator class | Liar's
+Dice</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,400i,600,600i%7CSource+Code+Pro:400,400i,600" />
+  <link rel="stylesheet" href="m-dark+documentation.compiled.css" />
+  <link rel="icon" href="favicon-dark.png" type="image/png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#22272e" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+</head>
+<body>
+<header><nav id="navigation">
+  <div class="m-container">
+    <div class="m-row">
+      <a href="index.html" id="m-navbar-brand" class="m-col-t-8 m-col-m-none m-left-m">Liar's
+Dice</a>
+      <div class="m-col-t-4 m-hide-m m-text-right m-nopadr">
+        <a href="#search" class="m-doc-search-icon" title="Search" onclick="return showSearch()"><svg style="height: 0.9rem;" viewBox="0 0 16 16">
+          <path id="m-doc-search-icon-path" d="m6 0c-3.31 0-6 2.69-6 6 0 3.31 2.69 6 6 6 1.49 0 2.85-0.541 3.89-1.44-0.0164 0.338 0.147 0.759 0.5 1.15l3.22 3.79c0.552 0.614 1.45 0.665 2 0.115 0.55-0.55 0.499-1.45-0.115-2l-3.79-3.22c-0.392-0.353-0.812-0.515-1.15-0.5 0.895-1.05 1.44-2.41 1.44-3.89 0-3.31-2.69-6-6-6zm0 1.56a4.44 4.44 0 0 1 4.44 4.44 4.44 4.44 0 0 1-4.44 4.44 4.44 4.44 0 0 1-4.44-4.44 4.44 4.44 0 0 1 4.44-4.44z"/>
+        </svg></a>
+        <a id="m-navbar-show" href="#navigation" title="Show navigation"></a>
+        <a id="m-navbar-hide" href="#" title="Hide navigation"></a>
+      </div>
+      <div id="m-navbar-collapse" class="m-col-t-12 m-show-m m-col-m-none m-right-m">
+        <div class="m-row">
+          <ol class="m-col-t-6 m-col-m-none">
+            <li><a href="modules.html">Modules</a></li>
+            <li><a href="namespaces.html">Namespaces</a></li>
+            <li><a href="annotated.html">Classes</a></li>
+          </ol>
+          <ol class="m-col-t-6 m-col-m-none" start="4">
+            <li><a href="files.html">Files</a></li>
+            <li class="m-show-m"><a href="#search" class="m-doc-search-icon" title="Search" onclick="return showSearch()"><svg style="height: 0.9rem;" viewBox="0 0 16 16">
+              <use href="#m-doc-search-icon-path" />
+            </svg></a></li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav></header>
+<main><article>
+  <div class="m-container m-container-inflatable">
+    <div class="m-row">
+      <div class="m-col-l-10 m-push-l-1">
+        <h1>
+          <div class="m-doc-include m-code m-inverted m-right-m m-text-right"><span class="cp">#include</span> <a class="cpf" href="statistical__accumulator_8hpp.html">&lt;liarsdice/statistics/statistical_accumulator.hpp&gt;</a></div>
+          <div class="m-doc-template">template&lt;<a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">typename</a> <a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">T</a> = <a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">double</a>, std::size_t WindowSize = 100&gt;</div>
+          <span class="m-breadcrumb"><a href="namespaceliarsdice.html">liarsdice</a>::<wbr/></span><span class="m-breadcrumb"><a href="namespaceliarsdice_1_1statistics.html">statistics</a>::<wbr/></span>StatisticalAccumulator <span class="m-thin">class</span>
+        </h1>
+        <p>Comprehensive statistical accumulator for running statistics.</p>
+        <table class="m-table m-fullwidth m-flat">
+          <thead>
+            <tr><th colspan="2">Template parameters</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="width: 1%">WindowSize</td>
+              <td>Size of rolling window for windowed statistics</td>
+            </tr>
+          </tbody>
+        </table>
+        <nav class="m-block m-default">
+          <h3>Contents</h3>
+          <ul>
+            <li>
+              Reference
+              <ul>
+                <li><a href="#pub-types">Public types</a></li>
+                <li><a href="#typeless-methods">Constructors, destructors, conversion operators</a></li>
+                <li><a href="#pub-methods">Public functions</a></li>
+              </ul>
+            </li>
+          </ul>
+        </nav>
+<p>Uses boost::accumulators to efficiently calculate various statistics in a single pass. Supports both complete and rolling window statistics.</p>
+        <section id="pub-types">
+          <h2><a href="#pub-types">Public types</a></h2>
+          <dl class="m-doc">
+            <dt>
+              struct <a href="structliarsdice_1_1statistics_1_1StatisticalAccumulator_1_1Statistics.html" class="m-doc">Statistics</a>
+            </dt>
+            <dd>Get comprehensive statistics summary.</dd>
+            <dt id="aee76bdd48fb35732c499faaaa5d010ca">
+              using <a href="#aee76bdd48fb35732c499faaaa5d010ca" class="m-doc-self">value_type</a> = <a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">T</a>
+            </dt>
+            <dd><span></span></dd>
+            <dt id="a07702a894ca74efb9bfbd852d3a3a048">
+              using <a href="#a07702a894ca74efb9bfbd852d3a3a048" class="m-doc-self">accumulator_set</a> = acc::accumulator_set&lt;<a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">T</a>, acc::stats&lt;acc::tag::count, acc::tag::mean, acc::tag::variance, acc::tag::min, acc::tag::max, acc::tag::median, acc::tag::skewness, acc::tag::kurtosis, acc::tag::moment&lt;2&gt;, acc::tag::moment&lt;3&gt;, acc::tag::moment&lt;4&gt;&gt;&gt;
+            </dt>
+            <dd><span></span></dd>
+            <dt id="a662d40e7d6477b602ae34e0c0e771484">
+              using <a href="#a662d40e7d6477b602ae34e0c0e771484" class="m-doc-self">rolling_accumulator_set</a> = acc::accumulator_set&lt;<a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">T</a>, acc::stats&lt;acc::tag::rolling_mean, acc::tag::rolling_variance&gt;&gt;
+            </dt>
+            <dd><span></span></dd>
+          </dl>
+        </section>
+        <section id="typeless-methods">
+          <h2><a href="#typeless-methods">Constructors, destructors, conversion operators</a></h2>
+          <dl class="m-doc">
+            <dt id="aa941abffb5cda1468dc9173fb62adf56">
+              <span class="m-doc-wrap-bumper"><a href="#aa941abffb5cda1468dc9173fb62adf56" class="m-doc-self">StatisticalAccumulator</a>(</span><span class="m-doc-wrap">)</span>
+            </dt>
+            <dd>Default constructor.</dd>
+          </dl>
+        </section>
+        <section id="pub-methods">
+          <h2><a href="#pub-methods">Public functions</a></h2>
+          <dl class="m-doc">
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a href="#a2add23e704260faa1811436eebfc753a" class="m-doc">add</a>(</span><span class="m-doc-wrap"><a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">T</a> value) -&gt; <a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">void</a></span>
+            </dt>
+            <dd>Add a value to the accumulator.</dd>
+            <dt>
+              <div class="m-doc-template">template&lt;<a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">typename</a> <a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">InputIt</a>&gt;</div>
+              <span class="m-doc-wrap-bumper">auto <a href="#a235a593705b6105447449c97cba3de45" class="m-doc">add_range</a>(</span><span class="m-doc-wrap"><a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">InputIt</a> first,
+              <a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">InputIt</a> last) -&gt; <a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">void</a></span>
+            </dt>
+            <dd>Add multiple values.</dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a href="#a2425159e0ca4a0be81e877ea34f8fd36" class="m-doc">count</a>(</span><span class="m-doc-wrap">) const -&gt; std::size_t</span>
+            </dt>
+            <dd>Get number of accumulated values.</dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a href="#a463bd3596d9699ebc4270d1483a6bdee" class="m-doc">mean</a>(</span><span class="m-doc-wrap">) const -&gt; <a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">T</a></span>
+            </dt>
+            <dd>Get mean of all values.</dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a href="#a966552e58e23bf6258283a44de5864eb" class="m-doc">variance</a>(</span><span class="m-doc-wrap">) const -&gt; <a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">T</a></span>
+            </dt>
+            <dd>Get variance of all values.</dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a href="#a115800255de6b7c91cad4308fc12543f" class="m-doc">standard_deviation</a>(</span><span class="m-doc-wrap">) const -&gt; <a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">T</a></span>
+            </dt>
+            <dd>Get standard deviation.</dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a href="#ac8f4f44ca11a10dcfabbf12853394291" class="m-doc">min</a>(</span><span class="m-doc-wrap">) const -&gt; <a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">T</a></span>
+            </dt>
+            <dd>Get minimum value.</dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a href="#a785a757f4d3ab1aba1777355eed03a18" class="m-doc">max</a>(</span><span class="m-doc-wrap">) const -&gt; <a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">T</a></span>
+            </dt>
+            <dd>Get maximum value.</dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a href="#a640f34adebd4aecb616b0849dea5a70c" class="m-doc">range</a>(</span><span class="m-doc-wrap">) const -&gt; <a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">T</a></span>
+            </dt>
+            <dd>Get range (max - min)</dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a href="#af294dbbb30326393b2f3b26b2bf66b22" class="m-doc">median</a>(</span><span class="m-doc-wrap">) const -&gt; <a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">T</a></span>
+            </dt>
+            <dd>Get median value.</dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a href="#a80f1ef3c4b6408d95f2d3cc6d6a5eaea" class="m-doc">skewness</a>(</span><span class="m-doc-wrap">) const -&gt; <a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">T</a></span>
+            </dt>
+            <dd>Get skewness.</dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a href="#ae55a83e90ab3f8c7ba8ef64975e26d0b" class="m-doc">kurtosis</a>(</span><span class="m-doc-wrap">) const -&gt; <a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">T</a></span>
+            </dt>
+            <dd>Get kurtosis.</dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a href="#a3875c63a26282f1e451f3b161c80db6e" class="m-doc">coefficient_of_variation</a>(</span><span class="m-doc-wrap">) const -&gt; <a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">T</a></span>
+            </dt>
+            <dd>Get coefficient of variation (CV)</dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a href="#a187df5edbfcfbf454e5761d0285b9996" class="m-doc">rms</a>(</span><span class="m-doc-wrap">) const -&gt; <a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">T</a></span>
+            </dt>
+            <dd>Get root mean square (RMS)</dd>
+            <dt>
+              <div class="m-doc-template">template&lt;<a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">int</a> N&gt;</div>
+              <span class="m-doc-wrap-bumper">auto <a href="#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">moment</a>(</span><span class="m-doc-wrap">) const -&gt; T</span>
+            </dt>
+            <dd>Get nth central moment.</dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a href="#a5c251141bda521ec4f5f54daf4fd1ca4" class="m-doc">rolling_mean</a>(</span><span class="m-doc-wrap">) const -&gt; <a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">T</a></span>
+            </dt>
+            <dd>Get rolling mean over window.</dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a href="#a63607a5a591d62bbfaf3fcd5e93cad30" class="m-doc">rolling_variance</a>(</span><span class="m-doc-wrap">) const -&gt; <a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">T</a></span>
+            </dt>
+            <dd>Get rolling variance over window.</dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a href="#acd131b527dfd1078565028383490f8bf" class="m-doc">rolling_std_dev</a>(</span><span class="m-doc-wrap">) const -&gt; <a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">T</a></span>
+            </dt>
+            <dd>Get rolling standard deviation.</dd>
+            <dt id="a57d6844ffa1d50c429fe0977ab063b3d">
+              <span class="m-doc-wrap-bumper">auto <a href="#a57d6844ffa1d50c429fe0977ab063b3d" class="m-doc-self">get_statistics</a>(</span><span class="m-doc-wrap">) const -&gt; <a href="structliarsdice_1_1statistics_1_1StatisticalAccumulator_1_1Statistics.html" class="m-doc">Statistics</a></span>
+            </dt>
+            <dd><span></span></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a href="#aeec6d6314336a1eee103c5d3045d2a27" class="m-doc">is_normal_distributed</a>(</span><span class="m-doc-wrap"><a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">double</a> alpha = 0.05) const -&gt; <a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">bool</a></span>
+            </dt>
+            <dd>Check if distribution is approximately normal.</dd>
+            <dt id="a7d99206733e090167e41c26ffec5fef7">
+              <span class="m-doc-wrap-bumper">auto <a href="#a7d99206733e090167e41c26ffec5fef7" class="m-doc-self">reset</a>(</span><span class="m-doc-wrap">) -&gt; <a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">void</a></span>
+            </dt>
+            <dd>Reset accumulator to initial state.</dd>
+          </dl>
+        </section>
+        <section>
+          <h2>Function documentation</h2>
+          <section class="m-doc-details" id="a2add23e704260faa1811436eebfc753a"><div>
+            <h3>
+              <div class="m-doc-template">
+                template&lt;<a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">typename</a> <a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">T</a> _1, std::size_t WindowSize&gt;
+              </div>
+              <span class="m-doc-wrap-bumper"><a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">void</a> liarsdice::<wbr />statistics::<wbr />StatisticalAccumulator&lt;_1, WindowSize&gt;::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a2add23e704260faa1811436eebfc753a" class="m-doc-self">add</a>(</span><span class="m-doc-wrap"><a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">T</a> value)</span></span>
+            </h3>
+            <p>Add a value to the accumulator.</p>
+            <table class="m-table m-fullwidth m-flat">
+              <thead>
+                <tr><th colspan="2">Parameters</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="width: 1%">value</td>
+                  <td>Value to accumulate</td>
+                </tr>
+              </tbody>
+            </table>
+          </div></section>
+          <section class="m-doc-details" id="a235a593705b6105447449c97cba3de45"><div>
+            <h3>
+              <div class="m-doc-template">
+                template&lt;<a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">typename</a> <a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">T</a> _1, std::size_t WindowSize&gt;
+                template&lt;<a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">typename</a> <a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">InputIt</a>&gt;
+              </div>
+              <span class="m-doc-wrap-bumper"><a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">void</a> liarsdice::<wbr />statistics::<wbr />StatisticalAccumulator&lt;_1, WindowSize&gt;::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a235a593705b6105447449c97cba3de45" class="m-doc-self">add_range</a>(</span><span class="m-doc-wrap"><a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">InputIt</a> first,
+              <a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">InputIt</a> last)</span></span>
+            </h3>
+            <p>Add multiple values.</p>
+            <table class="m-table m-fullwidth m-flat">
+              <thead>
+                <tr><th colspan="2">Parameters</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="width: 1%">first</td>
+                  <td>Beginning of range</td>
+                </tr>
+                <tr>
+                  <td>last</td>
+                  <td>End of range</td>
+                </tr>
+              </tbody>
+            </table>
+          </div></section>
+          <section class="m-doc-details" id="a2425159e0ca4a0be81e877ea34f8fd36"><div>
+            <h3>
+              <div class="m-doc-template">
+                template&lt;<a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">typename</a> <a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">T</a> _1, std::size_t WindowSize&gt;
+              </div>
+              <span class="m-doc-wrap-bumper">std::size_t liarsdice::<wbr />statistics::<wbr />StatisticalAccumulator&lt;_1, WindowSize&gt;::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a2425159e0ca4a0be81e877ea34f8fd36" class="m-doc-self">count</a>(</span><span class="m-doc-wrap">) const</span></span>
+            </h3>
+            <p>Get number of accumulated values.</p>
+            <table class="m-table m-fullwidth m-flat">
+              <tfoot>
+                <tr>
+                  <th style="width: 1%">Returns</th>
+                  <td>Count of values</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div></section>
+          <section class="m-doc-details" id="a463bd3596d9699ebc4270d1483a6bdee"><div>
+            <h3>
+              <div class="m-doc-template">
+                template&lt;<a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">typename</a> <a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">T</a> _1, std::size_t WindowSize&gt;
+              </div>
+              <span class="m-doc-wrap-bumper"><a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">T</a> liarsdice::<wbr />statistics::<wbr />StatisticalAccumulator&lt;_1, WindowSize&gt;::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a463bd3596d9699ebc4270d1483a6bdee" class="m-doc-self">mean</a>(</span><span class="m-doc-wrap">) const</span></span>
+            </h3>
+            <p>Get mean of all values.</p>
+            <table class="m-table m-fullwidth m-flat">
+              <tfoot>
+                <tr>
+                  <th style="width: 1%">Returns</th>
+                  <td>Mean value</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div></section>
+          <section class="m-doc-details" id="a966552e58e23bf6258283a44de5864eb"><div>
+            <h3>
+              <div class="m-doc-template">
+                template&lt;<a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">typename</a> <a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">T</a> _1, std::size_t WindowSize&gt;
+              </div>
+              <span class="m-doc-wrap-bumper"><a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">T</a> liarsdice::<wbr />statistics::<wbr />StatisticalAccumulator&lt;_1, WindowSize&gt;::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a966552e58e23bf6258283a44de5864eb" class="m-doc-self">variance</a>(</span><span class="m-doc-wrap">) const</span></span>
+            </h3>
+            <p>Get variance of all values.</p>
+            <table class="m-table m-fullwidth m-flat">
+              <tfoot>
+                <tr>
+                  <th style="width: 1%">Returns</th>
+                  <td>Variance</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div></section>
+          <section class="m-doc-details" id="a115800255de6b7c91cad4308fc12543f"><div>
+            <h3>
+              <div class="m-doc-template">
+                template&lt;<a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">typename</a> <a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">T</a> _1, std::size_t WindowSize&gt;
+              </div>
+              <span class="m-doc-wrap-bumper"><a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">T</a> liarsdice::<wbr />statistics::<wbr />StatisticalAccumulator&lt;_1, WindowSize&gt;::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a115800255de6b7c91cad4308fc12543f" class="m-doc-self">standard_deviation</a>(</span><span class="m-doc-wrap">) const</span></span>
+            </h3>
+            <p>Get standard deviation.</p>
+            <table class="m-table m-fullwidth m-flat">
+              <tfoot>
+                <tr>
+                  <th style="width: 1%">Returns</th>
+                  <td>Standard deviation</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div></section>
+          <section class="m-doc-details" id="ac8f4f44ca11a10dcfabbf12853394291"><div>
+            <h3>
+              <div class="m-doc-template">
+                template&lt;<a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">typename</a> <a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">T</a> _1, std::size_t WindowSize&gt;
+              </div>
+              <span class="m-doc-wrap-bumper"><a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">T</a> liarsdice::<wbr />statistics::<wbr />StatisticalAccumulator&lt;_1, WindowSize&gt;::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#ac8f4f44ca11a10dcfabbf12853394291" class="m-doc-self">min</a>(</span><span class="m-doc-wrap">) const</span></span>
+            </h3>
+            <p>Get minimum value.</p>
+            <table class="m-table m-fullwidth m-flat">
+              <tfoot>
+                <tr>
+                  <th style="width: 1%">Returns</th>
+                  <td>Minimum value seen</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div></section>
+          <section class="m-doc-details" id="a785a757f4d3ab1aba1777355eed03a18"><div>
+            <h3>
+              <div class="m-doc-template">
+                template&lt;<a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">typename</a> <a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">T</a> _1, std::size_t WindowSize&gt;
+              </div>
+              <span class="m-doc-wrap-bumper"><a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">T</a> liarsdice::<wbr />statistics::<wbr />StatisticalAccumulator&lt;_1, WindowSize&gt;::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a785a757f4d3ab1aba1777355eed03a18" class="m-doc-self">max</a>(</span><span class="m-doc-wrap">) const</span></span>
+            </h3>
+            <p>Get maximum value.</p>
+            <table class="m-table m-fullwidth m-flat">
+              <tfoot>
+                <tr>
+                  <th style="width: 1%">Returns</th>
+                  <td>Maximum value seen</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div></section>
+          <section class="m-doc-details" id="a640f34adebd4aecb616b0849dea5a70c"><div>
+            <h3>
+              <div class="m-doc-template">
+                template&lt;<a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">typename</a> <a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">T</a> _1, std::size_t WindowSize&gt;
+              </div>
+              <span class="m-doc-wrap-bumper"><a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">T</a> liarsdice::<wbr />statistics::<wbr />StatisticalAccumulator&lt;_1, WindowSize&gt;::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a640f34adebd4aecb616b0849dea5a70c" class="m-doc-self">range</a>(</span><span class="m-doc-wrap">) const</span></span>
+            </h3>
+            <p>Get range (max - min)</p>
+            <table class="m-table m-fullwidth m-flat">
+              <tfoot>
+                <tr>
+                  <th style="width: 1%">Returns</th>
+                  <td>Range of values</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div></section>
+          <section class="m-doc-details" id="af294dbbb30326393b2f3b26b2bf66b22"><div>
+            <h3>
+              <div class="m-doc-template">
+                template&lt;<a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">typename</a> <a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">T</a> _1, std::size_t WindowSize&gt;
+              </div>
+              <span class="m-doc-wrap-bumper"><a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">T</a> liarsdice::<wbr />statistics::<wbr />StatisticalAccumulator&lt;_1, WindowSize&gt;::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#af294dbbb30326393b2f3b26b2bf66b22" class="m-doc-self">median</a>(</span><span class="m-doc-wrap">) const</span></span>
+            </h3>
+            <p>Get median value.</p>
+            <table class="m-table m-fullwidth m-flat">
+              <tfoot>
+                <tr>
+                  <th style="width: 1%">Returns</th>
+                  <td>Median</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div></section>
+          <section class="m-doc-details" id="a80f1ef3c4b6408d95f2d3cc6d6a5eaea"><div>
+            <h3>
+              <div class="m-doc-template">
+                template&lt;<a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">typename</a> <a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">T</a> _1, std::size_t WindowSize&gt;
+              </div>
+              <span class="m-doc-wrap-bumper"><a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">T</a> liarsdice::<wbr />statistics::<wbr />StatisticalAccumulator&lt;_1, WindowSize&gt;::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a80f1ef3c4b6408d95f2d3cc6d6a5eaea" class="m-doc-self">skewness</a>(</span><span class="m-doc-wrap">) const</span></span>
+            </h3>
+            <p>Get skewness.</p>
+            <table class="m-table m-fullwidth m-flat">
+              <tfoot>
+                <tr>
+                  <th style="width: 1%">Returns</th>
+                  <td>Skewness measure</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div></section>
+          <section class="m-doc-details" id="ae55a83e90ab3f8c7ba8ef64975e26d0b"><div>
+            <h3>
+              <div class="m-doc-template">
+                template&lt;<a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">typename</a> <a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">T</a> _1, std::size_t WindowSize&gt;
+              </div>
+              <span class="m-doc-wrap-bumper"><a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">T</a> liarsdice::<wbr />statistics::<wbr />StatisticalAccumulator&lt;_1, WindowSize&gt;::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#ae55a83e90ab3f8c7ba8ef64975e26d0b" class="m-doc-self">kurtosis</a>(</span><span class="m-doc-wrap">) const</span></span>
+            </h3>
+            <p>Get kurtosis.</p>
+            <table class="m-table m-fullwidth m-flat">
+              <tfoot>
+                <tr>
+                  <th style="width: 1%">Returns</th>
+                  <td>Kurtosis measure</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div></section>
+          <section class="m-doc-details" id="a3875c63a26282f1e451f3b161c80db6e"><div>
+            <h3>
+              <div class="m-doc-template">
+                template&lt;<a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">typename</a> <a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">T</a> _1, std::size_t WindowSize&gt;
+              </div>
+              <span class="m-doc-wrap-bumper"><a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">T</a> liarsdice::<wbr />statistics::<wbr />StatisticalAccumulator&lt;_1, WindowSize&gt;::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a3875c63a26282f1e451f3b161c80db6e" class="m-doc-self">coefficient_of_variation</a>(</span><span class="m-doc-wrap">) const</span></span>
+            </h3>
+            <p>Get coefficient of variation (CV)</p>
+            <table class="m-table m-fullwidth m-flat">
+              <tfoot>
+                <tr>
+                  <th style="width: 1%">Returns</th>
+                  <td>CV = std_dev / mean</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div></section>
+          <section class="m-doc-details" id="a187df5edbfcfbf454e5761d0285b9996"><div>
+            <h3>
+              <div class="m-doc-template">
+                template&lt;<a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">typename</a> <a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">T</a> _1, std::size_t WindowSize&gt;
+              </div>
+              <span class="m-doc-wrap-bumper"><a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">T</a> liarsdice::<wbr />statistics::<wbr />StatisticalAccumulator&lt;_1, WindowSize&gt;::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a187df5edbfcfbf454e5761d0285b9996" class="m-doc-self">rms</a>(</span><span class="m-doc-wrap">) const</span></span>
+            </h3>
+            <p>Get root mean square (RMS)</p>
+            <table class="m-table m-fullwidth m-flat">
+              <tfoot>
+                <tr>
+                  <th style="width: 1%">Returns</th>
+                  <td>RMS value</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div></section>
+          <section class="m-doc-details" id="a8e9f9698661da820581bf0062f32c3cb"><div>
+            <h3>
+              <div class="m-doc-template">
+                template&lt;<a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">typename</a> <a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">T</a> _1, std::size_t WindowSize&gt;
+                template&lt;<a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">int</a> N&gt;
+              </div>
+              <span class="m-doc-wrap-bumper">T liarsdice::<wbr />statistics::<wbr />StatisticalAccumulator&lt;_1, WindowSize&gt;::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a8e9f9698661da820581bf0062f32c3cb" class="m-doc-self">moment</a>(</span><span class="m-doc-wrap">) const</span></span>
+            </h3>
+            <p>Get nth central moment.</p>
+            <table class="m-table m-fullwidth m-flat">
+              <thead>
+                <tr><th colspan="2">Template parameters</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="width: 1%">N</td>
+                  <td>Moment order</td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <th>Returns</th>
+                  <td>Nth central moment</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div></section>
+          <section class="m-doc-details" id="a5c251141bda521ec4f5f54daf4fd1ca4"><div>
+            <h3>
+              <div class="m-doc-template">
+                template&lt;<a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">typename</a> <a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">T</a> _1, std::size_t WindowSize&gt;
+              </div>
+              <span class="m-doc-wrap-bumper"><a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">T</a> liarsdice::<wbr />statistics::<wbr />StatisticalAccumulator&lt;_1, WindowSize&gt;::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a5c251141bda521ec4f5f54daf4fd1ca4" class="m-doc-self">rolling_mean</a>(</span><span class="m-doc-wrap">) const</span></span>
+            </h3>
+            <p>Get rolling mean over window.</p>
+            <table class="m-table m-fullwidth m-flat">
+              <tfoot>
+                <tr>
+                  <th style="width: 1%">Returns</th>
+                  <td>Mean of last WindowSize values</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div></section>
+          <section class="m-doc-details" id="a63607a5a591d62bbfaf3fcd5e93cad30"><div>
+            <h3>
+              <div class="m-doc-template">
+                template&lt;<a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">typename</a> <a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">T</a> _1, std::size_t WindowSize&gt;
+              </div>
+              <span class="m-doc-wrap-bumper"><a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">T</a> liarsdice::<wbr />statistics::<wbr />StatisticalAccumulator&lt;_1, WindowSize&gt;::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a63607a5a591d62bbfaf3fcd5e93cad30" class="m-doc-self">rolling_variance</a>(</span><span class="m-doc-wrap">) const</span></span>
+            </h3>
+            <p>Get rolling variance over window.</p>
+            <table class="m-table m-fullwidth m-flat">
+              <tfoot>
+                <tr>
+                  <th style="width: 1%">Returns</th>
+                  <td>Variance of last WindowSize values</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div></section>
+          <section class="m-doc-details" id="acd131b527dfd1078565028383490f8bf"><div>
+            <h3>
+              <div class="m-doc-template">
+                template&lt;<a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">typename</a> <a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">T</a> _1, std::size_t WindowSize&gt;
+              </div>
+              <span class="m-doc-wrap-bumper"><a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">T</a> liarsdice::<wbr />statistics::<wbr />StatisticalAccumulator&lt;_1, WindowSize&gt;::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#acd131b527dfd1078565028383490f8bf" class="m-doc-self">rolling_std_dev</a>(</span><span class="m-doc-wrap">) const</span></span>
+            </h3>
+            <p>Get rolling standard deviation.</p>
+            <table class="m-table m-fullwidth m-flat">
+              <tfoot>
+                <tr>
+                  <th style="width: 1%">Returns</th>
+                  <td>Standard deviation of last WindowSize values</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div></section>
+          <section class="m-doc-details" id="aeec6d6314336a1eee103c5d3045d2a27"><div>
+            <h3>
+              <div class="m-doc-template">
+                template&lt;<a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">typename</a> <a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">T</a> _1, std::size_t WindowSize&gt;
+              </div>
+              <span class="m-doc-wrap-bumper"><a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">bool</a> liarsdice::<wbr />statistics::<wbr />StatisticalAccumulator&lt;_1, WindowSize&gt;::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#aeec6d6314336a1eee103c5d3045d2a27" class="m-doc-self">is_normal_distributed</a>(</span><span class="m-doc-wrap"><a href="classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a8e9f9698661da820581bf0062f32c3cb" class="m-doc">double</a> alpha = 0.05) const</span></span>
+            </h3>
+            <p>Check if distribution is approximately normal.</p>
+            <table class="m-table m-fullwidth m-flat">
+              <thead>
+                <tr><th colspan="2">Parameters</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="width: 1%">alpha</td>
+                  <td>Significance level (default: 0.05)</td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <th>Returns</th>
+                  <td>True if skewness and kurtosis suggest normality</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div></section>
+        </section>
+      </div>
+    </div>
+  </div>
+</article></main>
+<div class="m-doc-search" id="search">
+  <a href="#!" onclick="return hideSearch()"></a>
+  <div class="m-container">
+    <div class="m-row">
+      <div class="m-col-m-8 m-push-m-2">
+        <div class="m-doc-search-header m-text m-small">
+          <div><span class="m-label m-default">Tab</span> / <span class="m-label m-default">T</span> to search, <span class="m-label m-default">Esc</span> to close</div>
+          <div id="search-symbolcount">&hellip;</div>
+        </div>
+        <div class="m-doc-search-content">
+          <form>
+            <input type="search" name="q" id="search-input" placeholder="Loading &hellip;" disabled="disabled" autofocus="autofocus" autocomplete="off" spellcheck="false" />
+          </form>
+          <noscript class="m-text m-danger m-text-center">Unlike everything else in the docs, the search functionality <em>requires</em> JavaScript.</noscript>
+          <div id="search-help" class="m-text m-dim m-text-center">
+            <p class="m-noindent">Search for symbols, directories, files, pages or
+            modules. You can omit any prefix from the symbol or file path; adding a
+            <code>:</code> or <code>/</code> suffix lists all members of given symbol or
+            directory.</p>
+            <p class="m-noindent">Use <span class="m-label m-dim">&darr;</span>
+            / <span class="m-label m-dim">&uarr;</span> to navigate through the list,
+            <span class="m-label m-dim">Enter</span> to go.
+            <span class="m-label m-dim">Tab</span> autocompletes common prefix, you can
+            copy a link to the result using <span class="m-label m-dim">⌘</span>
+            <span class="m-label m-dim">L</span> while <span class="m-label m-dim">⌘</span>
+            <span class="m-label m-dim">M</span> produces a Markdown link.</p>
+          </div>
+          <div id="search-notfound" class="m-text m-warning m-text-center">Sorry, nothing was found.</div>
+          <ul id="search-results"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="search-v2.js"></script>
+<script src="searchdata-v2.js" async="async"></script>
+<footer><nav>
+  <div class="m-container">
+    <div class="m-row">
+      <div class="m-col-l-10 m-push-l-1">
+        <p>Liar's
+Dice. Created with <a href="https://doxygen.org/">Doxygen</a> 1.10.0 and <a href="https://mcss.mosra.cz/">m.css</a>.</p>
+      </div>
+    </div>
+  </div>
+</nav></footer>
+</body>
+</html>

@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>liarsdice::core::Game class | Liar's
+Dice</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,400i,600,600i%7CSource+Code+Pro:400,400i,600" />
+  <link rel="stylesheet" href="m-dark+documentation.compiled.css" />
+  <link rel="icon" href="favicon-dark.png" type="image/png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#22272e" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+</head>
+<body>
+<header><nav id="navigation">
+  <div class="m-container">
+    <div class="m-row">
+      <a href="index.html" id="m-navbar-brand" class="m-col-t-8 m-col-m-none m-left-m">Liar's
+Dice</a>
+      <div class="m-col-t-4 m-hide-m m-text-right m-nopadr">
+        <a href="#search" class="m-doc-search-icon" title="Search" onclick="return showSearch()"><svg style="height: 0.9rem;" viewBox="0 0 16 16">
+          <path id="m-doc-search-icon-path" d="m6 0c-3.31 0-6 2.69-6 6 0 3.31 2.69 6 6 6 1.49 0 2.85-0.541 3.89-1.44-0.0164 0.338 0.147 0.759 0.5 1.15l3.22 3.79c0.552 0.614 1.45 0.665 2 0.115 0.55-0.55 0.499-1.45-0.115-2l-3.79-3.22c-0.392-0.353-0.812-0.515-1.15-0.5 0.895-1.05 1.44-2.41 1.44-3.89 0-3.31-2.69-6-6-6zm0 1.56a4.44 4.44 0 0 1 4.44 4.44 4.44 4.44 0 0 1-4.44 4.44 4.44 4.44 0 0 1-4.44-4.44 4.44 4.44 0 0 1 4.44-4.44z"/>
+        </svg></a>
+        <a id="m-navbar-show" href="#navigation" title="Show navigation"></a>
+        <a id="m-navbar-hide" href="#" title="Hide navigation"></a>
+      </div>
+      <div id="m-navbar-collapse" class="m-col-t-12 m-show-m m-col-m-none m-right-m">
+        <div class="m-row">
+          <ol class="m-col-t-6 m-col-m-none">
+            <li><a href="modules.html">Modules</a></li>
+            <li><a href="namespaces.html">Namespaces</a></li>
+            <li><a href="annotated.html">Classes</a></li>
+          </ol>
+          <ol class="m-col-t-6 m-col-m-none" start="4">
+            <li><a href="files.html">Files</a></li>
+            <li class="m-show-m"><a href="#search" class="m-doc-search-icon" title="Search" onclick="return showSearch()"><svg style="height: 0.9rem;" viewBox="0 0 16 16">
+              <use href="#m-doc-search-icon-path" />
+            </svg></a></li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav></header>
+<main><article>
+  <div class="m-container m-container-inflatable">
+    <div class="m-row">
+      <div class="m-col-l-10 m-push-l-1">
+        <h1>
+          <span class="m-breadcrumb"><a href="namespaceliarsdice.html">liarsdice</a>::<wbr/></span><span class="m-breadcrumb"><a href="namespaceliarsdice_1_1core.html">core</a>::<wbr/></span>Game <span class="m-thin">class</span>
+          <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="game_8hpp.html">&lt;liarsdice/core/game.hpp&gt;</a></div>
+        </h1>
+        <p><span></span></p>
+        <nav class="m-block m-default">
+          <h3>Contents</h3>
+          <ul>
+            <li>
+              Reference
+              <ul>
+                <li><a href="#pub-types">Public types</a></li>
+                <li><a href="#typeless-methods">Constructors, destructors, conversion operators</a></li>
+                <li><a href="#pub-methods">Public functions</a></li>
+              </ul>
+            </li>
+          </ul>
+        </nav>
+        <section id="pub-types">
+          <h2><a href="#pub-types">Public types</a></h2>
+          <dl class="m-doc">
+            <dt id="abdca2e6f1e34c15a636f19b70848ba31">
+              <span class="m-doc-wrap-bumper">enum class <a href="#abdca2e6f1e34c15a636f19b70848ba31" class="m-doc-self">State</a> { </span><span class="m-doc-wrap"><a href="#abdca2e6f1e34c15a636f19b70848ba31a06972acc3aafeb3a65dbd996c8dedc73" class="m-doc">NOT_STARTED</a>,
+              <a href="#abdca2e6f1e34c15a636f19b70848ba31a618357533cecd68408ed2fcf98e7314b" class="m-doc">WAITING_FOR_PLAYERS</a>,
+              <a href="#abdca2e6f1e34c15a636f19b70848ba31aca69f96c768067fbff6c911ca87bccc9" class="m-doc">IN_PROGRESS</a>,
+              <a href="#abdca2e6f1e34c15a636f19b70848ba31adc76cde8f8f2d8eba2bebd8be5f4cdb5" class="m-doc">ROUND_ENDED</a>,
+              <a href="#abdca2e6f1e34c15a636f19b70848ba31af8454a27e1df41397bf42444fe5aa45b" class="m-doc">GAME_OVER</a> }</span>
+            </dt>
+            <dd><span></span></dd>
+          </dl>
+        </section>
+        <section id="typeless-methods">
+          <h2><a href="#typeless-methods">Constructors, destructors, conversion operators</a></h2>
+          <dl class="m-doc">
+            <dt id="a6c29806415edf0fc15a74c9877030a26">
+              <span class="m-doc-wrap-bumper"><a href="#a6c29806415edf0fc15a74c9877030a26" class="m-doc-self">Game</a>(</span><span class="m-doc-wrap">const <a href="structliarsdice_1_1core_1_1GameConfig.html" class="m-doc">GameConfig</a>&amp; config = {}) <span class="m-label m-flat m-info">explicit</span> </span>
+            </dt>
+            <dd><span></span></dd>
+          </dl>
+        </section>
+        <section id="pub-methods">
+          <h2><a href="#pub-methods">Public functions</a></h2>
+          <dl class="m-doc">
+            <dt id="acc0e3695933ade92508fbc2eeb1bcdc3">
+              <span class="m-doc-wrap-bumper">void <a href="#acc0e3695933ade92508fbc2eeb1bcdc3" class="m-doc-self">add_player</a>(</span><span class="m-doc-wrap">std::shared_ptr&lt;<a href="classliarsdice_1_1core_1_1Player.html" class="m-doc">Player</a>&gt; player)</span>
+            </dt>
+            <dd><span></span></dd>
+            <dt id="ad85c9afac5bb7c74fb1e5e549819262e">
+              <span class="m-doc-wrap-bumper">void <a href="#ad85c9afac5bb7c74fb1e5e549819262e" class="m-doc-self">remove_player</a>(</span><span class="m-doc-wrap">unsigned int player_id)</span>
+            </dt>
+            <dd><span></span></dd>
+            <dt id="a648a6a74ca4a89dc725600501d1f5980">
+              <span class="m-doc-wrap-bumper">auto <a href="#a648a6a74ca4a89dc725600501d1f5980" class="m-doc-self">get_player_count</a>(</span><span class="m-doc-wrap">) const -&gt; size_t</span>
+            </dt>
+            <dd><span></span></dd>
+            <dt id="abfb6a815da757600caa1cb7f07c61b69">
+              <span class="m-doc-wrap-bumper">auto <a href="#abfb6a815da757600caa1cb7f07c61b69" class="m-doc-self">get_players</a>(</span><span class="m-doc-wrap">) const -&gt; const std::vector&lt;std::shared_ptr&lt;<a href="classliarsdice_1_1core_1_1Player.html" class="m-doc">Player</a>&gt;&gt;&amp;</span>
+            </dt>
+            <dd><span></span></dd>
+            <dt id="a426ce6419e23df09a041530ecf2b2840">
+              <span class="m-doc-wrap-bumper">auto <a href="#a426ce6419e23df09a041530ecf2b2840" class="m-doc-self">get_player</a>(</span><span class="m-doc-wrap">unsigned int id) const -&gt; std::shared_ptr&lt;<a href="classliarsdice_1_1core_1_1Player.html" class="m-doc">Player</a>&gt;</span>
+            </dt>
+            <dd><span></span></dd>
+            <dt id="a248967c3fb49ab2d584fb1db2cdd4999">
+              <span class="m-doc-wrap-bumper">auto <a href="#a248967c3fb49ab2d584fb1db2cdd4999" class="m-doc-self">get_current_player</a>(</span><span class="m-doc-wrap">) const -&gt; std::shared_ptr&lt;<a href="classliarsdice_1_1core_1_1Player.html" class="m-doc">Player</a>&gt;</span>
+            </dt>
+            <dd><span></span></dd>
+            <dt id="a8095dca26171b01a703de1a88d1801cc">
+              <span class="m-doc-wrap-bumper">void <a href="#a8095dca26171b01a703de1a88d1801cc" class="m-doc-self">start_game</a>(</span><span class="m-doc-wrap">)</span>
+            </dt>
+            <dd><span></span></dd>
+            <dt id="a2f141be710f31be6d1897ed0c5656237">
+              <span class="m-doc-wrap-bumper">void <a href="#a2f141be710f31be6d1897ed0c5656237" class="m-doc-self">start_round</a>(</span><span class="m-doc-wrap">)</span>
+            </dt>
+            <dd><span></span></dd>
+            <dt id="a5aa192e3deeeeef52e2b4fa44902c34c">
+              <span class="m-doc-wrap-bumper">void <a href="#a5aa192e3deeeeef52e2b4fa44902c34c" class="m-doc-self">process_guess</a>(</span><span class="m-doc-wrap">const <a href="structliarsdice_1_1core_1_1Guess.html" class="m-doc">Guess</a>&amp; guess)</span>
+            </dt>
+            <dd><span></span></dd>
+            <dt id="aa7b30c23eb9f4493ac19e77adf8679c3">
+              <span class="m-doc-wrap-bumper">void <a href="#aa7b30c23eb9f4493ac19e77adf8679c3" class="m-doc-self">process_call_liar</a>(</span><span class="m-doc-wrap">)</span>
+            </dt>
+            <dd><span></span></dd>
+            <dt id="af6f11eee6cb77de4749f2b47ff749f9d">
+              <span class="m-doc-wrap-bumper">void <a href="#af6f11eee6cb77de4749f2b47ff749f9d" class="m-doc-self">end_round</a>(</span><span class="m-doc-wrap">)</span>
+            </dt>
+            <dd><span></span></dd>
+            <dt id="a779f8ddf5eef050268f33fdf82a97900">
+              <span class="m-doc-wrap-bumper">void <a href="#a779f8ddf5eef050268f33fdf82a97900" class="m-doc-self">end_game</a>(</span><span class="m-doc-wrap">)</span>
+            </dt>
+            <dd><span></span></dd>
+            <dt id="a34edfa716d2783645837a82015516329">
+              <span class="m-doc-wrap-bumper">auto <a href="#a34edfa716d2783645837a82015516329" class="m-doc-self">get_state</a>(</span><span class="m-doc-wrap">) const -&gt; <a href="classliarsdice_1_1core_1_1Game.html#abdca2e6f1e34c15a636f19b70848ba31" class="m-doc">State</a></span>
+            </dt>
+            <dd><span></span></dd>
+            <dt id="a7cd95c1bd8f20ac56501d8faab1315c8">
+              <span class="m-doc-wrap-bumper">auto <a href="#a7cd95c1bd8f20ac56501d8faab1315c8" class="m-doc-self">is_game_active</a>(</span><span class="m-doc-wrap">) const -&gt; bool</span>
+            </dt>
+            <dd><span></span></dd>
+            <dt id="a7884f920e277e47f4fa16a2af7c7b18c">
+              <span class="m-doc-wrap-bumper">auto <a href="#a7884f920e277e47f4fa16a2af7c7b18c" class="m-doc-self">get_round_number</a>(</span><span class="m-doc-wrap">) const -&gt; unsigned int</span>
+            </dt>
+            <dd><span></span></dd>
+            <dt id="af2c2a82ae687309f91be7ea1dfbd5bfe">
+              <span class="m-doc-wrap-bumper">auto <a href="#af2c2a82ae687309f91be7ea1dfbd5bfe" class="m-doc-self">get_last_guess</a>(</span><span class="m-doc-wrap">) const -&gt; std::optional&lt;<a href="structliarsdice_1_1core_1_1Guess.html" class="m-doc">Guess</a>&gt;</span>
+            </dt>
+            <dd><span></span></dd>
+            <dt id="a40583a8dd9ad4e5ee56edf6a59bb7fef">
+              <span class="m-doc-wrap-bumper">auto <a href="#a40583a8dd9ad4e5ee56edf6a59bb7fef" class="m-doc-self">get_total_dice_count</a>(</span><span class="m-doc-wrap">) const -&gt; size_t</span>
+            </dt>
+            <dd><span></span></dd>
+            <dt id="a3622c844c74a90fab45bb489089fdd7b">
+              <span class="m-doc-wrap-bumper">auto <a href="#a3622c844c74a90fab45bb489089fdd7b" class="m-doc-self">count_total_dice_with_value</a>(</span><span class="m-doc-wrap">unsigned int face_value) const -&gt; size_t</span>
+            </dt>
+            <dd><span></span></dd>
+            <dt id="aaf3d6e04d5c916538c1c2df38e36abe2">
+              <span class="m-doc-wrap-bumper">auto <a href="#aaf3d6e04d5c916538c1c2df38e36abe2" class="m-doc-self">events</a>(</span><span class="m-doc-wrap">) -&gt; <a href="structliarsdice_1_1core_1_1GameEvents.html" class="m-doc">GameEvents</a>&amp;</span>
+            </dt>
+            <dd><span></span></dd>
+            <dt id="ace4fb2ff37cffaa16d98450b8c2c7040">
+              <span class="m-doc-wrap-bumper">auto <a href="#ace4fb2ff37cffaa16d98450b8c2c7040" class="m-doc-self">events</a>(</span><span class="m-doc-wrap">) const -&gt; const <a href="structliarsdice_1_1core_1_1GameEvents.html" class="m-doc">GameEvents</a>&amp;</span>
+            </dt>
+            <dd><span></span></dd>
+            <dt id="aa5d866a4ebd71b1ba72592f7914d4638">
+              <span class="m-doc-wrap-bumper">auto <a href="#aa5d866a4ebd71b1ba72592f7914d4638" class="m-doc-self">get_state_storage</a>(</span><span class="m-doc-wrap">) const -&gt; const <a href="classliarsdice_1_1core_1_1GameStateStorage.html" class="m-doc">GameStateStorage</a>&amp;</span>
+            </dt>
+            <dd><span></span></dd>
+            <dt id="aef952eb8e2a81f7c1b81f7d5460a9a8f">
+              <span class="m-doc-wrap-bumper">auto <a href="#aef952eb8e2a81f7c1b81f7d5460a9a8f" class="m-doc-self">get_history</a>(</span><span class="m-doc-wrap">) const -&gt; const <a href="classliarsdice_1_1core_1_1GameHistory.html" class="m-doc">GameHistory</a>&amp;</span>
+            </dt>
+            <dd><span></span></dd>
+            <dt id="aff223485baf652ff904e8f0b67731bac">
+              <span class="m-doc-wrap-bumper">auto <a href="#aff223485baf652ff904e8f0b67731bac" class="m-doc-self">is_valid_guess</a>(</span><span class="m-doc-wrap">const <a href="structliarsdice_1_1core_1_1Guess.html" class="m-doc">Guess</a>&amp; guess) const -&gt; bool</span>
+            </dt>
+            <dd><span></span></dd>
+          </dl>
+        </section>
+      </div>
+    </div>
+  </div>
+</article></main>
+<div class="m-doc-search" id="search">
+  <a href="#!" onclick="return hideSearch()"></a>
+  <div class="m-container">
+    <div class="m-row">
+      <div class="m-col-m-8 m-push-m-2">
+        <div class="m-doc-search-header m-text m-small">
+          <div><span class="m-label m-default">Tab</span> / <span class="m-label m-default">T</span> to search, <span class="m-label m-default">Esc</span> to close</div>
+          <div id="search-symbolcount">&hellip;</div>
+        </div>
+        <div class="m-doc-search-content">
+          <form>
+            <input type="search" name="q" id="search-input" placeholder="Loading &hellip;" disabled="disabled" autofocus="autofocus" autocomplete="off" spellcheck="false" />
+          </form>
+          <noscript class="m-text m-danger m-text-center">Unlike everything else in the docs, the search functionality <em>requires</em> JavaScript.</noscript>
+          <div id="search-help" class="m-text m-dim m-text-center">
+            <p class="m-noindent">Search for symbols, directories, files, pages or
+            modules. You can omit any prefix from the symbol or file path; adding a
+            <code>:</code> or <code>/</code> suffix lists all members of given symbol or
+            directory.</p>
+            <p class="m-noindent">Use <span class="m-label m-dim">&darr;</span>
+            / <span class="m-label m-dim">&uarr;</span> to navigate through the list,
+            <span class="m-label m-dim">Enter</span> to go.
+            <span class="m-label m-dim">Tab</span> autocompletes common prefix, you can
+            copy a link to the result using <span class="m-label m-dim">⌘</span>
+            <span class="m-label m-dim">L</span> while <span class="m-label m-dim">⌘</span>
+            <span class="m-label m-dim">M</span> produces a Markdown link.</p>
+          </div>
+          <div id="search-notfound" class="m-text m-warning m-text-center">Sorry, nothing was found.</div>
+          <ul id="search-results"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="search-v2.js"></script>
+<script src="searchdata-v2.js" async="async"></script>
+<footer><nav>
+  <div class="m-container">
+    <div class="m-row">
+      <div class="m-col-l-10 m-push-l-1">
+        <p>Liar's
+Dice. Created with <a href="https://doxygen.org/">Doxygen</a> 1.10.0 and <a href="https://mcss.mosra.cz/">m.css</a>.</p>
+      </div>
+    </div>
+  </div>
+</nav></footer>
+</body>
+</html>

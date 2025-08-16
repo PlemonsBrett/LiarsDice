@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Game Rules | Liar's
+Dice</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,400i,600,600i%7CSource+Code+Pro:400,400i,600" />
+  <link rel="stylesheet" href="m-dark+documentation.compiled.css" />
+  <link rel="icon" href="favicon-dark.png" type="image/png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#22272e" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+</head>
+<body>
+<header><nav id="navigation">
+  <div class="m-container">
+    <div class="m-row">
+      <a href="index.html" id="m-navbar-brand" class="m-col-t-8 m-col-m-none m-left-m">Liar's
+Dice</a>
+      <div class="m-col-t-4 m-hide-m m-text-right m-nopadr">
+        <a href="#search" class="m-doc-search-icon" title="Search" onclick="return showSearch()"><svg style="height: 0.9rem;" viewBox="0 0 16 16">
+          <path id="m-doc-search-icon-path" d="m6 0c-3.31 0-6 2.69-6 6 0 3.31 2.69 6 6 6 1.49 0 2.85-0.541 3.89-1.44-0.0164 0.338 0.147 0.759 0.5 1.15l3.22 3.79c0.552 0.614 1.45 0.665 2 0.115 0.55-0.55 0.499-1.45-0.115-2l-3.79-3.22c-0.392-0.353-0.812-0.515-1.15-0.5 0.895-1.05 1.44-2.41 1.44-3.89 0-3.31-2.69-6-6-6zm0 1.56a4.44 4.44 0 0 1 4.44 4.44 4.44 4.44 0 0 1-4.44 4.44 4.44 4.44 0 0 1-4.44-4.44 4.44 4.44 0 0 1 4.44-4.44z"/>
+        </svg></a>
+        <a id="m-navbar-show" href="#navigation" title="Show navigation"></a>
+        <a id="m-navbar-hide" href="#" title="Hide navigation"></a>
+      </div>
+      <div id="m-navbar-collapse" class="m-col-t-12 m-show-m m-col-m-none m-right-m">
+        <div class="m-row">
+          <ol class="m-col-t-6 m-col-m-none">
+            <li><a href="modules.html">Modules</a></li>
+            <li><a href="namespaces.html">Namespaces</a></li>
+            <li><a href="annotated.html">Classes</a></li>
+          </ol>
+          <ol class="m-col-t-6 m-col-m-none" start="4">
+            <li><a href="files.html">Files</a></li>
+            <li class="m-show-m"><a href="#search" class="m-doc-search-icon" title="Search" onclick="return showSearch()"><svg style="height: 0.9rem;" viewBox="0 0 16 16">
+              <use href="#m-doc-search-icon-path" />
+            </svg></a></li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav></header>
+<main><article>
+  <div class="m-container m-container-inflatable">
+    <div class="m-row">
+      <div class="m-col-l-10 m-push-l-1">
+        <h1>
+          Game Rules
+        </h1>
+<section id="rules_overview"><h2><a href="#rules_overview">Liar&#x27;s Dice Rules</a></h2><p>Liar&#x27;s Dice is a game of deception, probability, and psychology where players make increasingly bold claims about the dice hidden under their cups. The last player with dice remaining wins.</p></section><section id="basic_rules"><h2><a href="#basic_rules">Basic Rules</a></h2><section id="setup"><h3><a href="#setup">Game Setup</a></h3><ul><li>Each player starts with <strong>5 dice</strong> and <strong>5 points</strong></li><li>All players roll their dice secretly at the start of each round</li><li>Dice values range from 1 to 6</li><li><strong>Wild Rule</strong>: 1s are wild and count as any face value</li></ul></section><section id="gameplay_flow"><h3><a href="#gameplay_flow">Gameplay Flow</a></h3><ol><li><strong>Starting a Round</strong><ul><li>All players roll their dice secretly</li><li>Players can only see their own dice</li><li>The first player makes an initial guess</li></ul></li><li><strong>Making a Guess</strong><ul><li>A guess consists of: quantity + face value</li><li>Example: &quot;three 4s&quot; means at least 3 dice showing 4</li><li>Each guess must be higher than the previous:<ul><li>Higher quantity (any face value), OR</li><li>Same quantity with higher face value</li></ul></li></ul></li><li><strong>Calling Liar</strong><ul><li>Instead of guessing, a player can call &quot;liar&quot;</li><li>All dice are revealed</li><li>The actual count is determined (including wild 1s)</li><li>Loser loses points based on the outcome</li></ul></li></ol></section><section id="winning"><h3><a href="#winning">Winning Conditions</a></h3><ul><li>Players lose points when they lose a challenge</li><li>When a player reaches 0 points, they are eliminated</li><li>The last player with points remaining wins</li></ul></section></section><section id="detailed_rules"><h2><a href="#detailed_rules">Detailed Rules</a></h2><section id="point_system"><h3><a href="#point_system">Point System</a></h3><p>The point-based elimination system works as follows:</p><ul><li><strong>Starting Points</strong>: Each player begins with 5 points</li><li><strong>Lying Penalty</strong>: Lose 1 point if caught lying</li><li><strong>False Accusation</strong>: Lose 2 points for incorrectly calling liar</li><li><strong>Elimination</strong>: Players with 0 points are removed from the game</li></ul></section><section id="wild_dice"><h3><a href="#wild_dice">Wild Dice (1s)</a></h3><p>The wild dice rule adds strategic depth:</p><ul><li>1s count as the face value being guessed</li><li>Example: With dice [1,1,4,4,5], the count for 4s is 4 (two 4s + two 1s)</li><li>This increases probabilities and enables bolder guesses</li></ul></section><section id="guess_validation"><h3><a href="#guess_validation">Valid Guesses</a></h3><p>A guess is valid if it meets these criteria:</p><ol><li><strong>Quantity</strong>: Must not exceed total dice in play</li><li><strong>Progression</strong>: Must be higher than previous guess:<ul><li>More dice (e.g., &quot;four 3s&quot; after &quot;three 6s&quot;)</li><li>Same quantity, higher face (e.g., &quot;three 5s&quot; after &quot;three 4s&quot;)</li></ul></li><li><strong>Face Value</strong>: Must be between 2 and 6 (1s are wild)</li></ol><pre class="m-code"><span class="c1">// Validation logic</span>
+<span class="kt">bool</span><span class="w"> </span><span class="nf">is_valid_guess</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">Guess</span><span class="o">&amp;</span><span class="w"> </span><span class="n">new_guess</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">Guess</span><span class="o">&amp;</span><span class="w"> </span><span class="n">previous</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">new_guess</span><span class="p">.</span><span class="n">face_value</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">new_guess</span><span class="p">.</span><span class="n">face_value</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">6</span><span class="p">)</span><span class="w"> </span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span>
+<span class="w">    </span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">new_guess</span><span class="p">.</span><span class="n">dice_count</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">total_dice_in_play</span><span class="p">)</span><span class="w"> </span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span>
+<span class="w">    </span>
+<span class="w">    </span><span class="c1">// Must increase quantity or keep same with higher face</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">new_guess</span><span class="p">.</span><span class="n">dice_count</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">previous</span><span class="p">.</span><span class="n">dice_count</span><span class="w"> </span><span class="o">||</span>
+<span class="w">           </span><span class="p">(</span><span class="n">new_guess</span><span class="p">.</span><span class="n">dice_count</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">previous</span><span class="p">.</span><span class="n">dice_count</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>
+<span class="w">            </span><span class="n">new_guess</span><span class="p">.</span><span class="n">face_value</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">previous</span><span class="p">.</span><span class="n">face_value</span><span class="p">);</span>
+<span class="p">}</span></pre></section></section><section id="probability"><h2><a href="#probability">Probability Guide</a></h2><p>Understanding probabilities is key to success:</p><section id="basic_prob"><h3><a href="#basic_prob">Basic Probabilities</a></h3><p>For standard dice (no wilds):</p><ul><li>Probability of specific face: 1/6 ≈ 16.67%</li><li>Expected count: (total dice × 1/6)</li></ul><p>With wild dice rule:</p><ul><li>Probability of specific face: 1/3 ≈ 33.33%</li><li>Expected count: (total dice × 1/3)</li></ul></section><section id="probability_table"><h3><a href="#probability_table">Probability Table</a></h3><table class="m-table"><thead><tr><th>Total Dice</th><th>Face Count</th><th>Probability (with wilds)</th></tr></thead><tbody><tr><td>5</td><td>2+</td><td>86.8%</td></tr><tr><td>5</td><td>3+</td><td>53.9%</td></tr><tr><td>5</td><td>4+</td><td>20.9%</td></tr><tr><td>10</td><td>4+</td><td>78.5%</td></tr><tr><td>10</td><td>5+</td><td>55.1%</td></tr><tr><td>10</td><td>6+</td><td>32.3%</td></tr></tbody></table></section></section><section id="strategy"><h2><a href="#strategy">Strategy Tips</a></h2><section id="basic_strategy"><h3><a href="#basic_strategy">Basic Strategy</a></h3><ol><li><strong>Conservative Opening</strong>: Start with probable guesses</li><li><strong>Track Information</strong>: Remember what others claim to have</li><li><strong>Bluff Sparingly</strong>: Occasional bluffs keep opponents guessing</li><li><strong>Know the Odds</strong>: Understand when guesses become improbable</li></ol></section><section id="advanced_strategy"><h3><a href="#advanced_strategy">Advanced Strategy</a></h3><ol><li><strong>Pattern Recognition</strong>:<ul><li>Watch for player tendencies</li><li>Some bluff early, others late</li><li>Identify conservative vs aggressive players</li></ul></li><li><strong>Information Management</strong>:<ul><li>Your guesses reveal information</li><li>Sometimes guess what you don&#x27;t have</li><li>Force opponents to reveal their hands</li></ul></li><li><strong>Psychological Warfare</strong>:<ul><li>Quick calls suggest confidence</li><li>Hesitation can induce doubt</li><li>Vary your timing and demeanor</li></ul></li><li><strong>End Game</strong>:<ul><li>With few dice left, exact counts matter</li><li>Bluffing becomes riskier</li><li>Conservative play often wins</li></ul></li></ol></section></section><section id="variations"><h2><a href="#variations">Game Variations</a></h2><section id="common_variants"><h3><a href="#common_variants">Common Variants</a></h3><ol><li><strong>Spot On</strong>: Exact guess earns bonus (everyone else loses a die)</li><li><strong>Passing</strong>: Can pass instead of guessing (limited uses)</li><li><strong>Blind Bidding</strong>: Can increase bid without looking at dice</li><li><strong>Progressive Dice Loss</strong>: Lose dice instead of points</li></ol></section><section id="house_rules"><h3><a href="#house_rules">Popular House Rules</a></h3><ul><li><strong>No Wilds</strong>: 1s are not wild (harder game)</li><li><strong>Ace High</strong>: 1s are highest value instead of wild</li><li><strong>Minimum Bid</strong>: Must start with at least 2 dice</li><li><strong>Death Roll</strong>: Eliminated players get one final round</li></ul></section></section><section id="examples"><h2><a href="#examples">Example Round</a></h2><p>Setup**: 3 players, each with 5 dice</p><p>Dice Rolls** (hidden):</p><ul><li>Player 1: [1, 2, 4, 4, 6]</li><li>Player 2: [1, 1, 3, 5, 5]</li><li><p>Player 3: [2, 3, 3, 6, 6]</p><p>Actual Counts** (including wilds):</p></li><li><p>2s: 2, 3s: 5, 4s: 4, 5s: 4, 6s: 5</p><p>Bidding**:</p></li></ul><ol><li>Player 1: &quot;Three 4s&quot; (safe - has two 4s + one wild)</li><li>Player 2: &quot;Four 5s&quot; (aggressive - has two 5s + two wilds)</li><li>Player 3: &quot;Five 6s&quot; (bluff - only has two 6s)</li><li><p>Player 1: &quot;Liar!&quot;</p><p>Resolution**:</p></li></ol><ul><li>Actual 6s = 5 (two 6s + three wilds)</li><li>Player 3&#x27;s guess was exactly right!</li><li>Player 1 loses 2 points for false accusation</li></ul></section>
+      </div>
+    </div>
+  </div>
+</article></main>
+<div class="m-doc-search" id="search">
+  <a href="#!" onclick="return hideSearch()"></a>
+  <div class="m-container">
+    <div class="m-row">
+      <div class="m-col-m-8 m-push-m-2">
+        <div class="m-doc-search-header m-text m-small">
+          <div><span class="m-label m-default">Tab</span> / <span class="m-label m-default">T</span> to search, <span class="m-label m-default">Esc</span> to close</div>
+          <div id="search-symbolcount">&hellip;</div>
+        </div>
+        <div class="m-doc-search-content">
+          <form>
+            <input type="search" name="q" id="search-input" placeholder="Loading &hellip;" disabled="disabled" autofocus="autofocus" autocomplete="off" spellcheck="false" />
+          </form>
+          <noscript class="m-text m-danger m-text-center">Unlike everything else in the docs, the search functionality <em>requires</em> JavaScript.</noscript>
+          <div id="search-help" class="m-text m-dim m-text-center">
+            <p class="m-noindent">Search for symbols, directories, files, pages or
+            modules. You can omit any prefix from the symbol or file path; adding a
+            <code>:</code> or <code>/</code> suffix lists all members of given symbol or
+            directory.</p>
+            <p class="m-noindent">Use <span class="m-label m-dim">&darr;</span>
+            / <span class="m-label m-dim">&uarr;</span> to navigate through the list,
+            <span class="m-label m-dim">Enter</span> to go.
+            <span class="m-label m-dim">Tab</span> autocompletes common prefix, you can
+            copy a link to the result using <span class="m-label m-dim">⌘</span>
+            <span class="m-label m-dim">L</span> while <span class="m-label m-dim">⌘</span>
+            <span class="m-label m-dim">M</span> produces a Markdown link.</p>
+          </div>
+          <div id="search-notfound" class="m-text m-warning m-text-center">Sorry, nothing was found.</div>
+          <ul id="search-results"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="search-v2.js"></script>
+<script src="searchdata-v2.js" async="async"></script>
+<footer><nav>
+  <div class="m-container">
+    <div class="m-row">
+      <div class="m-col-l-10 m-push-l-1">
+        <p>Liar's
+Dice. Created with <a href="https://doxygen.org/">Doxygen</a> 1.10.0 and <a href="https://mcss.mosra.cz/">m.css</a>.</p>
+      </div>
+    </div>
+  </div>
+</nav></footer>
+</body>
+</html>

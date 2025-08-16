@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>AI System Design | Liar's
+Dice</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,400i,600,600i%7CSource+Code+Pro:400,400i,600" />
+  <link rel="stylesheet" href="m-dark+documentation.compiled.css" />
+  <link rel="icon" href="favicon-dark.png" type="image/png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#22272e" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+</head>
+<body>
+<header><nav id="navigation">
+  <div class="m-container">
+    <div class="m-row">
+      <a href="index.html" id="m-navbar-brand" class="m-col-t-8 m-col-m-none m-left-m">Liar's
+Dice</a>
+      <div class="m-col-t-4 m-hide-m m-text-right m-nopadr">
+        <a href="#search" class="m-doc-search-icon" title="Search" onclick="return showSearch()"><svg style="height: 0.9rem;" viewBox="0 0 16 16">
+          <path id="m-doc-search-icon-path" d="m6 0c-3.31 0-6 2.69-6 6 0 3.31 2.69 6 6 6 1.49 0 2.85-0.541 3.89-1.44-0.0164 0.338 0.147 0.759 0.5 1.15l3.22 3.79c0.552 0.614 1.45 0.665 2 0.115 0.55-0.55 0.499-1.45-0.115-2l-3.79-3.22c-0.392-0.353-0.812-0.515-1.15-0.5 0.895-1.05 1.44-2.41 1.44-3.89 0-3.31-2.69-6-6-6zm0 1.56a4.44 4.44 0 0 1 4.44 4.44 4.44 4.44 0 0 1-4.44 4.44 4.44 4.44 0 0 1-4.44-4.44 4.44 4.44 0 0 1 4.44-4.44z"/>
+        </svg></a>
+        <a id="m-navbar-show" href="#navigation" title="Show navigation"></a>
+        <a id="m-navbar-hide" href="#" title="Hide navigation"></a>
+      </div>
+      <div id="m-navbar-collapse" class="m-col-t-12 m-show-m m-col-m-none m-right-m">
+        <div class="m-row">
+          <ol class="m-col-t-6 m-col-m-none">
+            <li><a href="modules.html">Modules</a></li>
+            <li><a href="namespaces.html">Namespaces</a></li>
+            <li><a href="annotated.html">Classes</a></li>
+          </ol>
+          <ol class="m-col-t-6 m-col-m-none" start="4">
+            <li><a href="files.html">Files</a></li>
+            <li class="m-show-m"><a href="#search" class="m-doc-search-icon" title="Search" onclick="return showSearch()"><svg style="height: 0.9rem;" viewBox="0 0 16 16">
+              <use href="#m-doc-search-icon-path" />
+            </svg></a></li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav></header>
+<main><article>
+  <div class="m-container m-container-inflatable">
+    <div class="m-row">
+      <div class="m-col-l-10 m-push-l-1">
+        <h1>
+          AI System Design
+        </h1>
+<section id="ai_overview"><h2><a href="#ai_overview">AI System Overview</a></h2><p>The Liar&#x27;s Dice AI system uses a flexible strategy pattern that allows for multiple AI implementations with varying difficulty levels and play styles. The system is designed to be extensible, testable, and configurable.</p></section><section id="ai_architecture"><h2><a href="#ai_architecture">AI Architecture</a></h2><section id="strategy_pattern"><h3><a href="#strategy_pattern">Strategy Pattern Implementation</a></h3><p>The AI system is built around the Strategy pattern with the following components:</p><ul><li><strong>IAIStrategy</strong>: Pure virtual interface defining the contract for all AI strategies</li><li><strong>AIStrategyFactory</strong>: Singleton factory using type erasure for strategy creation</li><li><strong>AIDecision</strong>: Variant type for type-safe decision representation</li><li><strong>AIDecisionContext</strong>: Comprehensive game state information for decision making</li></ul><pre class="m-code"><span class="k">class</span><span class="w"> </span><span class="nc">IAIStrategy</span><span class="w"> </span><span class="p">{</span>
+<span class="k">public</span><span class="o">:</span>
+<span class="w">    </span><span class="k">virtual</span><span class="w"> </span><span class="o">~</span><span class="n">IAIStrategy</span><span class="p">()</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">default</span><span class="p">;</span>
+<span class="w">    </span><span class="k">virtual</span><span class="w"> </span><span class="n">AIDecision</span><span class="w"> </span><span class="nf">make_decision</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">AIDecisionContext</span><span class="o">&amp;</span><span class="w"> </span><span class="n">context</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">    </span><span class="k">virtual</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="nf">get_name</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">    </span><span class="k">virtual</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">unique_ptr</span><span class="o">&lt;</span><span class="n">IAIStrategy</span><span class="o">&gt;</span><span class="w"> </span><span class="n">clone</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="p">};</span></pre></section><section id="decision_types"><h3><a href="#decision_types">AI Decision Types</a></h3><p>AI players can make two types of decisions:</p><ol><li><strong>AIGuessAction</strong>: Make a new guess about dice counts</li><li><strong>AICallLiarAction</strong>: Challenge the previous player&#x27;s guess</li></ol><pre class="m-code"><span class="k">using</span><span class="w"> </span><span class="n">AIDecision</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">variant</span><span class="o">&lt;</span><span class="n">AIGuessAction</span><span class="p">,</span><span class="w"> </span><span class="n">AICallLiarAction</span><span class="o">&gt;</span><span class="p">;</span></pre></section></section><section id="ai_strategies"><h2><a href="#ai_strategies">AI Strategy Implementations</a></h2><section id="easy_ai"><h3><a href="#easy_ai">Easy AI Strategy</a></h3><p>Simple heuristic-based AI with configurable parameters:</p><p>Features:**</p><ul><li>Basic probability calculations</li><li>Conservative play style</li><li>Configurable risk tolerance (0.0 - 1.0)</li><li><p>Simple bluff detection</p><p>Configuration:**</p><pre class="m-code"><span class="k">struct</span><span class="w"> </span><span class="nc">EasyConfig</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">risk_tolerance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.2</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">bluff_frequency</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.1</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">call_threshold</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.8</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">bool</span><span class="w"> </span><span class="n">use_statistical_analysis</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">think_time_ms</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">500</span><span class="p">;</span>
+<span class="p">};</span></pre><p>Decision Logic:**</p></li></ul><ol><li>Calculate probability of current guess being true</li><li>If probability &lt; call_threshold, call liar</li><li>Otherwise, make conservative guess based on own dice</li></ol></section><section id="medium_ai"><h3><a href="#medium_ai">Medium AI Strategy</a></h3><p>Statistical AI with pattern recognition and opponent modeling:</p><p>Features:**</p><ul><li>Bayesian probability calculations</li><li>Opponent behavior tracking</li><li>Pattern recognition using game history</li><li>Bluff detection with statistical analysis</li><li><p>Adaptive play style</p><p>Configuration:**</p><pre class="m-code"><span class="k">struct</span><span class="w"> </span><span class="nc">MediumConfig</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">risk_tolerance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.4</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">bluff_frequency</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.2</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">call_threshold</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.7</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">pattern_weight</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.3</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">history_size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">20</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">think_time_ms</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1000</span><span class="p">;</span>
+<span class="p">};</span></pre><p>Advanced Features:**</p></li></ul><ol><li><strong>Probability Calculation:</strong><ul><li>Uses binomial distribution for exact probabilities</li><li>Accounts for wild dice (1s count as any value)</li><li>Considers revealed information from previous rounds</li></ul></li><li><p><strong>Opponent Modeling:</strong></p><pre class="m-code"><span class="k">struct</span><span class="w"> </span><span class="nc">OpponentPattern</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">deque</span><span class="o">&lt;</span><span class="n">Guess</span><span class="o">&gt;</span><span class="w"> </span><span class="n">recent_guesses</span><span class="p">;</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">unordered_map</span><span class="o">&lt;</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="p">,</span><span class="w"> </span><span class="kt">double</span><span class="o">&gt;</span><span class="w"> </span><span class="n">face_frequency</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">bluff_rate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">aggression_level</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0</span><span class="p">;</span>
+<span class="p">};</span></pre></li><li><strong>Pattern Recognition:</strong><ul><li>Tracks sequences of actions (e.g., &quot;guess-guess-call&quot;)</li><li>Identifies bluffing patterns</li><li>Adapts strategy based on opponent behavior</li></ul></li></ol></section><section id="hard_ai"><h3><a href="#hard_ai">Hard AI Strategy (Future)</a></h3><p>Advanced AI with machine learning capabilities:</p><p>Planned Features:**</p><ul><li>Neural network for decision making</li><li>Monte Carlo tree search</li><li>Advanced game theory concepts</li><li>Perfect information tracking</li><li>Multi-level reasoning</li></ul></section></section><section id="ai_decision_making"><h2><a href="#ai_decision_making">Decision Making Process</a></h2><section id="context_analysis"><h3><a href="#context_analysis">Context Analysis</a></h3><p>The AI receives comprehensive context for decision making:</p><pre class="m-code"><span class="k">struct</span><span class="w"> </span><span class="nc">AIDecisionContext</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">Game</span><span class="o">*</span><span class="w"> </span><span class="n">game</span><span class="p">;</span><span class="w">              </span><span class="c1">// Game state access</span>
+<span class="w">    </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">player_id</span><span class="p">;</span><span class="w">        </span><span class="c1">// AI player ID</span>
+<span class="w">    </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">total_dice</span><span class="p">;</span><span class="w">       </span><span class="c1">// Total dice in play</span>
+<span class="w">    </span><span class="n">boost</span><span class="o">::</span><span class="n">optional</span><span class="o">&lt;</span><span class="n">Guess</span><span class="o">&gt;</span><span class="w"> </span><span class="n">last_guess</span><span class="p">;</span><span class="w">  </span><span class="c1">// Previous guess</span>
+<span class="w">    </span><span class="n">GameHistory</span><span class="w"> </span><span class="n">history</span><span class="p">;</span><span class="w">           </span><span class="c1">// Historical data</span>
+<span class="p">};</span></pre></section><section id="decision_flow"><h3><a href="#decision_flow">Decision Flow</a></h3><ol><li><strong>Information Gathering</strong><ul><li>Analyze current game state</li><li>Review historical patterns</li><li>Calculate probabilities</li></ul></li><li><strong>Strategy Selection</strong><ul><li>Determine if defensive or aggressive play is needed</li><li>Consider risk tolerance and game phase</li><li>Evaluate bluffing opportunities</li></ul></li><li><strong>Action Generation</strong><ul><li>Generate candidate actions</li><li>Score each action based on expected value</li><li>Select optimal action with randomization</li></ul></li><li><strong>Learning and Adaptation</strong><ul><li>Update opponent models</li><li>Store patterns for future reference</li><li>Adjust strategy parameters</li></ul></li></ol></section></section><section id="ai_configuration"><h2><a href="#ai_configuration">AI Configuration</a></h2><section id="runtime_config"><h3><a href="#runtime_config">Runtime Configuration</a></h3><p>AI behavior can be configured through JSON files:</p><pre class="m-code"><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;ai&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;easy&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;risk_tolerance&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.2</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;bluff_frequency&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.1</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;call_threshold&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.8</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="nt">&quot;medium&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;risk_tolerance&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.4</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;pattern_weight&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.3</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;history_size&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">20</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span></pre></section><section id="difficulty_scaling"><h3><a href="#difficulty_scaling">Difficulty Scaling</a></h3><p>AI difficulty can be adjusted by modifying:</p><ul><li><strong>Risk Tolerance</strong>: Higher values make AI more aggressive</li><li><strong>Bluff Frequency</strong>: Controls how often AI bluffs</li><li><strong>Call Threshold</strong>: Lower values make AI more skeptical</li><li><strong>Think Time</strong>: Simulates human thinking delay</li></ul></section></section><section id="ai_testing"><h2><a href="#ai_testing">AI Testing</a></h2><section id="unit_tests"><h3><a href="#unit_tests">Unit Testing</a></h3><p>Each AI strategy has comprehensive unit tests:</p><ul><li>Decision making in various scenarios</li><li>Edge case handling</li><li>Configuration validation</li><li>Performance benchmarks</li></ul></section><section id="integration_tests"><h3><a href="#integration_tests">Integration Testing</a></h3><p>AI strategies are tested in full games:</p><ul><li>Win rate analysis</li><li>Behavioral consistency</li><li>Performance under pressure</li><li>Multi-AI interactions</li></ul></section><section id="statistical_validation"><h3><a href="#statistical_validation">Statistical Validation</a></h3><p>AI behavior is validated through:</p><ul><li>Monte Carlo simulations</li><li>Statistical analysis of decisions</li><li>Comparison with optimal play</li><li>A/B testing of strategies</li></ul></section></section><section id="ai_performance"><h2><a href="#ai_performance">Performance Considerations</a></h2><section id="optimization"><h3><a href="#optimization">Optimizations</a></h3><ul><li>Probability calculations are cached</li><li>Pattern matching uses trie data structure</li><li>Historical data uses circular buffers</li><li>SIMD operations for batch calculations</li></ul></section><section id="benchmarks"><h3><a href="#benchmarks">Performance Benchmarks</a></h3><table class="m-table"><thead><tr><th>AI Level</th><th>Decision Time</th><th>Memory Usage</th><th>Cache Efficiency</th></tr></thead><tbody><tr><td>Easy</td><td>&lt; 1ms</td><td>1KB</td><td>95%</td></tr><tr><td>Medium</td><td>&lt; 5ms</td><td>8KB</td><td>90%</td></tr><tr><td>Hard</td><td>&lt; 20ms</td><td>64KB</td><td>85%</td></tr></tbody></table></section></section><section id="extending_ai"><h2><a href="#extending_ai">Extending the AI System</a></h2><section id="new_strategy"><h3><a href="#new_strategy">Adding a New Strategy</a></h3><ol><li>Create new class inheriting from IAIStrategy</li><li>Implement required virtual methods</li><li>Register with AIStrategyFactory</li><li>Add configuration support</li><li>Create unit tests</li></ol><p>Example:</p><pre class="m-code"><span class="k">class</span><span class="w"> </span><span class="nc">CustomAIStrategy</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="n">IAIStrategy</span><span class="w"> </span><span class="p">{</span>
+<span class="k">public</span><span class="o">:</span>
+<span class="w">    </span><span class="n">AIDecision</span><span class="w"> </span><span class="n">make_decision</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">AIDecisionContext</span><span class="o">&amp;</span><span class="w"> </span><span class="n">context</span><span class="p">)</span><span class="w"> </span><span class="k">override</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// Custom logic here</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">get_name</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="k">override</span><span class="w"> </span><span class="p">{</span><span class="w"> </span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="s">&quot;custom&quot;</span><span class="p">;</span><span class="w"> </span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">unique_ptr</span><span class="o">&lt;</span><span class="n">IAIStrategy</span><span class="o">&gt;</span><span class="w"> </span><span class="n">clone</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="k">override</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">make_unique</span><span class="o">&lt;</span><span class="n">CustomAIStrategy</span><span class="o">&gt;</span><span class="p">(</span><span class="o">*</span><span class="k">this</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">};</span>
+
+<span class="c1">// Register with factory</span>
+<span class="n">AIStrategyFactory</span><span class="o">::</span><span class="n">instance</span><span class="p">().</span><span class="n">register_strategy</span><span class="p">(</span><span class="s">&quot;custom&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">    </span><span class="p">[]()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">make_unique</span><span class="o">&lt;</span><span class="n">CustomAIStrategy</span><span class="o">&gt;</span><span class="p">();</span><span class="w"> </span><span class="p">});</span></pre></section><section id="ai_tournaments"><h3><a href="#ai_tournaments">AI Tournaments</a></h3><p>The system supports AI vs AI tournaments for strategy evaluation:</p><pre class="m-code"><span class="c1">// Run tournament between different AI strategies</span>
+<span class="n">TournamentRunner</span><span class="w"> </span><span class="n">runner</span><span class="p">;</span>
+<span class="n">runner</span><span class="p">.</span><span class="n">add_strategy</span><span class="p">(</span><span class="s">&quot;easy&quot;</span><span class="p">);</span>
+<span class="n">runner</span><span class="p">.</span><span class="n">add_strategy</span><span class="p">(</span><span class="s">&quot;medium&quot;</span><span class="p">);</span>
+<span class="n">runner</span><span class="p">.</span><span class="n">run_games</span><span class="p">(</span><span class="mi">1000</span><span class="p">);</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">results</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">runner</span><span class="p">.</span><span class="n">get_statistics</span><span class="p">();</span></pre></section></section>
+      </div>
+    </div>
+  </div>
+</article></main>
+<div class="m-doc-search" id="search">
+  <a href="#!" onclick="return hideSearch()"></a>
+  <div class="m-container">
+    <div class="m-row">
+      <div class="m-col-m-8 m-push-m-2">
+        <div class="m-doc-search-header m-text m-small">
+          <div><span class="m-label m-default">Tab</span> / <span class="m-label m-default">T</span> to search, <span class="m-label m-default">Esc</span> to close</div>
+          <div id="search-symbolcount">&hellip;</div>
+        </div>
+        <div class="m-doc-search-content">
+          <form>
+            <input type="search" name="q" id="search-input" placeholder="Loading &hellip;" disabled="disabled" autofocus="autofocus" autocomplete="off" spellcheck="false" />
+          </form>
+          <noscript class="m-text m-danger m-text-center">Unlike everything else in the docs, the search functionality <em>requires</em> JavaScript.</noscript>
+          <div id="search-help" class="m-text m-dim m-text-center">
+            <p class="m-noindent">Search for symbols, directories, files, pages or
+            modules. You can omit any prefix from the symbol or file path; adding a
+            <code>:</code> or <code>/</code> suffix lists all members of given symbol or
+            directory.</p>
+            <p class="m-noindent">Use <span class="m-label m-dim">&darr;</span>
+            / <span class="m-label m-dim">&uarr;</span> to navigate through the list,
+            <span class="m-label m-dim">Enter</span> to go.
+            <span class="m-label m-dim">Tab</span> autocompletes common prefix, you can
+            copy a link to the result using <span class="m-label m-dim">⌘</span>
+            <span class="m-label m-dim">L</span> while <span class="m-label m-dim">⌘</span>
+            <span class="m-label m-dim">M</span> produces a Markdown link.</p>
+          </div>
+          <div id="search-notfound" class="m-text m-warning m-text-center">Sorry, nothing was found.</div>
+          <ul id="search-results"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="search-v2.js"></script>
+<script src="searchdata-v2.js" async="async"></script>
+<footer><nav>
+  <div class="m-container">
+    <div class="m-row">
+      <div class="m-col-l-10 m-push-l-1">
+        <p>Liar's
+Dice. Created with <a href="https://doxygen.org/">Doxygen</a> 1.10.0 and <a href="https://mcss.mosra.cz/">m.css</a>.</p>
+      </div>
+    </div>
+  </div>
+</nav></footer>
+</body>
+</html>
