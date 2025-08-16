@@ -15,6 +15,10 @@ on:
 env:
   CPM_SOURCE_CACHE: ${{ github.workspace }}/cpm_modules
 
+permissions:
+  contents: write
+  packages: write
+
 jobs:
   build-artifacts:
     name: Build ${{ matrix.os }}
