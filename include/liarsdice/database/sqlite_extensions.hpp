@@ -86,6 +86,7 @@ namespace liarsdice::database {
     void load_extensions(sqlite3* db) {
       boost::lock_guard<boost::mutex> lock(mutex_);
 
+#ifdef SQLITE_ENABLE_LOAD_EXTENSION
       // Enable extension loading
       sqlite3_enable_load_extension(db, 1);
 
@@ -100,6 +101,10 @@ namespace liarsdice::database {
       };
 
       CleanupGuard cleanup_guard{db};
+#else
+      // Extension loading not available - skip
+      return;
+#endif
 
       try {
         for (auto& [name, ext] : extensions_) {
@@ -193,15 +198,25 @@ namespace liarsdice::database {
      */
     void load_extension_internal(sqlite3* db, Extension& ext) {
       // Use SQLite's built-in extension loading mechanism
+#ifdef SQLITE_ENABLE_LOAD_EXTENSION
       char* error_msg = nullptr;
       int result = sqlite3_load_extension(db, ext.path.string().c_str(), nullptr, &error_msg);
 
       if (result == SQLITE_OK) {
+#else
+      // Extension loading not available
+      if (false) {
+#endif
         ext.loaded = true;
       } else {
+#ifdef SQLITE_ENABLE_LOAD_EXTENSION
         std::string error = error_msg ? error_msg : "Unknown error";
         sqlite3_free(error_msg);
         throw std::runtime_error("Failed to load extension " + ext.name + ": " + error);
+#else
+        // Extension loading not available - silently skip
+        ext.loaded = false;
+#endif
       }
     }
 
