@@ -61,6 +61,15 @@ custom memory allocators, and profiling utilities.
 */
 
 /**
+@defgroup database Database System
+@brief SQLite-based persistent storage
+
+Comprehensive database layer for persistent game storage, including
+connection pooling, schema management, and transaction support for
+storing game history, player statistics, and AI patterns.
+*/
+
+/**
 @defgroup di Dependency Injection
 @brief Lightweight dependency injection framework
 

@@ -6,28 +6,53 @@
 PROJECT_NAME = @DOXYGEN_PROJECT_NAME@
 PROJECT_NUMBER = @DOXYGEN_PROJECT_VERSION@
 
-# Add sources
-INPUT = @DOXYGEN_PROJECT_ROOT@/README.md \
+# Add sources - prioritize documentation over code
+INPUT = @DOXYGEN_PROJECT_ROOT@/documentation/main.md \
+        @DOXYGEN_PROJECT_ROOT@/documentation/pages \
         @DOXYGEN_PROJECT_ROOT@/include \
-        @DOXYGEN_PROJECT_ROOT@/source \
-        @DOXYGEN_PROJECT_ROOT@/documentation/pages
+        @DOXYGEN_PROJECT_ROOT@/source
 EXTRACT_ALL = YES
 RECURSIVE = YES
 OUTPUT_DIRECTORY = @DOXYGEN_OUTPUT_DIRECTORY@
 
-# Use the README as a main page
-USE_MDFILE_AS_MAINPAGE = @DOXYGEN_PROJECT_ROOT@/README.md
+# Use documentation main.md as the main page
+USE_MDFILE_AS_MAINPAGE = @DOXYGEN_PROJECT_ROOT@/documentation/main.md
 
 # set relative include paths
 FULL_PATH_NAMES = YES
 STRIP_FROM_PATH = @DOXYGEN_PROJECT_ROOT@/include @DOXYGEN_PROJECT_ROOT@
 
-# We use m.css to generate the html documentation, so we only need XML output
+# Generate HTML documentation with better navigation
 GENERATE_XML = YES
-GENERATE_HTML = NO
+GENERATE_HTML = YES
 GENERATE_LATEX = NO
-XML_PROGRAMLISTING = NO
+XML_PROGRAMLISTING = YES
 CREATE_SUBDIRS = NO
+
+# HTML output configuration
+HTML_OUTPUT = html
+HTML_FILE_EXTENSION = .html
+HTML_HEADER = 
+HTML_FOOTER = 
+HTML_STYLESHEET = 
+HTML_EXTRA_STYLESHEET = 
+HTML_EXTRA_FILES = 
+HTML_COLORSTYLE_HUE = 220
+HTML_COLORSTYLE_SAT = 100
+HTML_COLORSTYLE_GAMMA = 80
+HTML_TIMESTAMP = YES
+HTML_DYNAMIC_SECTIONS = YES
+HTML_INDEX_NUM_ENTRIES = 100
+
+# Enable navigation tree
+GENERATE_TREEVIEW = YES
+DISABLE_INDEX = NO
+FULL_SIDEBAR = NO
+TREEVIEW_WIDTH = 250
+
+# Enable search
+SEARCHENGINE = YES
+SERVER_BASED_SEARCH = NO
 
 # Include all directories, files and namespaces in the documentation
 # Disable to include only explicitly documented objects

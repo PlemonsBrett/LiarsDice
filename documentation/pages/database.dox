@@ -1,0 +1,413 @@
+/**
+ * @page database Database System
+ * @brief SQLite-based persistent storage for game data and statistics
+ * 
+ * @tableofcontents
+ * 
+ * @section database_overview Overview
+ * 
+ * The Liar's Dice database system provides persistent storage for game history, player statistics,
+ * AI behavior patterns, and performance metrics. Built on SQLite for portability and ease of deployment,
+ * the system includes connection pooling, schema versioning, and comprehensive error handling.
+ * 
+ * @section database_architecture Architecture
+ * 
+ * The database system consists of several key components:
+ * 
+ * @subsection database_manager Database Manager
+ * 
+ * The @ref liarsdice::database::DatabaseManager class provides the main interface for database operations:
+ * - Connection lifecycle management
+ * - Transaction support with RAII semantics
+ * - Prepared statement caching
+ * - Error handling and recovery
+ * 
+ * @code{.cpp}
+ * // Example usage
+ * DatabaseManager db("game_data.db");
+ * db.initialize();
+ * 
+ * auto transaction = db.beginTransaction();
+ * db.saveGameSession(session);
+ * db.updatePlayerStatistics(playerId, stats);
+ * transaction.commit();
+ * @endcode
+ * 
+ * @subsection connection_pool Connection Pool
+ * 
+ * The connection pool (managed by @ref liarsdice::database::ConnectionPool) manages a pool of database connections for 
+ * concurrent access:
+ * - Thread-safe connection acquisition and release
+ * - Configurable pool size (default: 4 connections)
+ * - Automatic connection validation and recycling
+ * - Connection timeout handling
+ * 
+ * @code{.cpp}
+ * ConnectionPool pool("game_data.db", 4);
+ * {
+ *     auto conn = pool.acquire();
+ *     conn->execute("INSERT INTO games ...");
+ * } // Connection automatically returned to pool
+ * @endcode
+ * 
+ * @subsection schema_manager Schema Manager
+ * 
+ * The @ref liarsdice::database::SchemaManager handles database schema creation and migrations:
+ * - Version tracking for schema upgrades
+ * - Automatic migration execution
+ * - Rollback support for failed migrations
+ * - Schema validation
+ * 
+ * @section database_schema Database Schema
+ * 
+ * @note Some fields in the schema are marked for future implementation and may not be 
+ * actively used in the current version. These are maintained for forward compatibility.
+ * 
+ * @subsection schema_tables Core Tables (V001 - Initial Schema)
+ * 
+ * **players** - Player account information
+ * @code{.sql}
+ * CREATE TABLE players (
+ *     id INTEGER PRIMARY KEY AUTOINCREMENT,
+ *     username TEXT NOT NULL UNIQUE,
+ *     display_name TEXT NOT NULL,
+ *     email TEXT UNIQUE,
+ *     total_games INTEGER DEFAULT 0,
+ *     games_won INTEGER DEFAULT 0,
+ *     games_lost INTEGER DEFAULT 0,
+ *     total_points INTEGER DEFAULT 0,
+ *     highest_score INTEGER DEFAULT 0,
+ *     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ *     last_login TIMESTAMP,
+ *     is_active BOOLEAN DEFAULT 1
+ * );
+ * @endcode
+ * 
+ * **game_history** - Game session records
+ * @code{.sql}
+ * CREATE TABLE game_history (
+ *     id INTEGER PRIMARY KEY AUTOINCREMENT,
+ *     game_uuid TEXT NOT NULL UNIQUE,
+ *     started_at TIMESTAMP NOT NULL,
+ *     ended_at TIMESTAMP,
+ *     total_players INTEGER NOT NULL,
+ *     total_rounds INTEGER DEFAULT 0,
+ *     winner_id INTEGER,
+ *     game_mode TEXT DEFAULT 'classic',
+ *     is_completed BOOLEAN DEFAULT 0,
+ *     FOREIGN KEY (winner_id) REFERENCES players(id)
+ * );
+ * @endcode
+ * 
+ * **game_participants** - Player participation in games
+ * @code{.sql}
+ * CREATE TABLE game_participants (
+ *     game_id INTEGER NOT NULL,
+ *     player_id INTEGER NOT NULL,
+ *     starting_position INTEGER NOT NULL,
+ *     final_position INTEGER,
+ *     points_scored INTEGER DEFAULT 0,
+ *     rounds_survived INTEGER DEFAULT 0,
+ *     total_guesses INTEGER DEFAULT 0,
+ *     successful_calls INTEGER DEFAULT 0,
+ *     bluffs_attempted INTEGER DEFAULT 0,
+ *     bluffs_caught INTEGER DEFAULT 0,
+ *     PRIMARY KEY (game_id, player_id),
+ *     FOREIGN KEY (game_id) REFERENCES game_history(id),
+ *     FOREIGN KEY (player_id) REFERENCES players(id)
+ * );
+ * @endcode
+ * 
+ * **achievements** - Achievement definitions
+ * @code{.sql}
+ * CREATE TABLE achievements (
+ *     id INTEGER PRIMARY KEY AUTOINCREMENT,
+ *     code TEXT NOT NULL UNIQUE,
+ *     name TEXT NOT NULL,
+ *     description TEXT,
+ *     points INTEGER DEFAULT 0,
+ *     icon_path TEXT,
+ *     category TEXT DEFAULT 'general'
+ * );
+ * @endcode
+ * 
+ * **player_achievements** - Player earned achievements
+ * @code{.sql}
+ * CREATE TABLE player_achievements (
+ *     player_id INTEGER NOT NULL,
+ *     achievement_id INTEGER NOT NULL,
+ *     earned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ *     game_id INTEGER,
+ *     PRIMARY KEY (player_id, achievement_id),
+ *     FOREIGN KEY (player_id) REFERENCES players(id),
+ *     FOREIGN KEY (achievement_id) REFERENCES achievements(id),
+ *     FOREIGN KEY (game_id) REFERENCES game_history(id)
+ * );
+ * @endcode
+ * 
+ * @subsection schema_statistics Statistics Tables (V002 - Statistics)
+ * 
+ * **game_rounds** - Round-by-round game details
+ * @code{.sql}
+ * CREATE TABLE game_rounds (
+ *     id INTEGER PRIMARY KEY AUTOINCREMENT,
+ *     game_id INTEGER NOT NULL,
+ *     round_number INTEGER NOT NULL,
+ *     starting_player_id INTEGER NOT NULL,
+ *     ending_player_id INTEGER,
+ *     total_dice INTEGER NOT NULL,
+ *     final_guess_count INTEGER,
+ *     final_guess_face INTEGER,
+ *     actual_count INTEGER,
+ *     liar_called BOOLEAN DEFAULT 0,
+ *     duration_seconds INTEGER,
+ *     FOREIGN KEY (game_id) REFERENCES game_history(id),
+ *     FOREIGN KEY (starting_player_id) REFERENCES players(id),
+ *     FOREIGN KEY (ending_player_id) REFERENCES players(id)
+ * );
+ * @endcode
+ * 
+ * **player_actions** - Individual player actions
+ * @code{.sql}
+ * CREATE TABLE player_actions (
+ *     id INTEGER PRIMARY KEY AUTOINCREMENT,
+ *     game_id INTEGER NOT NULL,
+ *     round_number INTEGER NOT NULL,
+ *     player_id INTEGER NOT NULL,
+ *     action_type TEXT NOT NULL, -- 'guess', 'call_liar'
+ *     action_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ *     guess_count INTEGER,
+ *     guess_face INTEGER,
+ *     was_bluff BOOLEAN,
+ *     was_correct BOOLEAN,
+ *     FOREIGN KEY (game_id) REFERENCES game_history(id),
+ *     FOREIGN KEY (player_id) REFERENCES players(id)
+ * );
+ * @endcode
+ * 
+ * **player_statistics** - Aggregated player statistics
+ * @code{.sql}
+ * CREATE TABLE player_statistics (
+ *     player_id INTEGER PRIMARY KEY,
+ *     avg_game_duration INTEGER DEFAULT 0,
+ *     avg_rounds_per_game REAL DEFAULT 0,
+ *     win_rate REAL DEFAULT 0,
+ *     favorite_dice_face INTEGER,
+ *     bluff_success_rate REAL DEFAULT 0,
+ *     call_accuracy_rate REAL DEFAULT 0,
+ *     most_played_hour INTEGER,
+ *     streak_current INTEGER DEFAULT 0,
+ *     streak_best INTEGER DEFAULT 0,
+ *     last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ *     FOREIGN KEY (player_id) REFERENCES players(id)
+ * );
+ * @endcode
+ * 
+ * **leaderboard_history** - Historical leaderboard snapshots
+ * @code{.sql}
+ * CREATE TABLE leaderboard_history (
+ *     id INTEGER PRIMARY KEY AUTOINCREMENT,
+ *     snapshot_date DATE NOT NULL,
+ *     rank INTEGER NOT NULL,
+ *     player_id INTEGER NOT NULL,
+ *     elo_rating INTEGER NOT NULL,  -- Player's ELO rating at snapshot time
+ *     games_played INTEGER NOT NULL,
+ *     win_rate REAL NOT NULL,
+ *     UNIQUE(snapshot_date, rank),
+ *     FOREIGN KEY (player_id) REFERENCES players(id)
+ * );
+ * @endcode
+ * 
+ * 
+ * @section database_operations Common Operations
+ * 
+ * @subsection db_save_game Saving Game Data
+ * 
+ * @code{.cpp}
+ * void saveGame(const Game& game) {
+ *     DatabaseManager db("game_data.db");
+ *     
+ *     // Begin transaction for consistency
+ *     auto transaction = db.beginTransaction();
+ *     
+ *     try {
+ *         // Save game history record
+ *         auto gameId = db.saveGameHistory({
+ *             .gameUuid = game.getUuid(),
+ *             .startedAt = game.getStartTime(),
+ *             .endedAt = game.getEndTime(),
+ *             .totalPlayers = game.getPlayerCount(),
+ *             .totalRounds = game.getRoundCount(),
+ *             .winnerId = game.getWinner()->getId(),
+ *             .gameMode = "classic",
+ *             .isCompleted = true
+ *         });
+ *         
+ *         // Save participant details
+ *         for (const auto& player : game.getPlayers()) {
+ *             db.saveGameParticipant(gameId, player->getId(), {
+ *                 .startingPosition = player->getStartPosition(),
+ *                 .finalPosition = player->getFinalPosition(),
+ *                 .pointsScored = player->getScore(),
+ *                 .roundsSurvived = player->getRoundsSurvived(),
+ *                 .totalGuesses = player->getGuessCount(),
+ *                 .successfulCalls = player->getSuccessfulCalls(),
+ *                 .bluffsAttempted = player->getBluffCount(),
+ *                 .bluffsCaught = player->getBluffsCaught()
+ *             });
+ *         }
+ *         
+ *         // Save round details (V002 schema)
+ *         for (const auto& round : game.getRounds()) {
+ *             db.saveGameRound(gameId, round);
+ *         }
+ *         
+ *         transaction.commit();
+ *     } catch (const std::exception& e) {
+ *         // Transaction automatically rolls back
+ *         throw;
+ *     }
+ * }
+ * @endcode
+ * 
+ * @subsection db_query_stats Querying Statistics
+ * 
+ * @code{.cpp}
+ * PlayerStatistics getPlayerStats(const std::string& username) {
+ *     DatabaseManager db("game_data.db");
+ *     
+ *     auto stmt = db.prepare(R"(
+ *         SELECT 
+ *             p.total_games,
+ *             p.games_won,
+ *             CAST(p.games_won AS REAL) / NULLIF(p.total_games, 0) as win_rate,
+ *             p.total_points,
+ *             p.highest_score,
+ *             ps.bluff_success_rate,
+ *             ps.call_accuracy_rate,
+ *             ps.avg_rounds_per_game,
+ *             ps.streak_current,
+ *             ps.streak_best
+ *         FROM players p
+ *         LEFT JOIN player_statistics ps ON p.id = ps.player_id
+ *         WHERE p.username = ?
+ *     )");
+ *     
+ *     stmt.bind(1, username);
+ *     
+ *     if (stmt.step()) {
+ *         return {
+ *             .totalGames = stmt.column<int>(0),
+ *             .gamesWon = stmt.column<int>(1),
+ *             .winRate = stmt.column<double>(2),
+ *             .totalPoints = stmt.column<int>(3),
+ *             .highestScore = stmt.column<int>(4),
+ *             .bluffSuccessRate = stmt.column<double>(5),
+ *             .callAccuracyRate = stmt.column<double>(6),
+ *             .avgRoundsPerGame = stmt.column<double>(7),
+ *             .currentStreak = stmt.column<int>(8),
+ *             .bestStreak = stmt.column<int>(9)
+ *         };
+ *     }
+ *     
+ *     throw std::runtime_error("Player not found");
+ * }
+ * @endcode
+ * 
+ * @subsection db_achievements Achievement Tracking
+ * 
+ * @code{.cpp}
+ * void checkAndAwardAchievements(int playerId, int gameId) {
+ *     DatabaseManager db("game_data.db");
+ *     
+ *     // Check for perfect game achievement
+ *     auto stmt = db.prepare(R"(
+ *         SELECT points_scored 
+ *         FROM game_participants 
+ *         WHERE game_id = ? AND player_id = ?
+ *     )");
+ *     
+ *     stmt.bind(1, gameId);
+ *     stmt.bind(2, playerId);
+ *     
+ *     if (stmt.step()) {
+ *         int pointsScored = stmt.column<int>(0);
+ *         
+ *         // Award perfect game achievement if applicable
+ *         if (pointsScored == 5) {  // No points lost
+ *             db.execute(R"(
+ *                 INSERT OR IGNORE INTO player_achievements 
+ *                 (player_id, achievement_id, game_id)
+ *                 SELECT ?, id, ? FROM achievements 
+ *                 WHERE code = 'perfect_game'
+ *             )", playerId, gameId);
+ *         }
+ *     }
+ * }
+ * @endcode
+ * 
+ * @section database_performance Performance Considerations
+ * 
+ * @subsection db_indexing Indexing Strategy
+ * 
+ * Key indexes for optimal query performance (created by migrations):
+ * 
+ * @code{.sql}
+ * -- Player lookups
+ * CREATE INDEX idx_players_username ON players(username);
+ * CREATE INDEX idx_players_email ON players(email);
+ * CREATE INDEX idx_players_last_login ON players(last_login);
+ * 
+ * -- Game history queries
+ * CREATE INDEX idx_game_history_uuid ON game_history(game_uuid);
+ * CREATE INDEX idx_game_history_dates ON game_history(started_at, ended_at);
+ * 
+ * -- Round and action queries (V002)
+ * CREATE INDEX idx_game_rounds_game ON game_rounds(game_id);
+ * CREATE INDEX idx_player_actions_game ON player_actions(game_id, round_number);
+ * CREATE INDEX idx_player_actions_player ON player_actions(player_id);
+ * 
+ * -- Leaderboard queries (V002)
+ * CREATE INDEX idx_leaderboard_date ON leaderboard_history(snapshot_date);
+ * @endcode
+ * 
+ * @subsection db_optimization Query Optimization
+ * 
+ * - Use prepared statements for repeated queries
+ * - Batch inserts within transactions
+ * - Use connection pooling for concurrent access
+ * - Implement caching for frequently accessed statistics
+ * - Regular VACUUM operations for database maintenance
+ * 
+ * @section database_error_handling Error Handling
+ * 
+ * The database system uses a comprehensive exception hierarchy:
+ * 
+ * @code{.cpp}
+ * try {
+ *     db.executeQuery(sql);
+ * } catch (const DatabaseConnectionError& e) {
+ *     // Handle connection failures
+ * } catch (const DatabaseConstraintError& e) {
+ *     // Handle constraint violations
+ * } catch (const DatabaseTimeoutError& e) {
+ *     // Handle timeout conditions
+ * } catch (const DatabaseError& e) {
+ *     // Handle general database errors
+ * }
+ * @endcode
+ * 
+ * @section database_testing Testing Strategy
+ * 
+ * Database testing includes:
+ * - Unit tests for each database component
+ * - Integration tests for transaction handling
+ * - Performance benchmarks for query optimization
+ * - Stress tests for connection pooling
+ * - Migration tests for schema updates
+ * 
+ * @see liarsdice::database::DatabaseManager
+ * @see liarsdice::database::ConnectionPool
+ * @see liarsdice::database::SchemaManager
+ * @see liarsdice::database::ConnectionManager
+ */
