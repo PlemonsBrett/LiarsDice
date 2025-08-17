@@ -1,0 +1,401 @@
+/**
+ * @page architecture_diagrams Architecture and Design Diagrams
+ * @brief Visual representations of system architecture and data flow
+ * 
+ * @tableofcontents
+ * 
+ * @section overview_arch System Architecture Overview
+ * 
+ * @dot
+ * digraph system_architecture {
+ *     rankdir=TB;
+ *     node [shape=box, style=filled, fillcolor=lightblue];
+ *     edge [color=darkblue];
+ *     
+ *     subgraph cluster_presentation {
+ *         label="Presentation Layer";
+ *         style=filled;
+ *         fillcolor=lightyellow;
+ *         
+ *         CLI [label="CLI Interface\n(standalone)"];
+ *         Robot [label="Robot Framework\n(Testing)"];
+ *     }
+ *     
+ *     subgraph cluster_game {
+ *         label="Game Logic Layer";
+ *         style=filled;
+ *         fillcolor=lightgreen;
+ *         
+ *         Game [label="Game\nOrchestrator"];
+ *         Players [label="Player\nManagement"];
+ *         AI [label="AI Strategy\nSystem"];
+ *         Dice [label="Dice\nManagement"];
+ *     }
+ *     
+ *     subgraph cluster_data {
+ *         label="Data Layer";
+ *         style=filled;
+ *         fillcolor=lightcyan;
+ *         
+ *         Storage [label="Game State\nStorage"];
+ *         Stats [label="Statistical\nAnalysis"];
+ *         DataStructures [label="Advanced\nData Structures"];
+ *     }
+ *     
+ *     subgraph cluster_persistence {
+ *         label="Persistence Layer";
+ *         style=filled;
+ *         fillcolor=lavender;
+ *         
+ *         DBManager [label="Database\nManager"];
+ *         ConnPool [label="Connection\nPool"];
+ *         Schema [label="Schema\nManager"];
+ *     }
+ *     
+ *     subgraph cluster_infra {
+ *         label="Infrastructure";
+ *         style=filled;
+ *         fillcolor=lightgray;
+ *         
+ *         DI [label="Dependency\nInjection"];
+ *         Events [label="Event\nSystem"];
+ *         Logging [label="Logging"];
+ *     }
+ *     
+ *     CLI -> Game;
+ *     Robot -> Game;
+ *     Game -> Players;
+ *     Game -> Dice;
+ *     Players -> AI;
+ *     Game -> Storage;
+ *     AI -> Stats;
+ *     AI -> DataStructures;
+ *     Storage -> DataStructures;
+ *     Game -> DBManager;
+ *     DBManager -> ConnPool;
+ *     DBManager -> Schema;
+ *     Game -> Events;
+ *     Game -> DI;
+ *     Game -> Logging;
+ * }
+ * @enddot
+ * 
+ * @section game_flow_diagram Game Flow
+ * 
+ * @dot
+ * digraph game_flow {
+ *     rankdir=TB;
+ *     node [shape=box, style=rounded];
+ *     
+ *     Start [shape=ellipse, style=filled, fillcolor=lightgreen, label="Game Start"];
+ *     Setup [label="Setup Players\n(Human/AI)"];
+ *     InitRound [label="Initialize Round\nRoll Dice"];
+ *     PlayerTurn [label="Player Turn"];
+ *     MakeGuess [label="Make Guess\nor Call Liar", shape=diamond];
+ *     ValidateGuess [label="Validate Guess"];
+ *     NextPlayer [label="Next Player"];
+ *     CallLiar [label="Liar Called\nReveal Dice"];
+ *     UpdatePoints [label="Update Points"];
+ *     CheckElimination [label="Check\nEliminations", shape=diamond];
+ *     CheckWinner [label="Check for\nWinner", shape=diamond];
+ *     EndGame [shape=ellipse, style=filled, fillcolor=lightcoral, label="Game End"];
+ *     
+ *     Start -> Setup;
+ *     Setup -> InitRound;
+ *     InitRound -> PlayerTurn;
+ *     PlayerTurn -> MakeGuess;
+ *     MakeGuess -> ValidateGuess [label="Guess"];
+ *     MakeGuess -> CallLiar [label="Call"];
+ *     ValidateGuess -> NextPlayer;
+ *     NextPlayer -> PlayerTurn;
+ *     CallLiar -> UpdatePoints;
+ *     UpdatePoints -> CheckElimination;
+ *     CheckElimination -> InitRound [label="Continue"];
+ *     CheckElimination -> CheckWinner [label="Player Out"];
+ *     CheckWinner -> InitRound [label="Continue"];
+ *     CheckWinner -> EndGame [label="Winner Found"];
+ * }
+ * @enddot
+ * 
+ * @section ai_decision_flow AI Decision Flow
+ * 
+ * @dot
+ * digraph ai_decision {
+ *     rankdir=TB;
+ *     node [shape=box, style=filled];
+ *     
+ *     Start [shape=ellipse, fillcolor=lightgreen, label="AI Turn"];
+ *     
+ *     subgraph cluster_analysis {
+ *         label="Analysis Phase";
+ *         style=filled;
+ *         fillcolor=lightyellow;
+ *         
+ *         AnalyzeState [label="Analyze\nGame State"];
+ *         CalcProb [label="Calculate\nProbabilities"];
+ *         CheckHistory [label="Check\nGame History"];
+ *         ModelOpponents [label="Model\nOpponents"];
+ *     }
+ *     
+ *     subgraph cluster_strategy {
+ *         label="Strategy Selection";
+ *         style=filled;
+ *         fillcolor=lightcyan;
+ *         
+ *         EvalRisk [label="Evaluate\nRisk Level"];
+ *         ConsiderBluff [label="Consider\nBluffing"];
+ *         CheckCall [label="Check Call\nThreshold"];
+ *     }
+ *     
+ *     Decision [shape=diamond, fillcolor=yellow, label="Make\nDecision"];
+ *     MakeGuess [fillcolor=lightblue, label="Make Guess"];
+ *     CallLiar [fillcolor=lightcoral, label="Call Liar"];
+ *     End [shape=ellipse, fillcolor=lightgreen, label="Return Action"];
+ *     
+ *     Start -> AnalyzeState;
+ *     AnalyzeState -> CalcProb;
+ *     CalcProb -> CheckHistory;
+ *     CheckHistory -> ModelOpponents;
+ *     ModelOpponents -> EvalRisk;
+ *     EvalRisk -> ConsiderBluff;
+ *     ConsiderBluff -> CheckCall;
+ *     CheckCall -> Decision;
+ *     Decision -> MakeGuess [label="Guess"];
+ *     Decision -> CallLiar [label="Call"];
+ *     MakeGuess -> End;
+ *     CallLiar -> End;
+ * }
+ * @enddot
+ * 
+ * @section data_flow_diagram Data Flow
+ * 
+ * @dot
+ * digraph data_flow {
+ *     rankdir=LR;
+ *     node [shape=box];
+ *     
+ *     subgraph cluster_input {
+ *         label="Input Sources";
+ *         style=filled;
+ *         fillcolor=lightgreen;
+ *         
+ *         UserInput [label="User Input\n(CLI)"];
+ *         AIEngine [label="AI Engine"];
+ *     }
+ *     
+ *     subgraph cluster_processing {
+ *         label="Processing";
+ *         style=filled;
+ *         fillcolor=lightyellow;
+ *         
+ *         Validation [label="Input\nValidation"];
+ *         GameLogic [label="Game Logic\nProcessing"];
+ *         StateUpdate [label="State\nUpdate"];
+ *     }
+ *     
+ *     subgraph cluster_storage {
+ *         label="Storage";
+ *         style=filled;
+ *         fillcolor=lightcyan;
+ *         
+ *         MemoryState [label="In-Memory\nState"];
+ *         CompactState [label="Compact\nState"];
+ *         Database [label="SQLite\nDatabase"];
+ *     }
+ *     
+ *     subgraph cluster_output {
+ *         label="Output";
+ *         style=filled;
+ *         fillcolor=lightcoral;
+ *         
+ *         Display [label="Display\n(CLI)"];
+ *         Events [label="Event\nNotifications"];
+ *         Logs [label="Logs"];
+ *     }
+ *     
+ *     UserInput -> Validation;
+ *     AIEngine -> Validation;
+ *     Validation -> GameLogic;
+ *     GameLogic -> StateUpdate;
+ *     StateUpdate -> MemoryState;
+ *     StateUpdate -> CompactState;
+ *     StateUpdate -> Database;
+ *     MemoryState -> Display;
+ *     StateUpdate -> Events;
+ *     StateUpdate -> Logs;
+ * }
+ * @enddot
+ * 
+ * @section class_hierarchy Class Hierarchy
+ * 
+ * @dot
+ * digraph class_hierarchy {
+ *     rankdir=TB;
+ *     node [shape=box, style=filled];
+ *     edge [arrowhead=empty];
+ *     
+ *     // Player hierarchy
+ *     Player [fillcolor=lightblue, label="Player\n(Abstract)"];
+ *     HumanPlayer [fillcolor=lightgreen];
+ *     AIPlayer [fillcolor=lightgreen];
+ *     
+ *     Player -> HumanPlayer;
+ *     Player -> AIPlayer;
+ *     
+ *     // AI Strategy hierarchy
+ *     IAIStrategy [fillcolor=lightblue, label="IAIStrategy\n(Interface)"];
+ *     EasyAI [fillcolor=lightyellow, label="EasyAIStrategy"];
+ *     MediumAI [fillcolor=lightyellow, label="MediumAIStrategy"];
+ *     HardAI [fillcolor=lightyellow, label="HardAIStrategy\n(Future)"];
+ *     
+ *     IAIStrategy -> EasyAI;
+ *     IAIStrategy -> MediumAI;
+ *     IAIStrategy -> HardAI;
+ *     
+ *     AIPlayer -> IAIStrategy [label="uses", style=dashed, arrowhead=normal];
+ *     
+ *     // Database hierarchy
+ *     DatabaseConnection [fillcolor=lightcyan, label="DatabaseConnection\n(Abstract)"];
+ *     SQLiteConnection [fillcolor=lightgreen, label="SQLiteConnection"];
+ *     PooledConnection [fillcolor=lightgreen, label="PooledConnection"];
+ *     
+ *     DatabaseConnection -> SQLiteConnection;
+ *     DatabaseConnection -> PooledConnection;
+ * }
+ * @enddot
+ * 
+ * @section database_erd Database Entity Relationship Diagram
+ * 
+ * @dot
+ * digraph database_erd {
+ *     rankdir=TB;
+ *     node [shape=record, style=filled, fillcolor=lightblue];
+ *     edge [arrowhead=crow, arrowtail=crow];
+ *     
+ *     players [label="{players|id : INTEGER PK\l|username : TEXT\l|display_name : TEXT\l|email : TEXT\l|total_games : INTEGER\l|games_won : INTEGER\l|...\l}"];
+ *     
+ *     game_history [label="{game_history|id : INTEGER PK\l|game_uuid : TEXT\l|started_at : TIMESTAMP\l|ended_at : TIMESTAMP\l|winner_id : INTEGER FK\l|...\l}"];
+ *     
+ *     game_participants [label="{game_participants|game_id : INTEGER FK\l|player_id : INTEGER FK\l|starting_position : INTEGER\l|final_position : INTEGER\l|points_scored : INTEGER\l|...\l}"];
+ *     
+ *     game_rounds [label="{game_rounds|id : INTEGER PK\l|game_id : INTEGER FK\l|round_number : INTEGER\l|starting_player_id : INTEGER FK\l|ending_player_id : INTEGER FK\l|...\l}"];
+ *     
+ *     player_actions [label="{player_actions|id : INTEGER PK\l|game_id : INTEGER FK\l|round_number : INTEGER\l|player_id : INTEGER FK\l|action_type : TEXT\l|...\l}"];
+ *     
+ *     player_statistics [label="{player_statistics|player_id : INTEGER PK FK\l|avg_game_duration : INTEGER\l|win_rate : REAL\l|bluff_success_rate : REAL\l|...\l}"];
+ *     
+ *     achievements [label="{achievements|id : INTEGER PK\l|code : TEXT\l|name : TEXT\l|description : TEXT\l|points : INTEGER\l|...\l}"];
+ *     
+ *     player_achievements [label="{player_achievements|player_id : INTEGER FK\l|achievement_id : INTEGER FK\l|earned_at : TIMESTAMP\l|game_id : INTEGER FK\l}"];
+ *     
+ *     // Relationships
+ *     players -> game_history [label="1:N", dir=back];
+ *     players -> game_participants [label="1:N"];
+ *     game_history -> game_participants [label="1:N"];
+ *     game_history -> game_rounds [label="1:N"];
+ *     players -> game_rounds [label="1:N"];
+ *     players -> player_actions [label="1:N"];
+ *     game_history -> player_actions [label="1:N"];
+ *     players -> player_statistics [label="1:1"];
+ *     players -> player_achievements [label="1:N"];
+ *     achievements -> player_achievements [label="1:N"];
+ *     game_history -> player_achievements [label="1:N", style=dashed];
+ * }
+ * @enddot
+ * 
+ * @section memory_layout Memory Layout Optimization
+ * 
+ * @dot
+ * digraph memory_layout {
+ *     rankdir=TB;
+ *     node [shape=record];
+ *     
+ *     subgraph cluster_compact {
+ *         label="CompactGameState (8 bytes)";
+ *         style=filled;
+ *         fillcolor=lightyellow;
+ *         
+ *         compact [label="{Bit Layout|{Dice Values\n15 bits|Player State\n8 bits|Last Action\n16 bits|Padding\n25 bits}}"];
+ *     }
+ *     
+ *     subgraph cluster_pool {
+ *         label="Memory Pool";
+ *         style=filled;
+ *         fillcolor=lightcyan;
+ *         
+ *         pool [label="{Pool Allocator|{Free List|Block 1|Block 2|...|Block N}}"];
+ *     }
+ *     
+ *     subgraph cluster_cache {
+ *         label="LRU Cache";
+ *         style=filled;
+ *         fillcolor=lightgreen;
+ *         
+ *         cache [label="{Multi-Index Container|{Hash Index|Time Index|Data Blocks}}"];
+ *     }
+ *     
+ *     compact -> pool [label="allocates from"];
+ *     cache -> pool [label="uses"];
+ * }
+ * @enddot
+ * 
+ * @section deployment_diagram Deployment Architecture
+ * 
+ * @dot
+ * digraph deployment {
+ *     rankdir=TB;
+ *     node [shape=box3d, style=filled];
+ *     
+ *     subgraph cluster_dev {
+ *         label="Development Environment";
+ *         style=filled;
+ *         fillcolor=lightgreen;
+ *         
+ *         DevMachine [label="Developer\nMachine", fillcolor=white];
+ *         LocalBuild [label="Local Build\n(CMake)", fillcolor=lightblue];
+ *         LocalTests [label="Unit Tests\n(Boost.Test)", fillcolor=lightblue];
+ *         RobotTests [label="Robot Tests", fillcolor=lightblue];
+ *     }
+ *     
+ *     subgraph cluster_ci {
+ *         label="CI/CD Pipeline";
+ *         style=filled;
+ *         fillcolor=lightyellow;
+ *         
+ *         GitHub [label="GitHub\nRepository", fillcolor=white];
+ *         Actions [label="GitHub\nActions", fillcolor=lightcyan];
+ *         Ubuntu [label="Ubuntu\nBuild", fillcolor=lightblue];
+ *         MacOS [label="macOS\nBuild", fillcolor=lightblue];
+ *         Windows [label="Windows\nBuild", fillcolor=lightblue];
+ *         Docs [label="Documentation\nBuild", fillcolor=lightcoral];
+ *     }
+ *     
+ *     subgraph cluster_artifacts {
+ *         label="Artifacts";
+ *         style=filled;
+ *         fillcolor=lightcyan;
+ *         
+ *         Binary [label="Game\nBinary", fillcolor=white];
+ *         Library [label="Static\nLibrary", fillcolor=white];
+ *         Documentation [label="HTML\nDocs", fillcolor=white];
+ *         Coverage [label="Coverage\nReport", fillcolor=white];
+ *     }
+ *     
+ *     DevMachine -> GitHub [label="push"];
+ *     GitHub -> Actions [label="trigger"];
+ *     Actions -> Ubuntu;
+ *     Actions -> MacOS;
+ *     Actions -> Windows;
+ *     Actions -> Docs;
+ *     Ubuntu -> Binary;
+ *     Ubuntu -> Library;
+ *     Ubuntu -> Coverage;
+ *     Docs -> Documentation;
+ * }
+ * @enddot
+ * 
+ * @section See Also
+ * - @ref architecture "Architecture Overview"
+ * - @ref database "Database System"
+ * - @ref ai_system "AI System"
+ */

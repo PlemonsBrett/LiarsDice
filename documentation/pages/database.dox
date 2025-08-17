@@ -35,7 +35,7 @@
  * 
  * @subsection connection_pool Connection Pool
  * 
- * The @ref liarsdice::database::ConnectionPool manages a pool of database connections for 
+ * The connection pool (managed by @ref liarsdice::database::ConnectionPool) manages a pool of database connections for 
  * concurrent access:
  * - Thread-safe connection acquisition and release
  * - Configurable pool size (default: 4 connections)
@@ -59,6 +59,9 @@
  * - Schema validation
  * 
  * @section database_schema Database Schema
+ * 
+ * @note Some fields in the schema are marked for future implementation and may not be 
+ * actively used in the current version. These are maintained for forward compatibility.
  * 
  * @subsection schema_tables Core Tables (V001 - Initial Schema)
  * 
@@ -207,7 +210,7 @@
  *     snapshot_date DATE NOT NULL,
  *     rank INTEGER NOT NULL,
  *     player_id INTEGER NOT NULL,
- *     rating INTEGER NOT NULL,
+ *     elo_rating INTEGER NOT NULL,  -- Player's ELO rating at snapshot time
  *     games_played INTEGER NOT NULL,
  *     win_rate REAL NOT NULL,
  *     UNIQUE(snapshot_date, rank),
@@ -406,4 +409,5 @@
  * @see liarsdice::database::DatabaseManager
  * @see liarsdice::database::ConnectionPool
  * @see liarsdice::database::SchemaManager
+ * @see liarsdice::database::ConnectionManager
  */

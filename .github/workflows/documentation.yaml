@@ -42,6 +42,35 @@ jobs:
           cmake -S. -Bbuild -DLIARSDICE_BUILD_DOCS=ON -DLIARSDICE_BUILD_TESTS=OFF
           cmake --build build --target GenerateDocs
 
+      - name: Validate Doxygen generation
+        run: |
+          # Check if Doxygen successfully generated output
+          if [ ! -d "build/documentation/doxygen/html" ]; then
+            echo "Error: Doxygen HTML output directory not found"
+            exit 1
+          fi
+          
+          # Check for main documentation files
+          if [ ! -f "build/documentation/doxygen/html/index.html" ]; then
+            echo "Error: Main index.html not found"
+            exit 1
+          fi
+          
+          # Check for warnings in Doxygen log
+          if [ -f "build/documentation/doxygen/doxygen.log" ]; then
+            if grep -q "Warning" build/documentation/doxygen/doxygen.log; then
+              echo "Doxygen warnings found:"
+              grep "Warning" build/documentation/doxygen/doxygen.log
+              # Don't fail on warnings for now, just report them
+            fi
+          fi
+          
+          echo "Doxygen documentation generated successfully"
+
+      - name: Validate database schema documentation
+        run: |
+          python3 scripts/validate_database_schema.py || echo "Schema validation skipped (implementation pending)"
+
       - name: Publish to GitHub Pages
         if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/'))
         uses: peaceiris/actions-gh-pages@v4

@@ -105,6 +105,18 @@ comprehensive testing framework.
 ./test/robot/run_tests.sh
 ```
 
+# Architecture & Design
+
+- @subpage architecture_diagrams "Architecture Diagrams" - Visual system design documentation
+  - System architecture overview
+  - Game flow diagrams
+  - AI decision flow
+  - Data flow diagrams
+  - Class hierarchy
+  - Database ERD
+  - Memory layout optimization
+  - Deployment architecture
+
 # Navigation
 
 Use the navigation menu to explore:
