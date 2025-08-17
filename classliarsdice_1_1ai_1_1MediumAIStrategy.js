@@ -1,0 +1,25 @@
+var classliarsdice_1_1ai_1_1MediumAIStrategy =
+[
+    [ "MediumConfig", "structliarsdice_1_1ai_1_1MediumAIStrategy_1_1MediumConfig.html", "structliarsdice_1_1ai_1_1MediumAIStrategy_1_1MediumConfig" ],
+    [ "OpponentPattern", "structliarsdice_1_1ai_1_1MediumAIStrategy_1_1OpponentPattern.html", "structliarsdice_1_1ai_1_1MediumAIStrategy_1_1OpponentPattern" ],
+    [ "MediumAIStrategy", "classliarsdice_1_1ai_1_1MediumAIStrategy.html#a6f1081c7125382c20ce489cc87d113bf", null ],
+    [ "MediumAIStrategy", "classliarsdice_1_1ai_1_1MediumAIStrategy.html#a8d9055f02a033089b73590b741c22306", null ],
+    [ "analyze_dice_patterns", "classliarsdice_1_1ai_1_1MediumAIStrategy.html#addf701a4941f5e635043e84066a3bfaa", null ],
+    [ "calculate_bayesian_probability", "classliarsdice_1_1ai_1_1MediumAIStrategy.html#a154d8050b1ec92443696d78f942b1b31", null ],
+    [ "decide_call_liar", "classliarsdice_1_1ai_1_1MediumAIStrategy.html#a5412f5323d0960608729f0429605742d", null ],
+    [ "detect_bluff_probability", "classliarsdice_1_1ai_1_1MediumAIStrategy.html#aeed7c9a7a27e48653bb77c7d261a916f", null ],
+    [ "generate_strategic_guess", "classliarsdice_1_1ai_1_1MediumAIStrategy.html#a136d252fd32c60e4533b34bc965a57e1", null ],
+    [ "get_config", "classliarsdice_1_1ai_1_1MediumAIStrategy.html#a916e7f99777d80a711f1412f0bf23e52", null ],
+    [ "invalidate_cache", "classliarsdice_1_1ai_1_1MediumAIStrategy.html#a59a55b301857c173f85b3aff4b8feb65", null ],
+    [ "make_guess", "classliarsdice_1_1ai_1_1MediumAIStrategy.html#aa7a3ce5bb9d590f933745c62bec2a78e", null ],
+    [ "set_config", "classliarsdice_1_1ai_1_1MediumAIStrategy.html#a21a8734a61d6ca5c3cfe557c1252e6e5", null ],
+    [ "set_game_history", "classliarsdice_1_1ai_1_1MediumAIStrategy.html#af892e3b8bfc2e565fbc7992e7c6e3d29", null ],
+    [ "set_game_state", "classliarsdice_1_1ai_1_1MediumAIStrategy.html#abd16815e8d2cc8d3c8474f99004c265f", null ],
+    [ "update_opponent_model", "classliarsdice_1_1ai_1_1MediumAIStrategy.html#ade9573f7bfbc9e2518e9efdcfab793c6", null ],
+    [ "cache_valid_", "classliarsdice_1_1ai_1_1MediumAIStrategy.html#a11aa10049ecfdb2b7a9e1282f961b648", null ],
+    [ "cached_face_probabilities_", "classliarsdice_1_1ai_1_1MediumAIStrategy.html#a188837bcda5ec90a2b44b77435a0a235", null ],
+    [ "config_", "classliarsdice_1_1ai_1_1MediumAIStrategy.html#a75e974750921c23bf34db42057248d6f", null ],
+    [ "game_history_", "classliarsdice_1_1ai_1_1MediumAIStrategy.html#ae9dca390e5b0a979d12e5fcfe2491fca", null ],
+    [ "game_state_", "classliarsdice_1_1ai_1_1MediumAIStrategy.html#ab73bb95cc7b5c3a1959c0763734d1f10", null ],
+    [ "opponent_models_", "classliarsdice_1_1ai_1_1MediumAIStrategy.html#af3d353d95b4bae0b39ccb94ee4d4352b", null ]
+];

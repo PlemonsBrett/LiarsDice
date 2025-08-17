@@ -1,0 +1,46 @@
+var namespaceliarsdice_1_1database =
+[
+    [ "BackupInfo", "structliarsdice_1_1database_1_1BackupInfo.html", "structliarsdice_1_1database_1_1BackupInfo" ],
+    [ "BackupManager", "classliarsdice_1_1database_1_1BackupManager.html", "classliarsdice_1_1database_1_1BackupManager" ],
+    [ "ConnectionManager", "classliarsdice_1_1database_1_1ConnectionManager.html", "classliarsdice_1_1database_1_1ConnectionManager" ],
+    [ "ConnectionPool", "classliarsdice_1_1database_1_1ConnectionPool.html", "classliarsdice_1_1database_1_1ConnectionPool" ],
+    [ "DatabaseConfig", "classliarsdice_1_1database_1_1DatabaseConfig.html", "classliarsdice_1_1database_1_1DatabaseConfig" ],
+    [ "DatabaseConnection", "classliarsdice_1_1database_1_1DatabaseConnection.html", "classliarsdice_1_1database_1_1DatabaseConnection" ],
+    [ "DatabaseError", "classliarsdice_1_1database_1_1DatabaseError.html", "classliarsdice_1_1database_1_1DatabaseError" ],
+    [ "DatabaseInitConfig", "structliarsdice_1_1database_1_1DatabaseInitConfig.html", "structliarsdice_1_1database_1_1DatabaseInitConfig" ],
+    [ "DatabaseInitializer", "classliarsdice_1_1database_1_1DatabaseInitializer.html", "classliarsdice_1_1database_1_1DatabaseInitializer" ],
+    [ "DatabaseManager", "classliarsdice_1_1database_1_1DatabaseManager.html", "classliarsdice_1_1database_1_1DatabaseManager" ],
+    [ "DatabaseResult", "classliarsdice_1_1database_1_1DatabaseResult.html", "classliarsdice_1_1database_1_1DatabaseResult" ],
+    [ "DatabaseResult< void >", "classliarsdice_1_1database_1_1DatabaseResult_3_01void_01_4.html", "classliarsdice_1_1database_1_1DatabaseResult_3_01void_01_4" ],
+    [ "FileMigration", "classliarsdice_1_1database_1_1FileMigration.html", "classliarsdice_1_1database_1_1FileMigration" ],
+    [ "Migration", "classliarsdice_1_1database_1_1Migration.html", "classliarsdice_1_1database_1_1Migration" ],
+    [ "PreparedStatement", "classliarsdice_1_1database_1_1PreparedStatement.html", "classliarsdice_1_1database_1_1PreparedStatement" ],
+    [ "RetentionPolicy", "structliarsdice_1_1database_1_1RetentionPolicy.html", "structliarsdice_1_1database_1_1RetentionPolicy" ],
+    [ "SchemaConstraint", "structliarsdice_1_1database_1_1SchemaConstraint.html", "structliarsdice_1_1database_1_1SchemaConstraint" ],
+    [ "SchemaManager", "classliarsdice_1_1database_1_1SchemaManager.html", "classliarsdice_1_1database_1_1SchemaManager" ],
+    [ "SchemaValidator", "classliarsdice_1_1database_1_1SchemaValidator.html", "classliarsdice_1_1database_1_1SchemaValidator" ],
+    [ "SchemaVersion", "structliarsdice_1_1database_1_1SchemaVersion.html", "structliarsdice_1_1database_1_1SchemaVersion" ],
+    [ "SeedDataEntry", "structliarsdice_1_1database_1_1SeedDataEntry.html", "structliarsdice_1_1database_1_1SeedDataEntry" ],
+    [ "SQLiteExtensionManager", "classliarsdice_1_1database_1_1SQLiteExtensionManager.html", "classliarsdice_1_1database_1_1SQLiteExtensionManager" ],
+    [ "ValidationReport", "structliarsdice_1_1database_1_1ValidationReport.html", "structliarsdice_1_1database_1_1ValidationReport" ],
+    [ "ConstraintType", "namespaceliarsdice_1_1database.html#af2968d02b6583dfefebb6b911f232f7f", [
+      [ "NotNull", "namespaceliarsdice_1_1database.html#af2968d02b6583dfefebb6b911f232f7fa0d162bc2f114996905081b87bc44869a", null ],
+      [ "Unique", "namespaceliarsdice_1_1database.html#af2968d02b6583dfefebb6b911f232f7fad019979a29c88c8d69bab3a63388da97", null ],
+      [ "PrimaryKey", "namespaceliarsdice_1_1database.html#af2968d02b6583dfefebb6b911f232f7fa29d1af362ab973271770de185604cae2", null ],
+      [ "ForeignKey", "namespaceliarsdice_1_1database.html#af2968d02b6583dfefebb6b911f232f7fa7e74eb738ee51f3276cb80b1711a4140", null ],
+      [ "Check", "namespaceliarsdice_1_1database.html#af2968d02b6583dfefebb6b911f232f7fa060bf2d587991d8f090a1309b285291c", null ],
+      [ "Default", "namespaceliarsdice_1_1database.html#af2968d02b6583dfefebb6b911f232f7fa7a1920d61156abc05a60135aefe8bc67", null ],
+      [ "Index", "namespaceliarsdice_1_1database.html#af2968d02b6583dfefebb6b911f232f7fa88fa71f0a6e0dfedbb46d91cc0b37a50", null ]
+    ] ],
+    [ "DatabaseErrorType", "namespaceliarsdice_1_1database.html#ad8234c4d1d4363e254e21f2488d2c27c", [
+      [ "ConnectionFailed", "namespaceliarsdice_1_1database.html#ad8234c4d1d4363e254e21f2488d2c27caaf98071f760be899f4fcf1d53a29ba17", null ],
+      [ "QueryFailed", "namespaceliarsdice_1_1database.html#ad8234c4d1d4363e254e21f2488d2c27cad14f393e86cbe5976f0457ae2a0fcc49", null ],
+      [ "TransactionFailed", "namespaceliarsdice_1_1database.html#ad8234c4d1d4363e254e21f2488d2c27cabd751916a2147b0d25806da5effaf44d", null ],
+      [ "PreparedStatementFailed", "namespaceliarsdice_1_1database.html#ad8234c4d1d4363e254e21f2488d2c27ca363bff0c1b8f38166e61a369c472bf00", null ],
+      [ "ConstraintViolation", "namespaceliarsdice_1_1database.html#ad8234c4d1d4363e254e21f2488d2c27ca93041ae1d2cce73eac2d7a786099f1c0", null ],
+      [ "Timeout", "namespaceliarsdice_1_1database.html#ad8234c4d1d4363e254e21f2488d2c27cac85a251cc457840f1e032f1b733e9398", null ],
+      [ "InvalidParameter", "namespaceliarsdice_1_1database.html#ad8234c4d1d4363e254e21f2488d2c27ca627251310d3384b591e4138be21145d5", null ],
+      [ "InternalError", "namespaceliarsdice_1_1database.html#ad8234c4d1d4363e254e21f2488d2c27ca8462b58246e70e5c83e5b939a9332cb5", null ],
+      [ "BackupFailed", "namespaceliarsdice_1_1database.html#ad8234c4d1d4363e254e21f2488d2c27caee9ddeb1a9d0f2b3082949359d178f10", null ]
+    ] ]
+];

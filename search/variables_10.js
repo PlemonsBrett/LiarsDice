@@ -1,0 +1,22 @@
+var searchData=
+[
+  ['random_5fseed_0',['random_seed',['../structliarsdice_1_1app_1_1AppConfig.html#a557f83c78b181386d606b59de76428c7',1,'liarsdice::app::AppConfig::random_seed'],['../structliarsdice_1_1core_1_1GameConfig.html#ae8340d251905e7c9077db92ff3ab4ed3',1,'liarsdice::core::GameConfig::random_seed']]],
+  ['range_1',['range',['../structliarsdice_1_1statistics_1_1StatisticalAccumulator_1_1Statistics.html#a05213ac684aead615299d9bbd7615675',1,'liarsdice::statistics::StatisticalAccumulator::Statistics']]],
+  ['rate_5f_2',['rate_',['../classliarsdice_1_1bayesian_1_1GammaPrior.html#ab730cc5f8723250d310e2ff57ed362db',1,'liarsdice::bayesian::GammaPrior']]],
+  ['recent_5fguesses_3',['recent_guesses',['../structliarsdice_1_1ai_1_1MediumAIStrategy_1_1OpponentPattern.html#a00e64af96efde6a6ad995837a659f096',1,'liarsdice::ai::MediumAIStrategy::OpponentPattern']]],
+  ['referenced_5ftables_4',['referenced_tables',['../structliarsdice_1_1database_1_1SchemaConstraint.html#ac7723cd9dfac478321e5b5cf2a11e170',1,'liarsdice::database::SchemaConstraint']]],
+  ['required_5ftables_5',['required_tables',['../structliarsdice_1_1database_1_1DatabaseInitConfig.html#abac5191ff651cbcde0c8d6baa40f7617',1,'liarsdice::database::DatabaseInitConfig']]],
+  ['reserved_6',['reserved',['../structliarsdice_1_1core_1_1CompactGameState_1_1LastAction.html#a94a66516e134484f193b92bf153be830',1,'liarsdice::core::CompactGameState::LastAction']]],
+  ['result_5f_7',['result_',['../classliarsdice_1_1database_1_1DatabaseResult.html#ab2d655cf9138b031e7b820bb90799c3d',1,'liarsdice::database::DatabaseResult']]],
+  ['retention_5fpolicy_5f_8',['retention_policy_',['../classliarsdice_1_1database_1_1BackupManager.html#a49bf6b92ad469c9ffb856eeac5a09d12',1,'liarsdice::database::BackupManager']]],
+  ['returner_5f_9',['returner_',['../classliarsdice_1_1database_1_1ConnectionPool_1_1PooledConnection.html#a72f475362a67b75d0980224897404e59',1,'liarsdice::database::ConnectionPool::PooledConnection']]],
+  ['risk_5ftolerance_10',['risk_tolerance',['../structliarsdice_1_1ai_1_1AIPlayer_1_1Strategy.html#a1aefc69d8641a1136f00eefe7ddd96ae',1,'liarsdice::ai::AIPlayer::Strategy::risk_tolerance'],['../structliarsdice_1_1ai_1_1EasyAIStrategy_1_1EasyConfig.html#a77bbfbb904da146abd824da2216488c2',1,'liarsdice::ai::EasyAIStrategy::EasyConfig::risk_tolerance'],['../structliarsdice_1_1ai_1_1MediumAIStrategy_1_1MediumConfig.html#af925b2a2a8a8f1528af93866b156d599',1,'liarsdice::ai::MediumAIStrategy::MediumConfig::risk_tolerance']]],
+  ['rms_11',['rms',['../structliarsdice_1_1statistics_1_1StatisticalAccumulator_1_1Statistics.html#a0135ce46dd38e699dd6891d3f3a704ac',1,'liarsdice::statistics::StatisticalAccumulator::Statistics']]],
+  ['rng_5f_12',['rng_',['../classliarsdice_1_1ai_1_1AIPlayer.html#a306307a128ed9e777d65ccb356a46adf',1,'liarsdice::ai::AIPlayer::rng_'],['../classliarsdice_1_1core_1_1Dice.html#a9dad26889e8d1eed12984ca3fc0a9644',1,'liarsdice::core::Dice::rng_']]],
+  ['rolling_5facc_5f_13',['rolling_acc_',['../classliarsdice_1_1statistics_1_1StatisticalAccumulator.html#a4c8cff133a89158cd6973d4e9a9c6421',1,'liarsdice::statistics::StatisticalAccumulator']]],
+  ['rolling_5fmean_14',['rolling_mean',['../structliarsdice_1_1statistics_1_1StatisticalAccumulator_1_1Statistics.html#ac0969a0c29509c64bbf1aba238855de1',1,'liarsdice::statistics::StatisticalAccumulator::Statistics']]],
+  ['rolling_5fstd_5fdev_15',['rolling_std_dev',['../structliarsdice_1_1statistics_1_1StatisticalAccumulator_1_1Statistics.html#aa0f2bbf10ee28a56a4939afd27b10851',1,'liarsdice::statistics::StatisticalAccumulator::Statistics']]],
+  ['root_5f_16',['root_',['../classliarsdice_1_1data__structures_1_1TrieMap.html#a2631d1aa8b1623009fff1d92f51ee8c5',1,'liarsdice::data_structures::TrieMap']]],
+  ['round_5fnumber_5f_17',['round_number_',['../classliarsdice_1_1core_1_1Game.html#a1c987092af8a8020878a1058a75bef29',1,'liarsdice::core::Game']]],
+  ['run_5fmigrations_18',['run_migrations',['../structliarsdice_1_1database_1_1DatabaseInitConfig.html#a2c281d6038bdc1b95e30102eb7b549f8',1,'liarsdice::database::DatabaseInitConfig']]]
+];

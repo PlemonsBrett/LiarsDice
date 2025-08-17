@@ -1,0 +1,35 @@
+var classliarsdice_1_1database_1_1DatabaseConnection =
+[
+    [ "ConnectionPtr", "classliarsdice_1_1database_1_1DatabaseConnection.html#a1724cbd80b45c80f9e717245b6588ce4", null ],
+    [ "State", "classliarsdice_1_1database_1_1DatabaseConnection.html#a6f1555e1d6b197b22520ce613f570561", [
+      [ "Disconnected", "classliarsdice_1_1database_1_1DatabaseConnection.html#a6f1555e1d6b197b22520ce613f570561aef70e46fd3bbc21e3e1f0b6815e750c0", null ],
+      [ "Connected", "classliarsdice_1_1database_1_1DatabaseConnection.html#a6f1555e1d6b197b22520ce613f570561a2ec0d16e4ca169baedb9b2d50ec5c6d7", null ],
+      [ "Error", "classliarsdice_1_1database_1_1DatabaseConnection.html#a6f1555e1d6b197b22520ce613f570561a902b0d55fddef6f8d651fe1035b7d4bd", null ]
+    ] ],
+    [ "DatabaseConnection", "classliarsdice_1_1database_1_1DatabaseConnection.html#ae845ab951f776a61ce78302d7e432ec2", null ],
+    [ "~DatabaseConnection", "classliarsdice_1_1database_1_1DatabaseConnection.html#a0a08bc4c70855b93bd285cec07a65b26", null ],
+    [ "begin_transaction", "classliarsdice_1_1database_1_1DatabaseConnection.html#a711de83ed678a6f408538dd4e5ff4aa5", null ],
+    [ "check_health", "classliarsdice_1_1database_1_1DatabaseConnection.html#a0016c99912fd05af75021c3769bacaa0", null ],
+    [ "close", "classliarsdice_1_1database_1_1DatabaseConnection.html#a1b63ee14ef8430516fb9d2d05f25c696", null ],
+    [ "commit", "classliarsdice_1_1database_1_1DatabaseConnection.html#ae18215eccad087e5bf2e701f3f28f669", null ],
+    [ "configure_connection", "classliarsdice_1_1database_1_1DatabaseConnection.html#ae2ae59ff33ea6b27a58ad76851c7f6c1", null ],
+    [ "execute", "classliarsdice_1_1database_1_1DatabaseConnection.html#a725c8f4e74feb35e498ca4b4147a412d", null ],
+    [ "get", "classliarsdice_1_1database_1_1DatabaseConnection.html#af18298b3c649d9d92c42dd3ca6a44c29", null ],
+    [ "get_changes", "classliarsdice_1_1database_1_1DatabaseConnection.html#a8bce40879ac72a9d27eb79bfb1e99bb5", null ],
+    [ "get_connection_string", "classliarsdice_1_1database_1_1DatabaseConnection.html#a0d74233bfea6b07794850ef6f106f400", null ],
+    [ "get_idle_time", "classliarsdice_1_1database_1_1DatabaseConnection.html#a4e254291bbf1bf8f13004376958ece98", null ],
+    [ "get_last_error", "classliarsdice_1_1database_1_1DatabaseConnection.html#a15d9053651428b80280c095f10beb6f7", null ],
+    [ "get_last_insert_rowid", "classliarsdice_1_1database_1_1DatabaseConnection.html#a3a1425add770d6d2511a5469516679d1", null ],
+    [ "get_state", "classliarsdice_1_1database_1_1DatabaseConnection.html#a2eefe29a8b3f66ce4c6114f34b90a2b5", null ],
+    [ "is_open", "classliarsdice_1_1database_1_1DatabaseConnection.html#a3d8a581efd80498cc96ecc3835e15ce8", null ],
+    [ "open", "classliarsdice_1_1database_1_1DatabaseConnection.html#aee4d8dd6d94fb69f261d134e22fe20d7", null ],
+    [ "rollback", "classliarsdice_1_1database_1_1DatabaseConnection.html#a999d2e620b0fe6334506f8cd51c678d4", null ],
+    [ "set_busy_timeout", "classliarsdice_1_1database_1_1DatabaseConnection.html#ac95695d2de96389d88437ee89b2998c3", null ],
+    [ "update_activity", "classliarsdice_1_1database_1_1DatabaseConnection.html#a50f49647d815474ff54078ce54187fc7", null ],
+    [ "connection_", "classliarsdice_1_1database_1_1DatabaseConnection.html#a939baccc4637238171bfabd69be7128d", null ],
+    [ "connection_string_", "classliarsdice_1_1database_1_1DatabaseConnection.html#a4647c99af6eb985326ef80130ea01ee3", null ],
+    [ "last_activity_", "classliarsdice_1_1database_1_1DatabaseConnection.html#a600540fd7f05e40752f1817863bc56d2", null ],
+    [ "last_error_", "classliarsdice_1_1database_1_1DatabaseConnection.html#a88574275d351cd4c1995e6fdf3fdacec", null ],
+    [ "mutex_", "classliarsdice_1_1database_1_1DatabaseConnection.html#a52fd702c249836b5eb583017dcb50193", null ],
+    [ "state_", "classliarsdice_1_1database_1_1DatabaseConnection.html#ac7ef10d193769b4ac87eadc40480ae98", null ]
+];

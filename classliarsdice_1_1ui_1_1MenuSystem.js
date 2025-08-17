@@ -1,0 +1,25 @@
+var classliarsdice_1_1ui_1_1MenuSystem =
+[
+    [ "InputValidator", "classliarsdice_1_1ui_1_1MenuSystem.html#ac731e091e83098ebff6f96459b437a5f", null ],
+    [ "MenuAction", "classliarsdice_1_1ui_1_1MenuSystem.html#a1d05c73012db6b2cf2fa97235a848e6a", null ],
+    [ "MenuSystem", "classliarsdice_1_1ui_1_1MenuSystem.html#a60ac9cee1ea17dcc742ef6484d73ed33", null ],
+    [ "apply_color", "classliarsdice_1_1ui_1_1MenuSystem.html#a8efa1f3a11a54dba05d4cb42fcb7bfa0", null ],
+    [ "apply_style", "classliarsdice_1_1ui_1_1MenuSystem.html#a728ddd05d72737c4913069f15828d93d", null ],
+    [ "clear_screen", "classliarsdice_1_1ui_1_1MenuSystem.html#a920b378d22da0f3e8a7693f9ad2e71a1", null ],
+    [ "confirm", "classliarsdice_1_1ui_1_1MenuSystem.html#af5446eebd1787bb878b44467d92b5e2f", null ],
+    [ "display_error", "classliarsdice_1_1ui_1_1MenuSystem.html#aa2cce9921bd37d96012d347dd4285e4e", null ],
+    [ "display_menu", "classliarsdice_1_1ui_1_1MenuSystem.html#a79d66a222364695e49f938e8022ec532", null ],
+    [ "display_message", "classliarsdice_1_1ui_1_1MenuSystem.html#a2df0905d0ee08617d5a9dcd7e3a76589", null ],
+    [ "display_text", "classliarsdice_1_1ui_1_1MenuSystem.html#ada014f0ab8b64b0e8585d589919e5614", null ],
+    [ "get_input", "classliarsdice_1_1ui_1_1MenuSystem.html#af2c7d5f1af8ec7cbd71051758b61f36a", null ],
+    [ "get_input_with_validation", "classliarsdice_1_1ui_1_1MenuSystem.html#aceee6a978eff36a8bad491dd7a8c66fc", null ],
+    [ "is_exit_requested", "classliarsdice_1_1ui_1_1MenuSystem.html#aeb6030e88393855c376a391a17b6341e", null ],
+    [ "register_action", "classliarsdice_1_1ui_1_1MenuSystem.html#a878d3a614add5fa569284330deadabea", null ],
+    [ "reset_color", "classliarsdice_1_1ui_1_1MenuSystem.html#a8e3e73af9d81052dcf2467c1f1b28259", null ],
+    [ "run_menu", "classliarsdice_1_1ui_1_1MenuSystem.html#a8a2912b82dc5d22f07f70b2190f7dc38", null ],
+    [ "set_exit_requested", "classliarsdice_1_1ui_1_1MenuSystem.html#a3b3ac64e212393b9bd37efdc4b073753", null ],
+    [ "validate_input", "classliarsdice_1_1ui_1_1MenuSystem.html#a1965c7cc4c90d2fa5cf6522c30ba59a8", null ],
+    [ "config_", "classliarsdice_1_1ui_1_1MenuSystem.html#a402024acedfe6e88711dc3622b9129dd", null ],
+    [ "exit_requested_", "classliarsdice_1_1ui_1_1MenuSystem.html#ae5ed6e330f5782490fd11b842427f652", null ],
+    [ "menu_actions_", "classliarsdice_1_1ui_1_1MenuSystem.html#a3ad5bc598c1ca2c5ac1219ea16491b43", null ]
+];

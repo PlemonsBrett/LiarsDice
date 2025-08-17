@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Architecture | Liar's
+  <title>Liar&#x27;s Dice Documentation &raquo; Architecture | Liar's
 Dice</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,400i,600,600i%7CSource+Code+Pro:400,400i,600" />
   <link rel="stylesheet" href="m-dark+documentation.compiled.css" />
@@ -48,6 +48,7 @@ Dice</a>
     <div class="m-row">
       <div class="m-col-l-10 m-push-l-1">
         <h1>
+          <span class="m-breadcrumb"><a href="index.html">Liar&#x27;s Dice Documentation</a> &raquo;</span>
           Architecture
         </h1>
 <section id="arch_overview"><h2><a href="#arch_overview">Architecture Overview</a></h2><p>The Liar&#x27;s Dice project follows clean architecture principles with clear separation of concerns and dependency inversion. The architecture is designed to be testable, maintainable, and extensible.</p></section><section id="layers"><h2><a href="#layers">Architectural Layers</a></h2><section id="core_layer"><h3><a href="#core_layer">Core Layer</a></h3><p>The innermost layer containing business logic and domain entities:</p><ul><li><strong>Game</strong>: Central game controller managing game flow and rules</li><li><strong>Player</strong>: Base class for human and AI players</li><li><strong>Dice</strong>: Dice rolling and management</li><li><strong>Guess</strong>: Game guess validation and comparison</li><li><strong>GameEvents</strong>: Event system for decoupled communication</li></ul></section><section id="ai_layer"><h3><a href="#ai_layer">AI Layer</a></h3><p>Strategy pattern implementation for AI players:</p><ul><li><strong>IAIStrategy</strong>: Pure virtual interface for AI strategies</li><li><strong>AIStrategyFactory</strong>: Factory with type erasure for strategy creation</li><li><strong>EasyAIStrategy</strong>: Simple heuristics-based AI</li><li><strong>MediumAIStrategy</strong>: Statistical analysis with pattern recognition</li><li><strong>HardAIStrategy</strong>: Advanced opponent modeling (future)</li></ul></section><section id="infrastructure"><h3><a href="#infrastructure">Infrastructure Layer</a></h3><p>Supporting services and utilities:</p><ul><li><strong>Logging</strong>: Structured logging with spdlog</li><li><strong>Configuration</strong>: Hierarchical configuration system</li><li><strong>Exceptions</strong>: Custom exception hierarchy</li><li><strong>Data Structures</strong>: High-performance containers</li><li><strong>Statistics</strong>: Statistical analysis tools</li></ul></section><section id="application"><h3><a href="#application">Application Layer</a></h3><p>User interface and application logic:</p><ul><li><strong>CLI Application</strong>: Command-line interface</li><li><strong>Game Setup</strong>: Player configuration and initialization</li><li><strong>UI Rendering</strong>: Console-based game visualization</li></ul></section></section><section id="patterns"><h2><a href="#patterns">Design Patterns</a></h2><section id="dependency_injection"><h3><a href="#dependency_injection">Dependency Injection</a></h3><p>Custom lightweight DI container for managing dependencies:</p><pre class="m-code"><span class="c1">// Service registration</span>

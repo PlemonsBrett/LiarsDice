@@ -1,0 +1,26 @@
+var classliarsdice_1_1database_1_1DatabaseManager =
+[
+    [ "CacheStats", "structliarsdice_1_1database_1_1DatabaseManager_1_1CacheStats.html", "structliarsdice_1_1database_1_1DatabaseManager_1_1CacheStats" ],
+    [ "QueryCallback", "classliarsdice_1_1database_1_1DatabaseManager.html#a1202e20134f500eb99028f64b1dd5842", null ],
+    [ "TransactionFunc", "classliarsdice_1_1database_1_1DatabaseManager.html#ac295f0f27fd53d19ecbcbc13ce94c88d", null ],
+    [ "DatabaseManager", "classliarsdice_1_1database_1_1DatabaseManager.html#a4a08698e7dd6c7285a9ba7da49d94c6f", null ],
+    [ "~DatabaseManager", "classliarsdice_1_1database_1_1DatabaseManager.html#adc72d7352179743b61a301a48326b479", null ],
+    [ "begin_transaction", "classliarsdice_1_1database_1_1DatabaseManager.html#a1c2c3fdd03bd35dfd81e6a59d13e00c7", null ],
+    [ "clear_statement_cache", "classliarsdice_1_1database_1_1DatabaseManager.html#a6a18a4f1cf7b21e0e877235af4b2bb99", null ],
+    [ "commit_transaction", "classliarsdice_1_1database_1_1DatabaseManager.html#ac652ec993cc69f3b9430dac65e15e543", null ],
+    [ "execute", "classliarsdice_1_1database_1_1DatabaseManager.html#a1bd2c91f1325c95e5db138dedd31dced", null ],
+    [ "execute_prepared", "classliarsdice_1_1database_1_1DatabaseManager.html#af75800ebf8bfa157a585035747f3633b", null ],
+    [ "get_cache_stats", "classliarsdice_1_1database_1_1DatabaseManager.html#a0448ae5fc99dc993d1f0868ef944086d", null ],
+    [ "in_transaction", "classliarsdice_1_1database_1_1DatabaseManager.html#a3ed86b946408a086eaf2fda8a183188c", null ],
+    [ "prepare", "classliarsdice_1_1database_1_1DatabaseManager.html#a1ab9a75018dffe24f8d37d1d20b349dd", null ],
+    [ "rollback_transaction", "classliarsdice_1_1database_1_1DatabaseManager.html#a6417d8beb284edcb36bb1094acfbf9fa", null ],
+    [ "with_transaction", "classliarsdice_1_1database_1_1DatabaseManager.html#ad87dc00d6254c4f67a4c076873dade49", null ],
+    [ "cache_lru_list_", "classliarsdice_1_1database_1_1DatabaseManager.html#a6364a9ae5b49016694e35e5718bc1fa8", null ],
+    [ "cache_lru_map_", "classliarsdice_1_1database_1_1DatabaseManager.html#a45283cf19eeb5112ea47caaa256839cb", null ],
+    [ "cache_mutex_", "classliarsdice_1_1database_1_1DatabaseManager.html#a270ab0aa01ebf46d83e9fbb784bfd0d8", null ],
+    [ "in_transaction_", "classliarsdice_1_1database_1_1DatabaseManager.html#aba66494a9e8c168ed938c8eb20429faf", null ],
+    [ "MAX_CACHE_MEMORY_MB", "classliarsdice_1_1database_1_1DatabaseManager.html#a751afc169677fcfe803ce81b59b031cd", null ],
+    [ "MAX_CACHED_STATEMENTS", "classliarsdice_1_1database_1_1DatabaseManager.html#ad805c34b11dfddeccb70841a0ee31106", null ],
+    [ "statement_cache_", "classliarsdice_1_1database_1_1DatabaseManager.html#a8f2fbfcbba2ef8347a31c4d0fbff5db0", null ],
+    [ "transaction_conn_", "classliarsdice_1_1database_1_1DatabaseManager.html#a5d828514df7618c1d8440b3deed427c5", null ]
+];

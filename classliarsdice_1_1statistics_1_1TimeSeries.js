@@ -1,0 +1,26 @@
+var classliarsdice_1_1statistics_1_1TimeSeries =
+[
+    [ "buffer_type", "classliarsdice_1_1statistics_1_1TimeSeries.html#a584e0091739f0417d22f7f53b7b26acf", null ],
+    [ "duration", "classliarsdice_1_1statistics_1_1TimeSeries.html#a17d0c6b6f3030eb7b8e6e28c147c3b2e", null ],
+    [ "time_point", "classliarsdice_1_1statistics_1_1TimeSeries.html#af57a1c6e31963b5bd735cc1a7898abae", null ],
+    [ "value_type", "classliarsdice_1_1statistics_1_1TimeSeries.html#ab6bc460fe9b741d4273adf778b70c2fd", null ],
+    [ "TimeSeries", "classliarsdice_1_1statistics_1_1TimeSeries.html#af1e607e1cba528806d4d436b1956bede", null ],
+    [ "add", "classliarsdice_1_1statistics_1_1TimeSeries.html#a16adbcc50655f1864b961f540d5e9ca9", null ],
+    [ "add", "classliarsdice_1_1statistics_1_1TimeSeries.html#a50f5eb436db363fdef288738e7761625", null ],
+    [ "autocorrelation", "classliarsdice_1_1statistics_1_1TimeSeries.html#adc8c2fcf236a352d142314eb78311d1a", null ],
+    [ "clear", "classliarsdice_1_1statistics_1_1TimeSeries.html#ac9962fdf2d82ae63385e2585a76b4407", null ],
+    [ "detect_outliers", "classliarsdice_1_1statistics_1_1TimeSeries.html#aacabed0756ea38b009793c7c9cebe26e", null ],
+    [ "empty", "classliarsdice_1_1statistics_1_1TimeSeries.html#a3d9d1274661fe3415b235e45ec49f5d8", null ],
+    [ "exponential_moving_average", "classliarsdice_1_1statistics_1_1TimeSeries.html#a5f890939ac69959c40e06afb368b0a81", null ],
+    [ "get_data", "classliarsdice_1_1statistics_1_1TimeSeries.html#a0fc458962a925a5bed72c7138c72478e", null ],
+    [ "get_window", "classliarsdice_1_1statistics_1_1TimeSeries.html#ae677250033e717219ebf54cc1638e934", null ],
+    [ "latest", "classliarsdice_1_1statistics_1_1TimeSeries.html#aa9371398a0ca36361d836e1c25023dba", null ],
+    [ "linear_trend", "classliarsdice_1_1statistics_1_1TimeSeries.html#a476912c035f98e2c893951a0d90bc093", null ],
+    [ "oldest", "classliarsdice_1_1statistics_1_1TimeSeries.html#a5e4c799c3f478342e90055bd46e728bd", null ],
+    [ "rate_of_change", "classliarsdice_1_1statistics_1_1TimeSeries.html#aeffe941a6274eafd5c88c65aac1606de", null ],
+    [ "resample", "classliarsdice_1_1statistics_1_1TimeSeries.html#a844676c4b2ec07e2054b394cafa66d5d", null ],
+    [ "savitzky_golay_filter", "classliarsdice_1_1statistics_1_1TimeSeries.html#acc5cebc34edd45c058d5e3069033c750", null ],
+    [ "simple_moving_average", "classliarsdice_1_1statistics_1_1TimeSeries.html#a2f7d048c9dbff2d0ee18112bc733f355", null ],
+    [ "size", "classliarsdice_1_1statistics_1_1TimeSeries.html#ac9ff63c6a5356c58baf46d91d37c6d84", null ],
+    [ "buffer_", "classliarsdice_1_1statistics_1_1TimeSeries.html#a44255837f5f413514d8082022ff3a75c", null ]
+];

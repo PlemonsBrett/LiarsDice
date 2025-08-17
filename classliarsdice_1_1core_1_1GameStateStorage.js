@@ -1,0 +1,27 @@
+var classliarsdice_1_1core_1_1GameStateStorage =
+[
+    [ "ActivePlayerSet", "classliarsdice_1_1core_1_1GameStateStorage.html#a4e025cab727861fca2a5d7d365e86721", null ],
+    [ "DiceCount", "classliarsdice_1_1core_1_1GameStateStorage.html#a71709da8036ac6a4d778b205674dacec", null ],
+    [ "FaceValue", "classliarsdice_1_1core_1_1GameStateStorage.html#a000ddec050922e6cf313e935607fdeff", null ],
+    [ "PlayerDataMap", "classliarsdice_1_1core_1_1GameStateStorage.html#a9d665280ffae2b4ab57f231f96d9f36e", null ],
+    [ "PlayerId", "classliarsdice_1_1core_1_1GameStateStorage.html#ac53b1ef7dbbd7c88f9d4de43b75e5825", null ],
+    [ "Points", "classliarsdice_1_1core_1_1GameStateStorage.html#acfe1e23ed9183386b8f5e9626f27a0e2", null ],
+    [ "GameStateStorage", "classliarsdice_1_1core_1_1GameStateStorage.html#a31a1efd01f4f0840b6b843014fef6fb9", null ],
+    [ "~GameStateStorage", "classliarsdice_1_1core_1_1GameStateStorage.html#a2fb514b2f3ba6aa2be01abe9a0016b72", null ],
+    [ "GameStateStorage", "classliarsdice_1_1core_1_1GameStateStorage.html#a0f0ec9a7d09fac54f554c27f81c9b741", null ],
+    [ "GameStateStorage", "classliarsdice_1_1core_1_1GameStateStorage.html#a2a275b072c335291ac8a9a6f2dde9b48", null ],
+    [ "add_active_player", "classliarsdice_1_1core_1_1GameStateStorage.html#a7d947b6e8babbba99b3b3e6470520831", null ],
+    [ "clear", "classliarsdice_1_1core_1_1GameStateStorage.html#acaacfc476e5c011be8ed11bb88f7e5d7", null ],
+    [ "get_active_players", "classliarsdice_1_1core_1_1GameStateStorage.html#a4e014a3ad5072b482ade2d40eeacc9e1", null ],
+    [ "get_player_state", "classliarsdice_1_1core_1_1GameStateStorage.html#a054a864d205eb547a50d4ae20ec81153", null ],
+    [ "get_player_state", "classliarsdice_1_1core_1_1GameStateStorage.html#a0457b5c71652e4e585005a4218eb1327", null ],
+    [ "is_player_active", "classliarsdice_1_1core_1_1GameStateStorage.html#a5252828996d000a05bfb9001214f06cd", null ],
+    [ "memory_usage", "classliarsdice_1_1core_1_1GameStateStorage.html#a13e9c760dc1d371bec3d3458d58fcc31", null ],
+    [ "operator=", "classliarsdice_1_1core_1_1GameStateStorage.html#af09b8c30a1c75b974895a75d85141e4e", null ],
+    [ "operator=", "classliarsdice_1_1core_1_1GameStateStorage.html#a552bbedec8b29d2947dcd12a0a422ca4", null ],
+    [ "remove_active_player", "classliarsdice_1_1core_1_1GameStateStorage.html#a60ba275cf95ce589eab34598d35fc43e", null ],
+    [ "size", "classliarsdice_1_1core_1_1GameStateStorage.html#aa9d7b14d4d231779f38758dde7d68336", null ],
+    [ "store_player_state", "classliarsdice_1_1core_1_1GameStateStorage.html#aa50c8cdeca684beb0ae95e535db6a2c3", null ],
+    [ "active_players_", "classliarsdice_1_1core_1_1GameStateStorage.html#ab0ac02a163a7d119483a7d903f3b351f", null ],
+    [ "player_states_", "classliarsdice_1_1core_1_1GameStateStorage.html#a885eb427dfe1f0a1fb94cd0a42cf7971", null ]
+];

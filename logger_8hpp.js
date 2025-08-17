@@ -1,0 +1,26 @@
+var logger_8hpp =
+[
+    [ "liarsdice::logging::LoggerConfig", "structliarsdice_1_1logging_1_1LoggerConfig.html", "structliarsdice_1_1logging_1_1LoggerConfig" ],
+    [ "liarsdice::logging::ILogger", "classliarsdice_1_1logging_1_1ILogger.html", "classliarsdice_1_1logging_1_1ILogger" ],
+    [ "liarsdice::logging::BoostLogger", "classliarsdice_1_1logging_1_1BoostLogger.html", "classliarsdice_1_1logging_1_1BoostLogger" ],
+    [ "liarsdice::logging::LoggerManager", "classliarsdice_1_1logging_1_1LoggerManager.html", "classliarsdice_1_1logging_1_1LoggerManager" ],
+    [ "AI_LOG_DEBUG", "logger_8hpp.html#afb3782c101583047e4ecb08ac1fa3901", null ],
+    [ "AI_LOG_ERROR", "logger_8hpp.html#af7f7d4386f3cf6d1c23f3d35ac174f30", null ],
+    [ "AI_LOG_INFO", "logger_8hpp.html#a42f8178c956718cd0ef2be25d704cfb0", null ],
+    [ "AI_LOG_WARNING", "logger_8hpp.html#ad6ad0684ee2d05c2694d04f54ed42d36", null ],
+    [ "GAME_LOG_DEBUG", "logger_8hpp.html#a60b289d8344b756d5765b9c8d07db78d", null ],
+    [ "GAME_LOG_ERROR", "logger_8hpp.html#ae76642752d694a1537df5d5062e85e2a", null ],
+    [ "GAME_LOG_INFO", "logger_8hpp.html#a81186d3c47da263873c17c679bfba92c", null ],
+    [ "GAME_LOG_WARNING", "logger_8hpp.html#a17e65a0145e7fafd2111559bf012fcf8", null ],
+    [ "LOG_DEBUG", "logger_8hpp.html#a77827b397e6aeebee4d410a604af8d19", null ],
+    [ "LOG_ERROR", "logger_8hpp.html#a9dd6e4ff7d1ad86be0489b1faa8b0f09", null ],
+    [ "LOG_FATAL", "logger_8hpp.html#aae4dba40a58c746d5b1f7387767af538", null ],
+    [ "LOG_INFO", "logger_8hpp.html#a22f93952919677e2be7c01bcb6f6c13e", null ],
+    [ "LOG_TRACE", "logger_8hpp.html#ad043d5b1eb60966201818a821f7e3a3e", null ],
+    [ "LOG_WARNING", "logger_8hpp.html#a5cc99dd77e66cb4eefb3993cc94be5fa", null ],
+    [ "PLAYER_LOG_DEBUG", "logger_8hpp.html#afe550585e54cfe8d510b2c158b3b6a5a", null ],
+    [ "PLAYER_LOG_ERROR", "logger_8hpp.html#a47229a090de9db038f2e0f33597430c8", null ],
+    [ "PLAYER_LOG_INFO", "logger_8hpp.html#a5808f8c3a8ecdc6d2495625dbd7bf771", null ],
+    [ "PLAYER_LOG_WARNING", "logger_8hpp.html#aa4a967c3589e5a47904737fa430a433e", null ],
+    [ "Severity", "logger_8hpp.html#ac97a4572c66d90db43aeb8a89f03b51c", null ]
+];

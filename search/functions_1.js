@@ -1,0 +1,27 @@
+var searchData=
+[
+  ['back_0',['back',['../classliarsdice_1_1data__structures_1_1CircularBuffer.html#a00a7100b4f69011a524256fb64a10dbf',1,'liarsdice::data_structures::CircularBuffer::back()'],['../classliarsdice_1_1data__structures_1_1CircularBuffer.html#a9479b96cf9fffa91e3d4e56c6834d4f6',1,'liarsdice::data_structures::CircularBuffer::back() const']]],
+  ['backupmanager_1',['BackupManager',['../classliarsdice_1_1database_1_1BackupManager.html#af3bc5fd5305d9a66948264a278b9726c',1,'liarsdice::database::BackupManager']]],
+  ['baseline_2',['baseline',['../classliarsdice_1_1database_1_1SchemaManager.html#a1b8ae8407ced28d52e9fbf9e7f76e823',1,'liarsdice::database::SchemaManager']]],
+  ['batch_5fprobability_3',['batch_probability',['../classliarsdice_1_1performance_1_1SimdDiceProbability.html#a5757b80661b8b35b897399f46320612a',1,'liarsdice::performance::SimdDiceProbability']]],
+  ['bayes_5ffactor_4',['bayes_factor',['../classliarsdice_1_1bayesian_1_1BayesianAnalyzer.html#a1d9f8c654dcdb19fd32d2114eeacbd0e',1,'liarsdice::bayesian::BayesianAnalyzer']]],
+  ['bayesiananalyzer_5',['BayesianAnalyzer',['../classliarsdice_1_1bayesian_1_1BayesianAnalyzer.html#a957cf97b9da95ac75af89b536bacd42e',1,'liarsdice::bayesian::BayesianAnalyzer']]],
+  ['begin_6',['begin',['../classliarsdice_1_1data__structures_1_1CircularBuffer.html#a858dcfd3c53003cb55e77f21443bc052',1,'liarsdice::data_structures::CircularBuffer::begin()'],['../classliarsdice_1_1data__structures_1_1CircularBuffer.html#a2655ce5b2b84432b7d07eca02ac57e33',1,'liarsdice::data_structures::CircularBuffer::begin() const']]],
+  ['begin_5ftransaction_7',['begin_transaction',['../classliarsdice_1_1database_1_1DatabaseManager.html#a1c2c3fdd03bd35dfd81e6a59d13e00c7',1,'liarsdice::database::DatabaseManager::begin_transaction()'],['../classliarsdice_1_1database_1_1DatabaseConnection.html#a711de83ed678a6f408538dd4e5ff4aa5',1,'liarsdice::database::DatabaseConnection::begin_transaction()']]],
+  ['beta_8',['beta',['../classliarsdice_1_1bayesian_1_1BetaPrior.html#ae9d1de1592380bf56458bd8083c6908b',1,'liarsdice::bayesian::BetaPrior::beta()'],['../classliarsdice_1_1bayesian_1_1GammaPrior.html#a37fe53704564c6f2697ce7fa199a10d1',1,'liarsdice::bayesian::GammaPrior::beta()'],['../classliarsdice_1_1statistics_1_1BetaDistribution.html#ab3445719640f81144bdd46eed080fdb7',1,'liarsdice::statistics::BetaDistribution::beta() const']]],
+  ['betadistribution_9',['BetaDistribution',['../classliarsdice_1_1statistics_1_1BetaDistribution.html#afc471001eadf25b99e192ab43cbb9ce9',1,'liarsdice::statistics::BetaDistribution']]],
+  ['betaprior_10',['BetaPrior',['../classliarsdice_1_1bayesian_1_1BetaPrior.html#a900c5cd77edce9dc1adc39186bae634e',1,'liarsdice::bayesian::BetaPrior']]],
+  ['bin_5fcenters_11',['bin_centers',['../classliarsdice_1_1statistics_1_1Histogram.html#a2bea31ccc543c6288efd18cd21102a60',1,'liarsdice::statistics::Histogram']]],
+  ['bin_5fcount_12',['bin_count',['../classliarsdice_1_1statistics_1_1Histogram.html#a3efc0d961255529785c0c8132f51c251',1,'liarsdice::statistics::Histogram']]],
+  ['bin_5fcounts_13',['bin_counts',['../classliarsdice_1_1statistics_1_1Histogram.html#adb0a8eb051a926074d4523918cbe4280',1,'liarsdice::statistics::Histogram']]],
+  ['bin_5fedges_14',['bin_edges',['../classliarsdice_1_1statistics_1_1Histogram.html#a93349e98341dd2f0f09025cd0c8cf86a',1,'liarsdice::statistics::Histogram']]],
+  ['bind_15',['bind',['../classliarsdice_1_1database_1_1PreparedStatement.html#aced24f6cfa2205a9cb40d77c2994c49b',1,'liarsdice::database::PreparedStatement::bind(int index, const ValueType &amp;value)'],['../classliarsdice_1_1database_1_1PreparedStatement.html#a5dcdc35cbe667497aae49f20a4e23bcc',1,'liarsdice::database::PreparedStatement::bind(const std::string &amp;name, const ValueType &amp;value)']]],
+  ['bind_5finstance_16',['bind_instance',['../namespaceliarsdice_1_1di.html#ae0055a01cd6d778379f1667c56c22529',1,'liarsdice::di']]],
+  ['bind_5finterface_17',['bind_interface',['../namespaceliarsdice_1_1di.html#abfb42755bd74b03f02a5a18a2c688bbd',1,'liarsdice::di']]],
+  ['bind_5fmock_18',['bind_mock',['../namespaceliarsdice_1_1di_1_1testing.html#a304b95c218de1d9bfb3d71f0cb6d1317',1,'liarsdice::di::testing']]],
+  ['bind_5fsingleton_19',['bind_singleton',['../namespaceliarsdice_1_1di.html#a7f1400b1e4766c5797c972e312a717f2',1,'liarsdice::di']]],
+  ['binomial_5fcoeff_20',['binomial_coeff',['../classliarsdice_1_1performance_1_1SimdDiceProbability.html#a7ce753e8e66d8a65b4a84e67f1b2c8fa',1,'liarsdice::performance::SimdDiceProbability']]],
+  ['binomialdistribution_21',['BinomialDistribution',['../classliarsdice_1_1statistics_1_1BinomialDistribution.html#aab732321412ce402594e2b7238b8db19',1,'liarsdice::statistics::BinomialDistribution']]],
+  ['binomiallikelihood_22',['BinomialLikelihood',['../classliarsdice_1_1bayesian_1_1BinomialLikelihood.html#ad78d8b76330e570bb56d3de33d442e95',1,'liarsdice::bayesian::BinomialLikelihood']]],
+  ['boostlogger_23',['BoostLogger',['../classliarsdice_1_1logging_1_1BoostLogger.html#abae43cefc02f4ecdb33712e9a8ca7dbc',1,'liarsdice::logging::BoostLogger']]]
+];

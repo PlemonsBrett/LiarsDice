@@ -1,0 +1,27 @@
+var searchData=
+[
+  ['id_0',['id',['../structliarsdice_1_1ui_1_1UIConfig_1_1MenuItem.html#aa9d532deea80e2aff163bc6939ff8894',1,'liarsdice::ui::UIConfig::MenuItem::id'],['../structliarsdice_1_1ui_1_1UIConfig_1_1Menu.html#a393addf456bd3dca6473d80627a357ea',1,'liarsdice::ui::UIConfig::Menu::id'],['../structliarsdice_1_1ui_1_1UIConfig_1_1Prompt.html#a0a66684f5df2d2b99878bf945a575dde',1,'liarsdice::ui::UIConfig::Prompt::id'],['../structliarsdice_1_1ui_1_1UIConfig_1_1Message.html#acd4ad497e50485230a15bdf9eb4ec321',1,'liarsdice::ui::UIConfig::Message::id'],['../structliarsdice_1_1database_1_1SchemaVersion.html#a6dfa920dec021412005c9388d17d7b1e',1,'liarsdice::database::SchemaVersion::id']]],
+  ['id_5f_1',['id_',['../classliarsdice_1_1core_1_1Player.html#a4456d0ef38801b996cd6e71addf4cd8f',1,'liarsdice::core::Player']]],
+  ['idle_5ftimeout_2',['idle_timeout',['../structliarsdice_1_1database_1_1ConnectionPool_1_1PoolConfig.html#af506dc15abf095d92ac8944283d24cd8',1,'liarsdice::database::ConnectionPool::PoolConfig']]],
+  ['importance_5fweights_5f_3',['importance_weights_',['../classliarsdice_1_1bayesian_1_1PosteriorCalculator.html#ad40a89024ae085c448ab744f9d28832a',1,'liarsdice::bayesian::PosteriorCalculator']]],
+  ['in_5ftransaction_5f_4',['in_transaction_',['../classliarsdice_1_1database_1_1DatabaseManager.html#aba66494a9e8c168ed938c8eb20429faf',1,'liarsdice::database::DatabaseManager']]],
+  ['information_5fgain_5',['information_gain',['../structliarsdice_1_1bayesian_1_1BayesianAnalyzer_1_1DiagnosticInfo.html#a97a7614db0220453370b3f1f96cbb1d1',1,'liarsdice::bayesian::BayesianAnalyzer::DiagnosticInfo']]],
+  ['init_5fflag_5f_6',['init_flag_',['../classliarsdice_1_1database_1_1ConnectionManager.html#a2d2dad0cd75716df6127e979985166c5',1,'liarsdice::database::ConnectionManager']]],
+  ['init_5ffunc_7',['init_func',['../structliarsdice_1_1database_1_1SQLiteExtensionManager_1_1Extension.html#a7688847234e2b63f0d54a6b092b2baf1',1,'liarsdice::database::SQLiteExtensionManager::Extension']]],
+  ['initial_5fdice_5fcount_8',['INITIAL_DICE_COUNT',['../classliarsdice_1_1core_1_1Player.html#a6c1b66b8bde070a489afe378a8f45c52',1,'liarsdice::core::Player']]],
+  ['initial_5fpoints_9',['INITIAL_POINTS',['../classliarsdice_1_1core_1_1Player.html#a2d69fd8c2654702cb368bb0204937126',1,'liarsdice::core::Player']]],
+  ['initialized_5f_10',['initialized_',['../classliarsdice_1_1logging_1_1LoggerManager.html#a089c74cf7d4d77335a6e0f194a9ec8ad',1,'liarsdice::logging::LoggerManager']]],
+  ['instance_11',['instance',['../structliarsdice_1_1di_1_1ServiceContainer_1_1ServiceInfo.html#a888c038af564709878a19e2e998feb2a',1,'liarsdice::di::ServiceContainer::ServiceInfo']]],
+  ['instance_5f_12',['instance_',['../classliarsdice_1_1database_1_1ConnectionManager.html#a8c2d6f809d7697d94ee04b1171371cc5',1,'liarsdice::database::ConnectionManager']]],
+  ['invalid_5fmsg_13',['INVALID_MSG',['../classliarsdice_1_1app_1_1Application.html#a17aa3003607f4e12498535943a6b3ac1',1,'liarsdice::app::Application']]],
+  ['io_5fcontext_5f_14',['io_context_',['../classliarsdice_1_1database_1_1ConnectionManager.html#a4bd1357c7e80330aec5aaaab1d309def',1,'liarsdice::database::ConnectionManager::io_context_'],['../classliarsdice_1_1database_1_1ConnectionPool.html#a558702f5e4bbfa54234ba7c1a7fe3ebb',1,'liarsdice::database::ConnectionPool::io_context_']]],
+  ['is_5factive_15',['is_active',['../structliarsdice_1_1core_1_1CompactGameState_1_1PlayerState.html#a61fdd6210841bb68cb8345b60c653224',1,'liarsdice::core::CompactGameState::PlayerState']]],
+  ['is_5fapplied_16',['is_applied',['../structliarsdice_1_1database_1_1SchemaVersion.html#a1a553d12efc63896572e9c1301f8a7ea',1,'liarsdice::database::SchemaVersion']]],
+  ['is_5fcompressed_17',['is_compressed',['../structliarsdice_1_1database_1_1BackupInfo.html#a8eabc14e8a561064a973a9706c0d7233',1,'liarsdice::database::BackupInfo']]],
+  ['is_5fconjugate_5f_18',['is_conjugate_',['../classliarsdice_1_1bayesian_1_1PosteriorCalculator.html#afce89d9b86e17164c554fdb11581e4e6',1,'liarsdice::bayesian::PosteriorCalculator']]],
+  ['is_5finitialized_5f_19',['is_initialized_',['../classliarsdice_1_1database_1_1ConnectionManager.html#a2d558b425c007332cbcf72e567273720',1,'liarsdice::database::ConnectionManager']]],
+  ['is_5frunning_5f_20',['is_running_',['../classliarsdice_1_1database_1_1ConnectionPool.html#afeab1d33924f0589c34643f93823dcd1',1,'liarsdice::database::ConnectionPool']]],
+  ['is_5fupdate_21',['is_update',['../structliarsdice_1_1database_1_1SeedDataEntry.html#a6c097845f309b2460c96279b4e46099c',1,'liarsdice::database::SeedDataEntry']]],
+  ['is_5fvalid_22',['is_valid',['../structliarsdice_1_1database_1_1ValidationReport.html#a1fc9b7ab604c79381b6f664c0ddf9be3',1,'liarsdice::database::ValidationReport']]],
+  ['items_23',['items',['../structliarsdice_1_1ui_1_1UIConfig_1_1Menu.html#a270997cea28563ccb2e15515910c9897',1,'liarsdice::ui::UIConfig::Menu']]]
+];
