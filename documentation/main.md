@@ -12,7 +12,7 @@ comprehensive testing framework.
 
 # Key Features
 
-- **Multiple AI Difficulty Levels**: Easy, Medium, and Hard AI players with different strategies
+- **Multiple AI Difficulty Levels**: Easy and Medium AI players with different strategies
 - **Point-based Elimination System**: Players start with 5 points and lose them based on game outcomes
 - **Optimized Game State Storage**: Bit-packed representations and cache-efficient data structures
 - **Database Integration**: SQLite-based persistent storage for game history and statistics
@@ -38,8 +38,7 @@ comprehensive testing framework.
 - @subpage ai_system "AI System Overview" - AI architecture and strategies
 - @ref liarsdice::ai::AIPlayer "AI Player" - AI player implementation
 - @ref liarsdice::ai::EasyAIStrategy "Easy AI" - Simple heuristics-based AI
-- @ref liarsdice::ai::MediumAIStrategy "Medium AI" - Statistical analysis AI
-- @ref liarsdice::ai::HardAIStrategy "Hard AI" - Advanced pattern recognition AI
+- @ref liarsdice::ai::MediumAIStrategy "Medium AI" - Statistical analysis AI with pattern recognition
 
 ## Data Structures & Optimization
 
@@ -96,10 +95,11 @@ comprehensive testing framework.
 # All tests
 ./test.sh
 
-# Specific unit test
+# Specific unit tests
 ./build/test/test_game
 ./build/test/test_ai
 ./build/test/test_database
+./build/test/test_database_manager
 
 # Robot Framework tests
 ./test/robot/run_tests.sh

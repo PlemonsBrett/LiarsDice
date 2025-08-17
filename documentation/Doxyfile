@@ -54,9 +54,6 @@ TREEVIEW_WIDTH = 250
 SEARCHENGINE = YES
 SERVER_BASED_SEARCH = NO
 
-# Main page configuration
-USE_MDFILE_AS_MAINPAGE = @DOXYGEN_PROJECT_ROOT@/documentation/main.md
-
 # Include all directories, files and namespaces in the documentation
 # Disable to include only explicitly documented objects
 M_SHOW_UNDOCUMENTED = YES

@@ -60,138 +60,161 @@
  * 
  * @section database_schema Database Schema
  * 
- * @subsection schema_tables Core Tables
+ * @subsection schema_tables Core Tables (V001 - Initial Schema)
  * 
- * **games** - Game session information
+ * **players** - Player account information
  * @code{.sql}
- * CREATE TABLE games (
+ * CREATE TABLE players (
  *     id INTEGER PRIMARY KEY AUTOINCREMENT,
- *     session_id TEXT UNIQUE NOT NULL,
- *     start_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
- *     end_time TIMESTAMP,
- *     winner_id INTEGER,
+ *     username TEXT NOT NULL UNIQUE,
+ *     display_name TEXT NOT NULL,
+ *     email TEXT UNIQUE,
+ *     total_games INTEGER DEFAULT 0,
+ *     games_won INTEGER DEFAULT 0,
+ *     games_lost INTEGER DEFAULT 0,
+ *     total_points INTEGER DEFAULT 0,
+ *     highest_score INTEGER DEFAULT 0,
+ *     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ *     last_login TIMESTAMP,
+ *     is_active BOOLEAN DEFAULT 1
+ * );
+ * @endcode
+ * 
+ * **game_history** - Game session records
+ * @code{.sql}
+ * CREATE TABLE game_history (
+ *     id INTEGER PRIMARY KEY AUTOINCREMENT,
+ *     game_uuid TEXT NOT NULL UNIQUE,
+ *     started_at TIMESTAMP NOT NULL,
+ *     ended_at TIMESTAMP,
+ *     total_players INTEGER NOT NULL,
  *     total_rounds INTEGER DEFAULT 0,
- *     game_mode TEXT,
- *     seed INTEGER,
+ *     winner_id INTEGER,
+ *     game_mode TEXT DEFAULT 'classic',
+ *     is_completed BOOLEAN DEFAULT 0,
  *     FOREIGN KEY (winner_id) REFERENCES players(id)
  * );
  * @endcode
  * 
- * **players** - Player information
+ * **game_participants** - Player participation in games
  * @code{.sql}
- * CREATE TABLE players (
- *     id INTEGER PRIMARY KEY AUTOINCREMENT,
- *     name TEXT UNIQUE NOT NULL,
- *     type TEXT CHECK(type IN ('human', 'ai_easy', 'ai_medium', 'ai_hard')),
- *     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
- *     games_played INTEGER DEFAULT 0,
- *     games_won INTEGER DEFAULT 0,
- *     total_points_lost INTEGER DEFAULT 0,
- *     total_bluffs INTEGER DEFAULT 0,
- *     successful_bluffs INTEGER DEFAULT 0,
- *     total_calls INTEGER DEFAULT 0,
- *     successful_calls INTEGER DEFAULT 0
- * );
- * @endcode
- * 
- * **game_players** - Players in each game
- * @code{.sql}
- * CREATE TABLE game_players (
+ * CREATE TABLE game_participants (
  *     game_id INTEGER NOT NULL,
  *     player_id INTEGER NOT NULL,
- *     position INTEGER NOT NULL,
+ *     starting_position INTEGER NOT NULL,
  *     final_position INTEGER,
- *     points_lost INTEGER DEFAULT 0,
+ *     points_scored INTEGER DEFAULT 0,
  *     rounds_survived INTEGER DEFAULT 0,
+ *     total_guesses INTEGER DEFAULT 0,
+ *     successful_calls INTEGER DEFAULT 0,
+ *     bluffs_attempted INTEGER DEFAULT 0,
+ *     bluffs_caught INTEGER DEFAULT 0,
  *     PRIMARY KEY (game_id, player_id),
- *     FOREIGN KEY (game_id) REFERENCES games(id),
+ *     FOREIGN KEY (game_id) REFERENCES game_history(id),
  *     FOREIGN KEY (player_id) REFERENCES players(id)
  * );
  * @endcode
  * 
- * **rounds** - Individual game rounds
+ * **achievements** - Achievement definitions
  * @code{.sql}
- * CREATE TABLE rounds (
+ * CREATE TABLE achievements (
+ *     id INTEGER PRIMARY KEY AUTOINCREMENT,
+ *     code TEXT NOT NULL UNIQUE,
+ *     name TEXT NOT NULL,
+ *     description TEXT,
+ *     points INTEGER DEFAULT 0,
+ *     icon_path TEXT,
+ *     category TEXT DEFAULT 'general'
+ * );
+ * @endcode
+ * 
+ * **player_achievements** - Player earned achievements
+ * @code{.sql}
+ * CREATE TABLE player_achievements (
+ *     player_id INTEGER NOT NULL,
+ *     achievement_id INTEGER NOT NULL,
+ *     earned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ *     game_id INTEGER,
+ *     PRIMARY KEY (player_id, achievement_id),
+ *     FOREIGN KEY (player_id) REFERENCES players(id),
+ *     FOREIGN KEY (achievement_id) REFERENCES achievements(id),
+ *     FOREIGN KEY (game_id) REFERENCES game_history(id)
+ * );
+ * @endcode
+ * 
+ * @subsection schema_statistics Statistics Tables (V002 - Statistics)
+ * 
+ * **game_rounds** - Round-by-round game details
+ * @code{.sql}
+ * CREATE TABLE game_rounds (
  *     id INTEGER PRIMARY KEY AUTOINCREMENT,
  *     game_id INTEGER NOT NULL,
  *     round_number INTEGER NOT NULL,
- *     starting_player_id INTEGER,
+ *     starting_player_id INTEGER NOT NULL,
  *     ending_player_id INTEGER,
- *     last_guess_count INTEGER,
- *     last_guess_face INTEGER,
+ *     total_dice INTEGER NOT NULL,
+ *     final_guess_count INTEGER,
+ *     final_guess_face INTEGER,
  *     actual_count INTEGER,
- *     was_bluff BOOLEAN,
- *     duration_ms INTEGER,
- *     FOREIGN KEY (game_id) REFERENCES games(id),
+ *     liar_called BOOLEAN DEFAULT 0,
+ *     duration_seconds INTEGER,
+ *     FOREIGN KEY (game_id) REFERENCES game_history(id),
  *     FOREIGN KEY (starting_player_id) REFERENCES players(id),
  *     FOREIGN KEY (ending_player_id) REFERENCES players(id)
  * );
  * @endcode
  * 
- * **actions** - Player actions within rounds
+ * **player_actions** - Individual player actions
  * @code{.sql}
- * CREATE TABLE actions (
- *     id INTEGER PRIMARY KEY AUTOINCREMENT,
- *     round_id INTEGER NOT NULL,
- *     player_id INTEGER NOT NULL,
- *     action_type TEXT CHECK(action_type IN ('guess', 'call_liar')),
- *     guess_count INTEGER,
- *     guess_face INTEGER,
- *     dice_state TEXT,  -- JSON array of dice values
- *     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
- *     decision_time_ms INTEGER,
- *     FOREIGN KEY (round_id) REFERENCES rounds(id),
- *     FOREIGN KEY (player_id) REFERENCES players(id)
- * );
- * @endcode
- * 
- * @subsection schema_ai_tables AI Analysis Tables
- * 
- * **ai_patterns** - Detected player behavior patterns
- * @code{.sql}
- * CREATE TABLE ai_patterns (
- *     id INTEGER PRIMARY KEY AUTOINCREMENT,
- *     player_id INTEGER NOT NULL,
- *     pattern_type TEXT,
- *     pattern_sequence TEXT,
- *     occurrence_count INTEGER DEFAULT 1,
- *     success_rate REAL,
- *     last_seen TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
- *     FOREIGN KEY (player_id) REFERENCES players(id)
- * );
- * @endcode
- * 
- * **ai_predictions** - AI prediction accuracy tracking
- * @code{.sql}
- * CREATE TABLE ai_predictions (
+ * CREATE TABLE player_actions (
  *     id INTEGER PRIMARY KEY AUTOINCREMENT,
  *     game_id INTEGER NOT NULL,
- *     ai_player_id INTEGER NOT NULL,
- *     target_player_id INTEGER NOT NULL,
- *     prediction_type TEXT,
- *     predicted_value REAL,
- *     actual_value REAL,
- *     accuracy REAL,
- *     round_number INTEGER,
- *     FOREIGN KEY (game_id) REFERENCES games(id),
- *     FOREIGN KEY (ai_player_id) REFERENCES players(id),
- *     FOREIGN KEY (target_player_id) REFERENCES players(id)
+ *     round_number INTEGER NOT NULL,
+ *     player_id INTEGER NOT NULL,
+ *     action_type TEXT NOT NULL, -- 'guess', 'call_liar'
+ *     action_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ *     guess_count INTEGER,
+ *     guess_face INTEGER,
+ *     was_bluff BOOLEAN,
+ *     was_correct BOOLEAN,
+ *     FOREIGN KEY (game_id) REFERENCES game_history(id),
+ *     FOREIGN KEY (player_id) REFERENCES players(id)
  * );
  * @endcode
  * 
- * @subsection schema_performance_tables Performance Tables
- * 
- * **performance_metrics** - System performance tracking
+ * **player_statistics** - Aggregated player statistics
  * @code{.sql}
- * CREATE TABLE performance_metrics (
- *     id INTEGER PRIMARY KEY AUTOINCREMENT,
- *     metric_name TEXT NOT NULL,
- *     metric_value REAL NOT NULL,
- *     unit TEXT,
- *     context TEXT,
- *     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+ * CREATE TABLE player_statistics (
+ *     player_id INTEGER PRIMARY KEY,
+ *     avg_game_duration INTEGER DEFAULT 0,
+ *     avg_rounds_per_game REAL DEFAULT 0,
+ *     win_rate REAL DEFAULT 0,
+ *     favorite_dice_face INTEGER,
+ *     bluff_success_rate REAL DEFAULT 0,
+ *     call_accuracy_rate REAL DEFAULT 0,
+ *     most_played_hour INTEGER,
+ *     streak_current INTEGER DEFAULT 0,
+ *     streak_best INTEGER DEFAULT 0,
+ *     last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ *     FOREIGN KEY (player_id) REFERENCES players(id)
  * );
  * @endcode
+ * 
+ * **leaderboard_history** - Historical leaderboard snapshots
+ * @code{.sql}
+ * CREATE TABLE leaderboard_history (
+ *     id INTEGER PRIMARY KEY AUTOINCREMENT,
+ *     snapshot_date DATE NOT NULL,
+ *     rank INTEGER NOT NULL,
+ *     player_id INTEGER NOT NULL,
+ *     rating INTEGER NOT NULL,
+ *     games_played INTEGER NOT NULL,
+ *     win_rate REAL NOT NULL,
+ *     UNIQUE(snapshot_date, rank),
+ *     FOREIGN KEY (player_id) REFERENCES players(id)
+ * );
+ * @endcode
+ * 
  * 
  * @section database_operations Common Operations
  * 
@@ -205,29 +228,35 @@
  *     auto transaction = db.beginTransaction();
  *     
  *     try {
- *         // Save game session
- *         auto gameId = db.saveGameSession({
- *             .sessionId = game.getSessionId(),
- *             .startTime = game.getStartTime(),
- *             .endTime = game.getEndTime(),
- *             .winnerId = game.getWinner()->getId(),
+ *         // Save game history record
+ *         auto gameId = db.saveGameHistory({
+ *             .gameUuid = game.getUuid(),
+ *             .startedAt = game.getStartTime(),
+ *             .endedAt = game.getEndTime(),
+ *             .totalPlayers = game.getPlayerCount(),
  *             .totalRounds = game.getRoundCount(),
- *             .seed = game.getSeed()
+ *             .winnerId = game.getWinner()->getId(),
+ *             .gameMode = "classic",
+ *             .isCompleted = true
  *         });
  *         
- *         // Save player participation
+ *         // Save participant details
  *         for (const auto& player : game.getPlayers()) {
- *             db.saveGamePlayer(gameId, player->getId(), {
- *                 .position = player->getPosition(),
+ *             db.saveGameParticipant(gameId, player->getId(), {
+ *                 .startingPosition = player->getStartPosition(),
  *                 .finalPosition = player->getFinalPosition(),
- *                 .pointsLost = player->getPointsLost(),
- *                 .roundsSurvived = player->getRoundsSurvived()
+ *                 .pointsScored = player->getScore(),
+ *                 .roundsSurvived = player->getRoundsSurvived(),
+ *                 .totalGuesses = player->getGuessCount(),
+ *                 .successfulCalls = player->getSuccessfulCalls(),
+ *                 .bluffsAttempted = player->getBluffCount(),
+ *                 .bluffsCaught = player->getBluffsCaught()
  *             });
  *         }
  *         
- *         // Save round details
+ *         // Save round details (V002 schema)
  *         for (const auto& round : game.getRounds()) {
- *             db.saveRound(gameId, round);
+ *             db.saveGameRound(gameId, round);
  *         }
  *         
  *         transaction.commit();
@@ -241,37 +270,40 @@
  * @subsection db_query_stats Querying Statistics
  * 
  * @code{.cpp}
- * PlayerStatistics getPlayerStats(const std::string& playerName) {
+ * PlayerStatistics getPlayerStats(const std::string& username) {
  *     DatabaseManager db("game_data.db");
  *     
  *     auto stmt = db.prepare(R"(
  *         SELECT 
- *             games_played,
- *             games_won,
- *             CAST(games_won AS REAL) / NULLIF(games_played, 0) as win_rate,
- *             total_bluffs,
- *             successful_bluffs,
- *             CAST(successful_bluffs AS REAL) / NULLIF(total_bluffs, 0) as bluff_success_rate,
- *             total_calls,
- *             successful_calls,
- *             CAST(successful_calls AS REAL) / NULLIF(total_calls, 0) as call_success_rate
- *         FROM players
- *         WHERE name = ?
+ *             p.total_games,
+ *             p.games_won,
+ *             CAST(p.games_won AS REAL) / NULLIF(p.total_games, 0) as win_rate,
+ *             p.total_points,
+ *             p.highest_score,
+ *             ps.bluff_success_rate,
+ *             ps.call_accuracy_rate,
+ *             ps.avg_rounds_per_game,
+ *             ps.streak_current,
+ *             ps.streak_best
+ *         FROM players p
+ *         LEFT JOIN player_statistics ps ON p.id = ps.player_id
+ *         WHERE p.username = ?
  *     )");
  *     
- *     stmt.bind(1, playerName);
+ *     stmt.bind(1, username);
  *     
  *     if (stmt.step()) {
  *         return {
- *             .gamesPlayed = stmt.column<int>(0),
+ *             .totalGames = stmt.column<int>(0),
  *             .gamesWon = stmt.column<int>(1),
  *             .winRate = stmt.column<double>(2),
- *             .totalBluffs = stmt.column<int>(3),
- *             .successfulBluffs = stmt.column<int>(4),
+ *             .totalPoints = stmt.column<int>(3),
+ *             .highestScore = stmt.column<int>(4),
  *             .bluffSuccessRate = stmt.column<double>(5),
- *             .totalCalls = stmt.column<int>(6),
- *             .successfulCalls = stmt.column<int>(7),
- *             .callSuccessRate = stmt.column<double>(8)
+ *             .callAccuracyRate = stmt.column<double>(6),
+ *             .avgRoundsPerGame = stmt.column<double>(7),
+ *             .currentStreak = stmt.column<int>(8),
+ *             .bestStreak = stmt.column<int>(9)
  *         };
  *     }
  *     
@@ -279,36 +311,35 @@
  * }
  * @endcode
  * 
- * @subsection db_ai_patterns AI Pattern Analysis
+ * @subsection db_achievements Achievement Tracking
  * 
  * @code{.cpp}
- * std::vector<BehaviorPattern> analyzePlayerPatterns(int playerId) {
+ * void checkAndAwardAchievements(int playerId, int gameId) {
  *     DatabaseManager db("game_data.db");
  *     
+ *     // Check for perfect game achievement
  *     auto stmt = db.prepare(R"(
- *         SELECT 
- *             pattern_sequence,
- *             occurrence_count,
- *             success_rate
- *         FROM ai_patterns
- *         WHERE player_id = ?
- *         AND occurrence_count >= 3  -- Minimum sample size
- *         ORDER BY occurrence_count DESC
- *         LIMIT 10
+ *         SELECT points_scored 
+ *         FROM game_participants 
+ *         WHERE game_id = ? AND player_id = ?
  *     )");
  *     
- *     stmt.bind(1, playerId);
+ *     stmt.bind(1, gameId);
+ *     stmt.bind(2, playerId);
  *     
- *     std::vector<BehaviorPattern> patterns;
- *     while (stmt.step()) {
- *         patterns.push_back({
- *             .sequence = stmt.column<std::string>(0),
- *             .occurrences = stmt.column<int>(1),
- *             .successRate = stmt.column<double>(2)
- *         });
+ *     if (stmt.step()) {
+ *         int pointsScored = stmt.column<int>(0);
+ *         
+ *         // Award perfect game achievement if applicable
+ *         if (pointsScored == 5) {  // No points lost
+ *             db.execute(R"(
+ *                 INSERT OR IGNORE INTO player_achievements 
+ *                 (player_id, achievement_id, game_id)
+ *                 SELECT ?, id, ? FROM achievements 
+ *                 WHERE code = 'perfect_game'
+ *             )", playerId, gameId);
+ *         }
  *     }
- *     
- *     return patterns;
  * }
  * @endcode
  * 
@@ -316,23 +347,25 @@
  * 
  * @subsection db_indexing Indexing Strategy
  * 
- * Key indexes for optimal query performance:
+ * Key indexes for optimal query performance (created by migrations):
  * 
  * @code{.sql}
- * -- Game lookup
- * CREATE INDEX idx_games_session ON games(session_id);
- * CREATE INDEX idx_games_time ON games(start_time, end_time);
+ * -- Player lookups
+ * CREATE INDEX idx_players_username ON players(username);
+ * CREATE INDEX idx_players_email ON players(email);
+ * CREATE INDEX idx_players_last_login ON players(last_login);
  * 
- * -- Player statistics
- * CREATE INDEX idx_players_name ON players(name);
- * CREATE INDEX idx_game_players_player ON game_players(player_id);
+ * -- Game history queries
+ * CREATE INDEX idx_game_history_uuid ON game_history(game_uuid);
+ * CREATE INDEX idx_game_history_dates ON game_history(started_at, ended_at);
  * 
- * -- Round and action queries
- * CREATE INDEX idx_rounds_game ON rounds(game_id, round_number);
- * CREATE INDEX idx_actions_round ON actions(round_id, player_id);
+ * -- Round and action queries (V002)
+ * CREATE INDEX idx_game_rounds_game ON game_rounds(game_id);
+ * CREATE INDEX idx_player_actions_game ON player_actions(game_id, round_number);
+ * CREATE INDEX idx_player_actions_player ON player_actions(player_id);
  * 
- * -- Pattern analysis
- * CREATE INDEX idx_patterns_player ON ai_patterns(player_id, occurrence_count DESC);
+ * -- Leaderboard queries (V002)
+ * CREATE INDEX idx_leaderboard_date ON leaderboard_history(snapshot_date);
  * @endcode
  * 
  * @subsection db_optimization Query Optimization
