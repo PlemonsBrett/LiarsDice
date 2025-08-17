@@ -1,10 +1,10 @@
-cmake_minimum_required(VERSION 0.1...3.28)
+cmake_minimum_required(VERSION 1.0...3.28)
 
 # ---- Project ----
 
 project(
   LiarsDice
-  VERSION 0.1
+  VERSION 1.0
   LANGUAGES CXX C
 )
 
